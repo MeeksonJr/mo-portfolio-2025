@@ -75,9 +75,9 @@ export default function Footer() {
                 scale: [0.8, 1, 0.8],
               }}
               transition={{
-                duration: Math.random() * 4 + 3,
+                duration: 4.2,
                 repeat: Number.POSITIVE_INFINITY,
-                delay: Math.random() * 5,
+                delay: 2.1,
               }}
             />
           ))}

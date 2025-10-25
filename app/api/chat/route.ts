@@ -55,7 +55,7 @@ CONTACT:
 - Email: d.mohamed1504@gmail.com
 - Phone: +1 518-704-9000
 - GitHub: github.com/MeeksonJr
-- LinkedIn: linkedin.com/in/mohamed-datt-b60907296
+- LinkedIn: linkedin.com/in/mohamed-datt
 - Portfolio: mohameddatt.com
 
 PERSONALITY TRAITS: Resilient, Creative, Resourceful, Self-taught
@@ -146,8 +146,8 @@ export async function POST(req: Request) {
           console.log("🌟 Chat API: Initializing Gemini model")
           const profileData = await getMohamedProfileData()
 
-          // Try different Gemini models in order
-          const geminiModels = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]
+          // Try different Gemini models in order (updated to current models)
+          const geminiModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.5-pro"]
           let geminiSuccess = false
 
           for (const geminiModel of geminiModels) {
@@ -177,25 +177,49 @@ export async function POST(req: Request) {
       }
 
       console.log("📤 Chat API: Returning streaming response")
-
-      // Add additional headers for better streaming
-      const response = result.toDataStreamResponse({
-        headers: {
-          "Content-Type": "text/plain; charset=utf-8",
-          "Cache-Control": "no-cache",
-          Connection: "keep-alive",
-        },
-      })
-
-      console.log("🎯 Chat API: Response created successfully")
-      return response
+      console.log("🔍 Result type:", typeof result)
+      console.log("🔍 Result constructor:", result?.constructor?.name)
+      
+      // Try different methods available on the result object
+      if (typeof result.toTextStreamResponse === 'function') {
+        console.log("✅ Using toTextStreamResponse method")
+        return result.toTextStreamResponse()
+      } else if (typeof result.toUIMessageStreamResponse === 'function') {
+        console.log("✅ Using toUIMessageStreamResponse method")
+        return result.toUIMessageStreamResponse()
+      } else if (typeof result.toDataStreamResponse === 'function') {
+        console.log("✅ Using toDataStreamResponse method")
+        return result.toDataStreamResponse()
+      } else if (typeof result.toResponse === 'function') {
+        console.log("✅ Using toResponse method")
+        return result.toResponse()
+      } else if (result instanceof Response) {
+        console.log("✅ Result is already a Response object")
+        return result
+      } else {
+        console.log("❌ No valid response method found, creating fallback response")
+        // Fallback: create a simple streaming response
+        return new Response(JSON.stringify({ error: 'Invalid response format' }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
     } catch (modelError) {
       console.error("🔥 Chat API: Model-specific error:", {
         model,
         error: modelError.message,
         stack: modelError.stack,
       })
-      throw modelError
+      
+      // Return a user-friendly error response instead of throwing
+      return new Response(JSON.stringify({
+        error: "AI service is temporarily unavailable",
+        message: "Our AI assistant is currently experiencing issues. Please try again later or contact us directly through the contact form below.",
+        suggestion: "You can also reach out via email or use the contact form for immediate assistance."
+      }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
   } catch (error) {
     console.error("💥 Chat API Error:", {
@@ -206,13 +230,12 @@ export async function POST(req: Request) {
 
     return new Response(
       JSON.stringify({
-        error: "Failed to process chat request",
-        details: error.message,
-        timestamp: new Date().toISOString(),
-        model: req.body?.model || "unknown",
+        error: "AI service is temporarily unavailable",
+        message: "Our AI assistant is currently experiencing issues. Please try again later or contact us directly through the contact form below.",
+        suggestion: "You can also reach out via email or use the contact form for immediate assistance."
       }),
       {
-        status: 500,
+        status: 503,
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",

@@ -325,7 +325,7 @@ export default function MiniInspector() {
               <form onSubmit={handleSubmit} className="p-3 border-t border-gray-700 flex-shrink-0">
                 <div className="flex gap-2">
                   <input
-                    value={input}
+                    value={input || ""}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Ask about implementation details..."
                     className="flex-1 px-2 py-1 bg-gray-900 border border-gray-700 rounded text-white text-xs focus:border-green-400 focus:outline-none"
@@ -333,7 +333,7 @@ export default function MiniInspector() {
                   />
                   <button
                     type="submit"
-                    disabled={isLoading || !input.trim()}
+                    disabled={isLoading || !input?.trim()}
                     className="px-2 py-1 bg-green-400 text-black rounded hover:bg-green-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Send size={12} />

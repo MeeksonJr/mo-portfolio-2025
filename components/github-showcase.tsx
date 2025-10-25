@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Github, Star, GitFork, ExternalLink, Calendar, Eye, AlertCircle, RefreshCw } from 'lucide-react'
+import { Github, Star, GitFork, ExternalLink, Calendar, Eye, AlertCircle, RefreshCw } from "lucide-react"
 import { useState, useEffect } from "react"
 import Inspectable from "./inspectable"
 

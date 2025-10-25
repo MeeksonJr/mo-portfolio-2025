@@ -1,90 +1,39 @@
-"use client"
-import Hero from "@/components/hero"
-import About from "@/components/about"
-import Experience from "@/components/experience"
-import Education from "@/components/education"
-import Skills from "@/components/skills"
-import GitHubShowcase from "@/components/github-showcase"
+import HeroLight from "@/components/hero-light"
+import QuickStats from "@/components/quick-stats"
+import TechSnapshot from "@/components/tech-snapshot"
+import AboutLight from "@/components/about-light"
+import ProjectsLight from "@/components/projects-light"
+import ServicesPricing from "@/components/services-pricing"
+import CoursesSection from "@/components/courses-section"
 import Contact from "@/components/contact"
-import CommandHub from "@/components/command-hub"
-import Footer from "@/components/footer"
-import AIChatbotSimple from "@/components/ai-chatbot-simple"
+import FooterLight from "@/components/footer-light"
+import Navigation from "@/components/navigation"
+import AIChatbotEnhanced from "@/components/ai-chatbot-enhanced"
+import AIChatbotVoice from "@/components/ai-chatbot-voice"
+import MusicPlayer from "@/components/music-player"
 import ScrollProgress from "@/components/scroll-progress"
-import FloatingNav from "@/components/floating-nav"
-import { InspectModeProvider } from "@/components/inspect-mode-context"
-import MiniInspector from "@/components/mini-inspector"
-import Inspectable from "@/components/inspectable"
-import InspectToggle from "@/components/inspect-toggle"
-import TerminalAdventureEnhanced from "@/components/terminal-adventure-enhanced"
 
-export default function Portfolio() {
+export default function Home() {
   return (
-    <InspectModeProvider>
-      <div className="min-h-screen bg-black text-white font-mono">
-        <ScrollProgress />
-        <FloatingNav />
-        <InspectToggle />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <ScrollProgress />
+      <Navigation />
 
-        <Inspectable elementId="commandhub">
-          <CommandHub />
-        </Inspectable>
+      <main>
+        <HeroLight />
+        <QuickStats />
+        <TechSnapshot />
+        <AboutLight />
+        <ProjectsLight />
+        <ServicesPricing />
+        <CoursesSection />
+        <Contact />
+      </main>
 
-        <Inspectable elementId="hero">
-          <div id="hero">
-            <Hero />
-          </div>
-        </Inspectable>
-
-        <Inspectable elementId="about">
-          <div id="about">
-            <About />
-          </div>
-        </Inspectable>
-
-        <Inspectable elementId="experience">
-          <div id="experience">
-            <Experience />
-          </div>
-        </Inspectable>
-
-        <Inspectable elementId="education">
-          <div id="education">
-            <Education />
-          </div>
-        </Inspectable>
-
-        <Inspectable elementId="terminal-adventure">
-          <div id="projects">
-            <TerminalAdventureEnhanced />
-          </div>
-        </Inspectable>
-
-        <Inspectable elementId="skills">
-          <div id="skills">
-            <Skills />
-          </div>
-        </Inspectable>
-
-        <Inspectable elementId="github">
-          <div id="github">
-            <GitHubShowcase />
-          </div>
-        </Inspectable>
-
-        <Inspectable elementId="contact">
-          <div id="contact">
-            <Contact />
-          </div>
-        </Inspectable>
-
-        <Footer />
-
-        <Inspectable elementId="chatbot">
-          <AIChatbotSimple />
-        </Inspectable>
-
-        <MiniInspector />
-      </div>
-    </InspectModeProvider>
+      <FooterLight />
+      <AIChatbotEnhanced />
+      <AIChatbotVoice />
+      <MusicPlayer />
+    </div>
   )
 }

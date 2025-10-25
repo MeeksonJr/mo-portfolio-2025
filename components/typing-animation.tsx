@@ -16,8 +16,8 @@ export default function TypingAnimation({ text, speed = 30, onComplete, classNam
   useEffect(() => {
     if (currentIndex < text.length) {
       const timeout = setTimeout(() => {
-        setDisplayedText(prev => prev + text[currentIndex])
-        setCurrentIndex(prev => prev + 1)
+        setDisplayedText((prev) => prev + text[currentIndex])
+        setCurrentIndex((prev) => prev + 1)
       }, speed)
 
       return () => clearTimeout(timeout)
@@ -35,9 +35,7 @@ export default function TypingAnimation({ text, speed = 30, onComplete, classNam
   return (
     <span className={className}>
       {displayedText}
-      {currentIndex < text.length && (
-        <span className="animate-pulse">|</span>
-      )}
+      {currentIndex < text.length && <span className="animate-pulse">|</span>}
     </span>
   )
 }

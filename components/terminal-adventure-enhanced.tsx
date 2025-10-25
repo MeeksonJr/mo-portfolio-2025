@@ -1182,14 +1182,14 @@ export default function TerminalAdventureEnhanced() {
         window.open("mailto:d.mohamed1504@gmail.com?subject=Let's Connect - From Terminal Adventure Game", "_blank")
         break
       case "contact_linkedin":
-        window.open("https://linkedin.com/in/mohamed-datt-b60907296", "_blank")
+        window.open("https://linkedin.com/in/mohamed-datt", "_blank")
         break
       case "contact_github":
         window.open("https://github.com/MeeksonJr", "_blank")
         break
       case "contact_resume":
         const link = document.createElement("a")
-        link.href = "/resume-2025-Mohamed-Datt-Full Stack Developer (1).pdf"
+        link.href = "/resume-Mohamed-Datt-Full Stack Developer-2025.pdf"
         link.download = "Mohamed-Datt-Resume-2025.pdf"
         link.click()
         break

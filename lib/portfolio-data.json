@@ -1,0 +1,174 @@
+{
+  "personal": {
+    "name": "Mohamed Datt",
+    "title": "Creative Full-Stack Developer",
+    "tagline": "AI-driven web products & SaaS solutions",
+    "shortBio": "Born in Guinea, raised in NYC, now building in Norfolk. I design and ship AI-powered SaaS and web apps — from prototypes to live products. Available for freelance, partnerships, and full-time roles.",
+    "email": "d.mohamed1504@gmail.com",
+    "github": "https://github.com/MeeksonJr",
+    "linkedin": "https://www.linkedin.com/in/mohamed-datt-b60907296",
+    "location": "Norfolk, Virginia, USA",
+    "availability": "Available for opportunities",
+    "resume": "/resume-Mohamed-Datt-Full Stack Developer-2025.pdf"
+  },
+  "quickStats": [
+    { "label": "Years Coding", "value": "5+", "icon": "💻" },
+    { "label": "Projects Shipped", "value": "15+", "icon": "🚀" },
+    { "label": "Sites Sold", "value": "2", "icon": "💰" },
+    { "label": "Award Winner", "value": "1st Place", "icon": "🏆" }
+  ],
+  "coreTraits": [
+    { "trait": "Resilient", "description": "Overcame early challenges to thrive" },
+    { "trait": "Creative", "description": "Innovative problem solver" },
+    { "trait": "Resourceful", "description": "Maximizes every opportunity" },
+    { "trait": "Self-taught", "description": "Continuous learner" }
+  ],
+  "techStack": {
+    "frontend": [
+      { "name": "React", "level": "Expert", "icon": "⚛️" },
+      { "name": "Next.js", "level": "Expert", "icon": "▲" },
+      { "name": "TypeScript", "level": "Advanced", "icon": "📘" },
+      { "name": "TailwindCSS", "level": "Expert", "icon": "🎨" }
+    ],
+    "backend": [
+      { "name": "Node.js", "level": "Advanced", "icon": "🟢" },
+      { "name": "Supabase", "level": "Advanced", "icon": "⚡" },
+      { "name": "PostgreSQL", "level": "Intermediate", "icon": "🐘" },
+      { "name": "Firebase", "level": "Advanced", "icon": "🔥" }
+    ],
+    "ai": [
+      { "name": "Gemini 2.0", "level": "Advanced", "icon": "🤖" },
+      { "name": "Groq", "level": "Intermediate", "icon": "🧠" },
+      { "name": "Hugging Face", "level": "Intermediate", "icon": "🤗" }
+    ],
+    "tools": [
+      { "name": "Git/GitHub", "level": "Expert", "icon": "🔧" },
+      { "name": "Vercel", "level": "Advanced", "icon": "▲" },
+      { "name": "VS Code", "level": "Expert", "icon": "💙" }
+    ]
+  },
+  "services": [
+    {
+      "tier": "Quick Fix",
+      "price": "$150 - $300",
+      "description": "Bug fixes, small features, or quick consultations",
+      "features": [
+        "1-2 hour response time",
+        "Code review & debugging",
+        "Small feature additions",
+        "Performance optimization"
+      ],
+      "deliveryTime": "1-3 days"
+    },
+    {
+      "tier": "Starter Site",
+      "price": "$300 - $700",
+      "description": "Professional landing pages and portfolio sites",
+      "features": [
+        "Responsive design",
+        "SEO optimization",
+        "Contact form integration",
+        "GitHub deployment",
+        "1 month support"
+      ],
+      "deliveryTime": "1-2 weeks",
+      "popular": true
+    },
+    {
+      "tier": "SaaS Setup",
+      "price": "$1,500+",
+      "description": "Full-stack applications with AI integration",
+      "features": [
+        "Complete app development",
+        "Authentication & database",
+        "AI/API integrations",
+        "Payment processing",
+        "Deployment & hosting",
+        "3 months support & maintenance"
+      ],
+      "deliveryTime": "4-8 weeks"
+    }
+  ],
+  "projects": [
+    {
+      "id": "edusphere",
+      "name": "EduSphere AI",
+      "description": "Comprehensive student platform with AI-powered assignment assistance, blog generation, and calendar integration",
+      "stack": ["Next.js", "Supabase", "Gemini", "TailwindCSS"],
+      "status": "live",
+      "github": "https://github.com/MeeksonJr/edusphere-ai",
+      "demo": "#",
+      "image": "/placeholder.svg?height=300&width=500&text=EduSphere+AI"
+    },
+    {
+      "id": "interview-prep",
+      "name": "InterviewPrep AI",
+      "description": "AI-powered interview preparation platform with voice and text mock interviews",
+      "stack": ["Next.js", "PostgreSQL", "Gemini", "Firebase", "PayPal"],
+      "status": "sold",
+      "saleInfo": {
+        "price": 500,
+        "buyer": "Private Client",
+        "notes": "Ongoing maintenance & feature updates contracted"
+      },
+      "github": "https://github.com/MeeksonJr/interview-prep",
+      "image": "/placeholder.svg?height=300&width=500&text=InterviewPrep+AI"
+    },
+    {
+      "id": "content-gen",
+      "name": "AI Content Generator",
+      "description": "Advanced content generation platform with sentiment analysis and comprehensive analytics",
+      "stack": ["Next.js 14", "Supabase", "Gemini", "Hugging Face", "Recharts"],
+      "status": "live",
+      "github": "https://github.com/MeeksonJr/content-generator",
+      "demo": "#",
+      "image": "/placeholder.svg?height=300&width=500&text=Content+Generator"
+    },
+    {
+      "id": "snapfind",
+      "name": "SnapFind",
+      "description": "Image analysis and search tool using advanced AI models",
+      "stack": ["Next.js", "Gemini Vision", "Hugging Face"],
+      "status": "beta",
+      "github": "https://github.com/MeeksonJr/snapfind",
+      "image": "/placeholder.svg?height=300&width=500&text=SnapFind"
+    }
+  ],
+  "education": [
+    {
+      "school": "Old Dominion University",
+      "degree": "B.S. in Computer Science",
+      "status": "Currently enrolled",
+      "location": "Norfolk, VA",
+      "current": true,
+      "relevantCourses": [
+        "Data Structures & Algorithms",
+        "Computer Architecture",
+        "Database Systems",
+        "Software Engineering",
+        "Linear Algebra",
+        "Discrete Mathematics",
+        "C++ Programming",
+        "Operating Systems"
+      ]
+    },
+    {
+      "school": "Tidewater Community College",
+      "degree": "A.S. in Computer Science",
+      "graduated": "Dec 2024",
+      "location": "Norfolk, VA",
+      "current": false,
+      "achievements": ["3.8 GPA", "Dean's List", "1st Place Internship Competition (Fall 2024)"]
+    }
+  ],
+  "experience": [
+    {
+      "role": "Software Developer Intern",
+      "company": "Tech Internship Program",
+      "duration": "Fall 2024",
+      "achievement": "1st place out of 13 teams for best final app",
+      "description": "Built full-stack SaaS application using TypeScript, React, and AI integrations",
+      "stack": ["TypeScript", "Supabase", "React", "Neon", "Gemini", "Hugging Face"]
+    }
+  ]
+}

@@ -5,17 +5,18 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { MessageCircle, X, Send, Bot, User, Settings, RefreshCw } from "lucide-react"
-import { useChat } from "ai/react"
+import { useChat } from "@ai-sdk/react"
 
 export default function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [selectedModel, setSelectedModel] = useState("gemini")
   const [useDirectAPI, setUseDirectAPI] = useState(false)
+  const [input, setInput] = useState("")
 
   console.log("🤖 Chatbot: Component rendered with model:", selectedModel, "Direct API:", useDirectAPI)
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error, reload, setMessages } = useChat({
+  const { messages, sendMessage, isLoading, error, reload, setMessages } = useChat({
     api: useDirectAPI ? "/api/chat-direct" : "/api/chat",
     body: {
       model: selectedModel,
@@ -80,8 +81,9 @@ export default function AIChatbot() {
       return
     }
 
-    console.log("🚀 Chatbot: Calling handleSubmit...")
-    handleSubmit(e)
+    console.log("🚀 Chatbot: Calling sendMessage...")
+    sendMessage({ role: "user", content: input })
+    setInput("") // Clear input after submission
   }
 
   const handleModelChange = (modelId: string) => {
@@ -300,7 +302,7 @@ export default function AIChatbot() {
               <div className="flex gap-2">
                 <input
                   value={input}
-                  onChange={handleInputChange}
+                  onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about Mohamed's experience..."
                   className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white text-sm focus:border-green-400 focus:outline-none"
                   disabled={isLoading}

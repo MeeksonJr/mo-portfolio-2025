@@ -51,7 +51,7 @@ export default function Hero() {
           <div className="text-green-400 text-xs md:text-sm">$ cat bio.txt</div>
           <p className="text-gray-300 max-w-2xl mx-auto leading-relaxed text-sm md:text-base px-4">
             Born in Guinea, raised in NYC, now in Norfolk, Virginia. Learned English in 3 months using cartoons like
-            Dora after facing early issues and setbacks. Grew into a resilient, self-driven developer with a passion
+            Dora after facing early bullying and setbacks. Grew into a resilient, self-driven developer with a passion
             for creative, AI-powered web experiences.
           </p>
           <div className="text-gray-500 text-xs md:text-sm mt-4">

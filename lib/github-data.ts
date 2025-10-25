@@ -90,31 +90,31 @@ async function fetchGitHubDataDirect(): Promise<GitHubData> {
 
     while (true) {
       console.log(`📦 GitHub Data: Fetching page ${page}...`)
-      
+
       const reposResponse = await fetch(
         `${GITHUB_API_BASE}/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=${perPage}&page=${page}`,
-        { headers }
+        { headers },
       )
-      
+
       if (!reposResponse.ok) {
         throw new Error(`GitHub repos API failed: ${reposResponse.status}`)
       }
-      
+
       const repos = await reposResponse.json()
-      
+
       if (repos.length === 0) {
         break // No more repositories
       }
-      
+
       allRepos = [...allRepos, ...repos]
-      
+
       // If we got less than perPage, we're done
       if (repos.length < perPage) {
         break
       }
-      
+
       page++
-      
+
       // Safety check to prevent infinite loops
       if (page > 10) {
         console.warn("⚠️ GitHub Data: Reached page limit, stopping fetch")
@@ -415,8 +415,16 @@ REPOSITORY ANALYSIS:
 - Total Repository Size: ${repositories.reduce((sum, repo) => sum + (repo.size || 0), 0)} KB
 
 RECENT ACTIVITY:
-- Most Recently Updated: ${repositories.sort((a, b) => new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime()).slice(0, 3).map(r => r.name).join(", ")}
-- Most Recently Pushed: ${repositories.sort((a, b) => new Date(b.pushed_at || 0).getTime() - new Date(a.pushed_at || 0).getTime()).slice(0, 3).map(r => r.name).join(", ")}
+- Most Recently Updated: ${repositories
+    .sort((a, b) => new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime())
+    .slice(0, 3)
+    .map((r) => r.name)
+    .join(", ")}
+- Most Recently Pushed: ${repositories
+    .sort((a, b) => new Date(b.pushed_at || 0).getTime() - new Date(a.pushed_at || 0).getTime())
+    .slice(0, 3)
+    .map((r) => r.name)
+    .join(", ")}
 
 ${data.success ? "✅ This data was fetched live from GitHub API." : "⚠️ This is fallback data (GitHub API unavailable)."}
 Data last updated: ${new Date(data.fetched_at).toLocaleString()}
@@ -431,12 +439,15 @@ You can answer questions about ANY of these repositories, including their detail
 // Helper function to find a specific repository
 export function findRepository(data: GitHubData | null, repoName: string): Repository | null {
   if (!data || !data.repositories) return null
-  
+
   const normalizedName = repoName.toLowerCase().replace(/[-_\s]/g, "")
-  
-  return data.repositories.find(repo => 
-    repo.name.toLowerCase().replace(/[-_\s]/g, "") === normalizedName ||
-    repo.name.toLowerCase().includes(repoName.toLowerCase()) ||
-    repo.description.toLowerCase().includes(repoName.toLowerCase())
-  ) || null
+
+  return (
+    data.repositories.find(
+      (repo) =>
+        repo.name.toLowerCase().replace(/[-_\s]/g, "") === normalizedName ||
+        repo.name.toLowerCase().includes(repoName.toLowerCase()) ||
+        repo.description.toLowerCase().includes(repoName.toLowerCase()),
+    ) || null
+  )
 }

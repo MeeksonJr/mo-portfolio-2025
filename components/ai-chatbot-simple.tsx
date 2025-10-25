@@ -324,7 +324,7 @@ export default function AIChatbotSimple() {
             <form onSubmit={handleSubmit} className="p-4 border-t border-gray-700">
               <div className="flex gap-2">
                 <input
-                  value={input}
+                  value={input || ""}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about any repository..."
                   className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white text-sm focus:border-green-400 focus:outline-none"
@@ -332,7 +332,7 @@ export default function AIChatbotSimple() {
                 />
                 <button
                   type="submit"
-                  disabled={isLoading || !input.trim()}
+                  disabled={isLoading || !input?.trim()}
                   className="px-3 py-2 bg-green-400 text-black rounded hover:bg-green-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send size={16} />

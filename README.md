@@ -424,8 +424,8 @@ This isn't just a portfolio - it's a demonstration of the same skills that won 1
 - 🐙 GitHub: [@MeeksonJr](https://github.com/MeeksonJr)
 - 💼 LinkedIn: [mohamed-datt-b60907296](https://www.linkedin.com/in/mohamed-datt-b60907296)
 - 🌐 Portfolio: [mohameddatt.com](https://mohameddatt.com)
-- 📄 Resume: [Download PDF](./public/resume-2025-Mohamed-Datt-Full%20Stack%20Developer%20(1).pdf)
-<!-- resume-2025-Mohamed-Datt-Full Stack Developer (1).pdf -->
+- 📄 Resume: [Download PDF](./public/resume-Mohamed-Datt-Full%20Stack%20Developer-2025.pdf)
+
 ### 🎓 **Current Status**
 - **Education**: Computer Science student at Old Dominion University
 - **Previous**: A.S. Computer Science from Tidewater Community College (2024)
