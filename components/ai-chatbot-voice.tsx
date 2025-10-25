@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { MessageCircle, X, Send, Bot, User, Mic, MicOff, Volume2, VolumeX } from "lucide-react"
+import ReactMarkdown from "react-markdown"
 
 interface Message {
   id: string
@@ -20,8 +21,9 @@ export default function AIChatbotVoice() {
   const [isListening, setIsListening] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [hasAudioSupport, setHasAudioSupport] = useState(false)
+  const [selectedVoice, setSelectedVoice] = useState('Kore')
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const recognitionRef = useRef<any>(null)
   const synthesisRef = useRef<SpeechSynthesisUtterance | null>(null)
 
   // Check for audio support
@@ -41,7 +43,7 @@ export default function AIChatbotVoice() {
         recognitionRef.current.interimResults = false
         recognitionRef.current.lang = 'en-US'
 
-        recognitionRef.current.onresult = (event) => {
+        recognitionRef.current.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript
           setInput(transcript)
           setIsListening(false)
@@ -57,6 +59,39 @@ export default function AIChatbotVoice() {
       }
     }
   }, [])
+
+  const voiceOptions = [
+    { name: 'Kore', description: 'Firm' },
+    { name: 'Zephyr', description: 'Bright' },
+    { name: 'Puck', description: 'Upbeat' },
+    { name: 'Charon', description: 'Informative' },
+    { name: 'Fenrir', description: 'Excitable' },
+    { name: 'Leda', description: 'Youthful' },
+    { name: 'Orus', description: 'Firm' },
+    { name: 'Aoede', description: 'Breezy' },
+    { name: 'Callirrhoe', description: 'Easy-going' },
+    { name: 'Autonoe', description: 'Bright' },
+    { name: 'Enceladus', description: 'Breathy' },
+    { name: 'Iapetus', description: 'Clear' },
+    { name: 'Umbriel', description: 'Easy-going' },
+    { name: 'Algieba', description: 'Smooth' },
+    { name: 'Despina', description: 'Smooth' },
+    { name: 'Erinome', description: 'Clear' },
+    { name: 'Algenib', description: 'Gravelly' },
+    { name: 'Rasalgethi', description: 'Informative' },
+    { name: 'Laomedeia', description: 'Upbeat' },
+    { name: 'Achernar', description: 'Soft' },
+    { name: 'Alnilam', description: 'Firm' },
+    { name: 'Schedar', description: 'Even' },
+    { name: 'Gacrux', description: 'Mature' },
+    { name: 'Pulcherrima', description: 'Forward' },
+    { name: 'Achird', description: 'Friendly' },
+    { name: 'Zubenelgenubi', description: 'Casual' },
+    { name: 'Vindemiatrix', description: 'Gentle' },
+    { name: 'Sadachbia', description: 'Lively' },
+    { name: 'Sadaltager', description: 'Knowledgeable' },
+    { name: 'Sulafat', description: 'Warm' },
+  ]
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -131,22 +166,122 @@ export default function AIChatbotVoice() {
     }
   }
 
-  const speakText = (text: string) => {
-    if ('speechSynthesis' in window) {
-      // Stop any current speech
-      window.speechSynthesis.cancel()
+  const speakText = async (text: string) => {
+    if (isSpeaking) return
+    
+    setIsSpeaking(true)
+    
+    try {
+      console.log('🎤 Using Gemini TTS with voice:', selectedVoice)
       
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.rate = 0.9
-      utterance.pitch = 1
-      utterance.volume = 0.8
+      // Use Gemini TTS for high-quality, natural voices
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: text,
+          voice: selectedVoice,
+        }),
+      })
       
-      utterance.onstart = () => setIsSpeaking(true)
-      utterance.onend = () => setIsSpeaking(false)
-      utterance.onerror = () => setIsSpeaking(false)
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Gemini TTS API Error:', response.status, errorText)
+        throw new Error(`Gemini TTS failed: ${response.status}`)
+      }
       
-      synthesisRef.current = utterance
-      window.speechSynthesis.speak(utterance)
+      console.log('✅ Gemini TTS response received, creating audio blob')
+      const audioBlob = await response.blob()
+      console.log('📦 Audio blob created:', audioBlob.type, audioBlob.size, 'bytes')
+      
+      const audioUrl = URL.createObjectURL(audioBlob)
+      const audio = new Audio(audioUrl)
+      
+      audio.onloadeddata = () => {
+        console.log('🎵 Gemini TTS audio data loaded successfully')
+      }
+      
+      audio.oncanplay = () => {
+        console.log('▶️ Gemini TTS audio ready to play')
+      }
+      
+      audio.onended = () => {
+        console.log('🔚 Gemini TTS audio playback ended')
+        setIsSpeaking(false)
+        URL.revokeObjectURL(audioUrl)
+      }
+      
+      audio.onerror = (error) => {
+        console.error('❌ Gemini TTS audio playback error:', error)
+        setIsSpeaking(false)
+        URL.revokeObjectURL(audioUrl)
+      }
+      
+      console.log('▶️ Starting Gemini TTS audio playback with voice:', selectedVoice)
+      await audio.play()
+    } catch (error) {
+      console.error('Gemini TTS Error:', error)
+      setIsSpeaking(false)
+      
+      // Fallback to browser TTS
+      console.log('🔄 Falling back to browser TTS')
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+        
+        const utterance = new SpeechSynthesisUtterance(text)
+        
+        // Try to set the voice based on selection
+        const voices = window.speechSynthesis.getVoices()
+        console.log('🎵 Available browser voices:', voices.length)
+        
+        // Map our voice names to browser voices
+        const voiceMap: { [key: string]: string[] } = {
+          'Kore': ['Google US English', 'Microsoft Zira Desktop', 'Alex'],
+          'Zephyr': ['Google US English', 'Microsoft Zira Desktop'],
+          'Puck': ['Google US English', 'Microsoft Zira Desktop'],
+          'Charon': ['Google US English', 'Microsoft Zira Desktop'],
+          'Fenrir': ['Google US English', 'Microsoft Zira Desktop'],
+          'Leda': ['Google US English', 'Microsoft Zira Desktop'],
+          'Orus': ['Google US English', 'Microsoft Zira Desktop'],
+          'Aoede': ['Google US English', 'Microsoft Zira Desktop'],
+          'Callirrhoe': ['Google US English', 'Microsoft Zira Desktop'],
+          'Autonoe': ['Google US English', 'Microsoft Zira Desktop'],
+        }
+        
+        const preferredVoices = voiceMap[selectedVoice] || ['Google US English']
+        const selectedVoiceObj = voices.find(voice => 
+          preferredVoices.some(pref => voice.name.includes(pref))
+        ) || voices[0]
+        
+        if (selectedVoiceObj) {
+          utterance.voice = selectedVoiceObj
+          console.log('🎤 Using browser voice:', selectedVoiceObj.name)
+        }
+        
+        utterance.rate = 0.9
+        utterance.pitch = 1
+        utterance.volume = 0.8
+        
+        utterance.onstart = () => {
+          console.log('▶️ Browser speech started')
+          setIsSpeaking(true)
+        }
+        
+        utterance.onend = () => {
+          console.log('🔚 Browser speech ended')
+          setIsSpeaking(false)
+        }
+        
+        utterance.onerror = (error) => {
+          console.error('❌ Browser speech error:', error.type, error.error)
+          setIsSpeaking(false)
+        }
+        
+        synthesisRef.current = utterance
+        window.speechSynthesis.speak(utterance)
+      }
     }
   }
 
@@ -237,6 +372,34 @@ export default function AIChatbotVoice() {
                     Reset
                   </button>
                 )}
+              </div>
+
+              {/* Voice Selection */}
+              <div className="mt-4">
+                <label className="text-xs text-primary-foreground/90 mb-1 block">Voice:</label>
+                <select
+                  value={selectedVoice}
+                  onChange={(e) => setSelectedVoice(e.target.value)}
+                  className="w-full px-3 py-2 bg-white/20 hover:bg-white/30 rounded text-sm backdrop-blur-sm border-0 text-primary-foreground"
+                >
+                  {voiceOptions.map((voice) => (
+                    <option key={voice.name} value={voice.name} className="text-gray-800">
+                      {voice.name} ({voice.description})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => {
+                    const voices = window.speechSynthesis.getVoices()
+                    console.log('🎵 Available voices:', voices.length)
+                    voices.forEach((voice, index) => {
+                      console.log(`${index}: ${voice.name} (${voice.lang}) - ${voice.default ? 'default' : ''}`)
+                    })
+                  }}
+                  className="mt-2 px-2 py-1 bg-white/20 hover:bg-white/30 rounded text-xs text-primary-foreground"
+                >
+                  Debug: List Voices
+                </button>
               </div>
 
               {/* Voice Controls */}
@@ -346,7 +509,20 @@ export default function AIChatbotVoice() {
                         : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-tl-none"
                     }`}
                   >
-                    <div className="whitespace-pre-wrap">{message.content}</div>
+                    <ReactMarkdown 
+                      components={{
+                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                        strong: ({ children }) => <strong className="font-bold text-primary">{children}</strong>,
+                        ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                        li: ({ children }) => <li className="text-sm">{children}</li>,
+                        a: ({ href, children }) => <a href={href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">{children}</a>,
+                        code: ({ children }) => <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                        pre: ({ children }) => <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-xs font-mono overflow-x-auto">{children}</pre>,
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
                   </div>
                 </motion.div>
               ))}

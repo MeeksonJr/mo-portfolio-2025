@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { MessageCircle, X, Send, Bot, User, Sparkles, DollarSign, Clock, RefreshCw } from "lucide-react"
+import ReactMarkdown from "react-markdown"
 
 interface Message {
   id: string
@@ -209,7 +210,20 @@ export default function AIChatbotEnhanced() {
                         : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-tl-none"
                     }`}
                   >
-                    <div className="whitespace-pre-wrap">{message.content}</div>
+                    <ReactMarkdown 
+                      components={{
+                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                        strong: ({ children }) => <strong className="font-bold text-primary">{children}</strong>,
+                        ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                        li: ({ children }) => <li className="text-sm">{children}</li>,
+                        a: ({ href, children }) => <a href={href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">{children}</a>,
+                        code: ({ children }) => <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                        pre: ({ children }) => <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-xs font-mono overflow-x-auto">{children}</pre>,
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
                   </div>
                 </motion.div>
               ))}
