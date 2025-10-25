@@ -12,6 +12,7 @@ import AIChatbotEnhanced from "@/components/ai-chatbot-enhanced"
 import AIChatbotVoice from "@/components/ai-chatbot-voice"
 import MusicPlayer from "@/components/music-player"
 import ScrollProgress from "@/components/scroll-progress"
+import Experience from "@/components/experience"
 
 export default function Home() {
   return (
@@ -25,6 +26,7 @@ export default function Home() {
         <TechSnapshot />
         <AboutLight />
         <ProjectsLight />
+        <Experience />
         <ServicesPricing />
         <CoursesSection />
         <Contact />

@@ -444,18 +444,6 @@ export default function AIChatbotVoice() {
                     </option>
                   ))}
                 </select>
-                <button
-                  onClick={() => {
-                    const voices = window.speechSynthesis.getVoices()
-                    console.log('🎵 Available voices:', voices.length)
-                    voices.forEach((voice, index) => {
-                      console.log(`${index}: ${voice.name} (${voice.lang}) - ${voice.default ? 'default' : ''}`)
-                    })
-                  }}
-                  className="mt-2 px-2 py-1 bg-white/20 hover:bg-white/30 rounded text-xs text-primary-foreground"
-                >
-                  Debug: List Voices
-                </button>
               </div>
 
               {/* Voice Controls */}
