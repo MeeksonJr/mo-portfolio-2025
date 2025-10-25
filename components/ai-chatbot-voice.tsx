@@ -24,7 +24,7 @@ export default function AIChatbotVoice() {
   const [selectedVoice, setSelectedVoice] = useState('Kore')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<any>(null)
-  const synthesisRef = useRef<SpeechSynthesisUtterance | null>(null)
+  const synthesisRef = useRef<HTMLAudioElement | SpeechSynthesisUtterance | null>(null)
 
   // Check for audio support
   useEffect(() => {
@@ -167,12 +167,21 @@ export default function AIChatbotVoice() {
   }
 
   const speakText = async (text: string) => {
-    if (isSpeaking) return
+    if (isSpeaking) {
+      console.log('⚠️ Already speaking, stopping current audio first')
+      stopSpeaking()
+      // Wait a moment for cleanup
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
     
     setIsSpeaking(true)
     
     try {
       console.log('🎤 Using Gemini TTS with voice:', selectedVoice)
+      
+      // Stop any existing audio before starting new one
+      stopSpeaking()
+      await new Promise(resolve => setTimeout(resolve, 100))
       
       // Use Gemini TTS for high-quality, natural voices
       const response = await fetch('/api/tts', {
@@ -199,6 +208,9 @@ export default function AIChatbotVoice() {
       const audioUrl = URL.createObjectURL(audioBlob)
       const audio = new Audio(audioUrl)
       
+      // Store reference to current audio for stopping
+      synthesisRef.current = audio
+      
       audio.onloadeddata = () => {
         console.log('🎵 Gemini TTS audio data loaded successfully')
       }
@@ -211,12 +223,20 @@ export default function AIChatbotVoice() {
         console.log('🔚 Gemini TTS audio playback ended')
         setIsSpeaking(false)
         URL.revokeObjectURL(audioUrl)
+        synthesisRef.current = null
       }
       
       audio.onerror = (error) => {
         console.error('❌ Gemini TTS audio playback error:', error)
         setIsSpeaking(false)
         URL.revokeObjectURL(audioUrl)
+        synthesisRef.current = null
+      }
+      
+      audio.onpause = () => {
+        console.log('⏸️ Gemini TTS audio paused')
+        setIsSpeaking(false)
+        synthesisRef.current = null
       }
       
       console.log('▶️ Starting Gemini TTS audio playback with voice:', selectedVoice)
@@ -286,10 +306,46 @@ export default function AIChatbotVoice() {
   }
 
   const stopSpeaking = () => {
+    console.log('🛑 Stopping all audio playback')
+    
+    // Stop the current audio reference
+    if (synthesisRef.current) {
+      if (synthesisRef.current instanceof HTMLAudioElement) {
+        synthesisRef.current.pause()
+        synthesisRef.current.currentTime = 0
+        console.log('🛑 Current audio element paused')
+      } else if (synthesisRef.current instanceof SpeechSynthesisUtterance) {
+        // Browser TTS is handled by speechSynthesis.cancel()
+        console.log('🛑 Current utterance will be cancelled')
+      }
+      synthesisRef.current = null
+    }
+    
+    // Stop browser TTS
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel()
-      setIsSpeaking(false)
+      console.log('🛑 Browser TTS cancelled')
     }
+    
+    // Stop any playing audio elements
+    const audioElements = document.querySelectorAll('audio')
+    audioElements.forEach((audio: HTMLAudioElement) => {
+      if (!audio.paused) {
+        audio.pause()
+        audio.currentTime = 0
+        console.log('🛑 Audio element paused:', audio.src)
+      }
+    })
+    
+    // Clear any object URLs to free memory
+    const audioUrls = document.querySelectorAll('audio[src^="blob:"]')
+    audioUrls.forEach((audio: HTMLAudioElement) => {
+      URL.revokeObjectURL(audio.src)
+      console.log('🛑 Audio URL revoked:', audio.src)
+    })
+    
+    setIsSpeaking(false)
+    console.log('🛑 All audio stopped, isSpeaking set to false')
   }
 
   // Auto-speak new AI responses
