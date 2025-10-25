@@ -80,7 +80,7 @@ export default function HeroLight() {
               <div className="relative">
                 <div className="w-64 h-64 md:w-80 md:h-80 rounded-2xl overflow-hidden border-4 border-white shadow-2xl">
                   <Image
-                    src="/images/mohamed-datt-professional.png"
+                    src="/images/Photo.jpg"
                     alt="Mohamed Datt"
                     width={320}
                     height={320}
