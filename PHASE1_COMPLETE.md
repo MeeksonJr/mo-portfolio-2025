@@ -125,7 +125,7 @@ Make sure these are in your `.env.local`:
 
 ```env
 # Supabase (You have these ✅)
-NEXT_PUBLIC_SUPABASE_URL=https://rlqwbcunfbaogoqixwwt.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 

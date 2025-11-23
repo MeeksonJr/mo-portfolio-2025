@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         const cookieStore = await cookies()
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
         const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'rlqwbcunfbaogoqixwwt'
+        const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || ''
         const authCookieName = `sb-${projectRef}-auth-token`
         
         // Get all cookies

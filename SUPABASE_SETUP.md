@@ -8,7 +8,7 @@ To set up the database schema, you need to run the SQL migration file in your Su
 
 1. **Go to Supabase Dashboard**
    - Navigate to https://supabase.com/dashboard
-   - Select your project: `rlqwbcunfbaogoqixwwt`
+   - Select your project (use your project reference ID)
 
 2. **Open SQL Editor**
    - Click on "SQL Editor" in the left sidebar
@@ -72,7 +72,7 @@ Make sure these are in your `.env.local`:
 
 ```env
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://rlqwbcunfbaogoqixwwt.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 

@@ -10,7 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Get project ref from URL for cookie names
-const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'rlqwbcunfbaogoqixwwt'
+const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || ''
 
 // Server-side Supabase client with user session
 export const createServerClient = async () => {
