@@ -61,3 +61,9 @@ coverage
 .cache
 .temp
 .tmp
+
+# Generated files
+public/robots.txt
+public/sitemap.xml
+public/sw.js
+public/workbox-*.js
