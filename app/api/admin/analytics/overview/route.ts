@@ -4,30 +4,56 @@ import { createClient } from '@supabase/supabase-js'
 
 export async function GET(request: NextRequest) {
   try {
-    // Try to get session using createServerClient first
+    // Try Authorization header first (most reliable, same pattern as music upload)
+    const authHeader = request.headers.get('authorization')
     let userId: string | null = null
     
-    try {
-      const supabase = await createServerClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '')
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       
-      if (user) {
-        userId = user.id
-      } else {
+      const tempClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      })
+      
+      const { data: userData } = await tempClient.auth.getUser()
+      if (userData?.user) {
+        userId = userData.user.id
+        console.log('Analytics API - User ID from Authorization header:', userId)
+      }
+    }
+    
+    // Fallback: Try createServerClient
+    if (!userId) {
+      try {
+        const supabase = await createServerClient()
         const {
           data: { session },
         } = await supabase.auth.getSession()
+
         if (session?.user) {
           userId = session.user.id
+          console.log('Analytics API - User ID from createServerClient:', userId)
+        } else {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser()
+          if (user) {
+            userId = user.id
+            console.log('Analytics API - User ID from createServerClient.getUser():', userId)
+          }
         }
+      } catch (error) {
+        console.log('Analytics API - createServerClient failed:', error)
       }
-    } catch (error) {
-      console.log('createServerClient failed, trying direct cookie read...', error)
     }
 
-    // If that didn't work, try reading cookies directly from request
+    // Last resort: Try reading cookies directly from request
     if (!userId) {
       const cookieHeader = request.headers.get('cookie') || ''
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -39,7 +65,7 @@ export async function GET(request: NextRequest) {
       cookieHeader.split(';').forEach((cookie) => {
         const [name, ...rest] = cookie.trim().split('=')
         if (name) {
-          cookies[name] = rest.join('=')
+          cookies[name] = decodeURIComponent(rest.join('='))
         }
       })
       
@@ -49,8 +75,7 @@ export async function GET(request: NextRequest) {
       
       if (authCookie) {
         try {
-          const decoded = decodeURIComponent(authCookie)
-          const parsed = JSON.parse(decoded)
+          const parsed = typeof authCookie === 'string' ? JSON.parse(authCookie) : authCookie
           
           if (parsed?.access_token) {
             const tempClient = createClient(supabaseUrl, supabaseAnonKey, {
@@ -63,12 +88,14 @@ export async function GET(request: NextRequest) {
             const { data } = await tempClient.auth.getUser()
             if (data?.user) {
               userId = data.user.id
+              console.log('Analytics API - User ID from cookie access_token:', userId)
             }
           } else if (parsed?.user?.id) {
             userId = parsed.user.id
+            console.log('Analytics API - User ID from cookie user object:', userId)
           }
         } catch (e) {
-          console.log('Failed to parse auth cookie:', e)
+          console.log('Analytics API - Failed to parse auth cookie:', e)
         }
       }
     }

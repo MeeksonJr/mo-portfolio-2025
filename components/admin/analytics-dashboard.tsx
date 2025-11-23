@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { supabase } from '@/lib/supabase/client'
 
 interface AnalyticsData {
   totalViews: number
@@ -32,17 +33,35 @@ export default function AnalyticsDashboard() {
   const fetchAnalytics = async () => {
     try {
       setLoading(true)
+      
+      // Get session token for authentication (same pattern as music upload)
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        console.error('No session found')
+        setData(null)
+        return
+      }
+
       const response = await fetch(`/api/admin/analytics/overview?days=${period}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
       })
+      
       if (!response.ok) {
+        if (response.status === 401) {
+          console.error('Unauthorized - session may have expired')
+          setData(null)
+          return
+        }
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
         throw new Error(errorData.error || 'Failed to fetch analytics')
       }
+      
       const analyticsData = await response.json()
       setData(analyticsData)
     } catch (error) {
@@ -51,6 +70,7 @@ export default function AnalyticsDashboard() {
       if (error instanceof Error) {
         console.error('Error details:', error.message)
       }
+      setData(null)
     } finally {
       setLoading(false)
     }
