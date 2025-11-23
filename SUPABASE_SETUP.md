@@ -82,7 +82,7 @@ GITHUB_TOKEN=your_github_token
 # AI Services
 GEMINI_API_KEY=your_gemini_key
 GROQ_API_KEY=your_groq_key
-HUGGINGFACE_API_KEY=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
+HUGGINGFACE_API_KEY=your_huggingface_token
 
 # Email
 RESEND_API_KEY=your_resend_key
