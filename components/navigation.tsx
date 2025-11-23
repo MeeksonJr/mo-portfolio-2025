@@ -1,9 +1,16 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Menu, X, Download } from "lucide-react"
+import { Menu, X, Download, ChevronDown } from "lucide-react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { ThemeToggle } from "@/components/theme-toggle"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -17,13 +24,23 @@ export default function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const navLinks = [
-    { name: "About", href: "#about" },
+  // Group navigation links
+  const mainLinks = [
+    { name: "About", href: "/about" },
     { name: "Work", href: "#projects" },
     { name: "Services", href: "#services" },
-    { name: "Courses", href: "#courses" },
     { name: "Contact", href: "#contact" },
   ]
+
+  const contentLinks = [
+    { name: "Projects", href: "/projects" },
+    { name: "Blog", href: "/blog" },
+    { name: "Case Studies", href: "/case-studies" },
+    { name: "Resources", href: "/resources" },
+    { name: "Music", href: "/music" },
+  ]
+
+  const allLinks = [...mainLinks, ...contentLinks]
 
   return (
     <motion.nav
@@ -42,20 +59,43 @@ export default function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors"
-              >
-                {link.name}
-              </a>
-            ))}
+          <div className="hidden lg:flex items-center gap-6">
+            {mainLinks.map((link) => {
+              const isExternal = link.href.startsWith('#')
+              const Component = isExternal ? 'a' : Link
+              const props = isExternal ? { href: link.href } : { href: link.href }
+              return (
+                <Component
+                  key={link.name}
+                  {...props}
+                  className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors"
+                >
+                  {link.name}
+                </Component>
+              )
+            })}
+            
+            {/* Content Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors flex items-center gap-1 outline-none">
+                Content
+                <ChevronDown className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {contentLinks.map((link) => (
+                  <DropdownMenuItem key={link.name} asChild>
+                    <Link href={link.href} className="cursor-pointer">
+                      {link.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
+            <ThemeToggle />
             <a
               href="/resume-Mohamed-Datt-Full Stack Developer-2025.pdf"
               target="_blank"
@@ -63,7 +103,7 @@ export default function Navigation() {
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground/70 hover:text-primary transition-colors"
             >
               <Download size={16} />
-              Resume
+              <span className="hidden xl:inline">Resume</span>
             </a>
             <a
               href="#contact"
@@ -74,7 +114,11 @@ export default function Navigation() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          <button 
+            className="lg:hidden" 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -82,22 +126,31 @@ export default function Navigation() {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <motion.div
-            className="md:hidden mt-4 glass rounded-lg p-4"
+            className="lg:hidden mt-4 glass rounded-lg p-4"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="flex flex-col gap-3">
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.name}
-                </a>
-              ))}
+              {allLinks.map((link) => {
+                const isExternal = link.href.startsWith('#')
+                const Component = isExternal ? 'a' : Link
+                const props = isExternal ? { href: link.href } : { href: link.href }
+                return (
+                  <Component
+                    key={link.name}
+                    {...props}
+                    className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.name}
+                  </Component>
+                )
+              })}
               <div className="border-t border-border pt-3 mt-2 space-y-2">
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-sm font-medium text-foreground/70">Theme</span>
+                  <ThemeToggle />
+                </div>
                 <a
                   href="/resume-Mohamed-Datt-Full Stack Developer-2025.pdf"
                   target="_blank"

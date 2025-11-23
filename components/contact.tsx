@@ -3,9 +3,11 @@
 import { motion } from "framer-motion"
 import { Send, CheckCircle, AlertCircle, Terminal, Code, Zap, MessageSquare, Coffee } from "lucide-react"
 import { useActionState, useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { submitContactForm } from "@/app/actions/contact"
 
 export default function Contact() {
+  const router = useRouter()
   const [state, formAction, isPending] = useActionState(submitContactForm, null)
   const [showCursor, setShowCursor] = useState(true)
   const [activeField, setActiveField] = useState("")
@@ -17,6 +19,16 @@ export default function Contact() {
     }, 500)
     return () => clearInterval(interval)
   }, [])
+
+  // Redirect to success page on successful submission
+  useEffect(() => {
+    if (state?.success) {
+      const timer = setTimeout(() => {
+        router.push('/contact/success')
+      }, 1500) // Wait 1.5 seconds to show success message
+      return () => clearTimeout(timer)
+    }
+  }, [state?.success, router])
 
   const terminalCommands = [
     "$ whoami",

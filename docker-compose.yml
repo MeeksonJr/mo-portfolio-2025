@@ -1,0 +1,17 @@
+services:
+  web:
+    build: .
+    command: sh -c "if [ -f pnpm-lock.yaml ]; then pnpm install && pnpm dev -H 0.0.0.0; else npm install && npm run dev -H 0.0.0.0; fi"
+    ports: ["3000:3000"]
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - pnpm_store:/root/.local/share/pnpm/store
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+volumes:
+  node_modules:
+  pnpm_store:

@@ -8,17 +8,24 @@ import CoursesSection from "@/components/courses-section"
 import Contact from "@/components/contact"
 import FooterLight from "@/components/footer-light"
 import Navigation from "@/components/navigation"
-import AIChatbotEnhanced from "@/components/ai-chatbot-enhanced"
 import AIChatbotVoice from "@/components/ai-chatbot-voice"
-import MusicPlayer from "@/components/music-player"
 import ScrollProgress from "@/components/scroll-progress"
 import Experience from "@/components/experience"
+import StructuredData from "@/components/structured-data"
+import FloatingActionMenu from "@/components/floating-action-menu"
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <ScrollProgress />
-      <Navigation />
+    <>
+      <StructuredData
+        type="Person"
+        title="Mohamed Datt - Full Stack Developer"
+        description="Creative Full Stack Developer specializing in AI-powered web applications, Next.js, TypeScript, and modern web technologies"
+        url="/"
+      />
+      <div className="min-h-screen bg-background">
+        <ScrollProgress />
+        <Navigation />
 
       <main>
         <HeroLight />
@@ -33,9 +40,9 @@ export default function Home() {
       </main>
 
       <FooterLight />
-      <AIChatbotEnhanced />
       <AIChatbotVoice />
-      <MusicPlayer />
+      <FloatingActionMenu />
     </div>
+    </>
   )
 }
