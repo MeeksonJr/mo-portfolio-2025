@@ -34,6 +34,7 @@ import {
   Play,
   Bot,
   CreditCard,
+  Calendar,
 } from 'lucide-react'
 
 export default function CommandPalette() {
@@ -194,6 +195,12 @@ export default function CommandPalette() {
           >
             <BarChart3 className="mr-2 h-4 w-4" />
             <span>Portfolio Analytics</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/calendar'))}
+          >
+            <Calendar className="mr-2 h-4 w-4" />
+            <span>Book a Meeting</span>
           </CommandItem>
         </CommandGroup>
 

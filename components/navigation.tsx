@@ -49,6 +49,7 @@ export default function Navigation() {
     { name: "AI Assistant", href: "/portfolio-assistant" },
     { name: "Business Card", href: "/card" },
     { name: "Analytics", href: "/analytics" },
+    { name: "Calendar", href: "/calendar" },
   ]
 
   const allLinks = [...mainLinks, ...contentLinks]
