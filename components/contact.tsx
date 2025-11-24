@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Send, CheckCircle, AlertCircle, Terminal, Code, Zap, MessageSquare, Coffee } from "lucide-react"
+import { Send, CheckCircle, AlertCircle, Terminal, Code, Zap, MessageSquare, Coffee, MessageCircle } from "lucide-react"
 import { useActionState, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { submitContactForm } from "@/app/actions/contact"
@@ -94,6 +94,13 @@ export default function Contact() {
               <Terminal className="text-primary" size={20} />
               <span className="text-primary font-mono text-sm">contact@mohameddatt.com</span>
             </div>
+            <a
+              href="/contact-hub"
+              className="ml-auto text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+            >
+              <MessageCircle className="h-3 w-3" />
+              View All Contact Methods
+            </a>
           </div>
 
           {/* Terminal Command Preview */}

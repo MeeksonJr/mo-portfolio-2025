@@ -169,6 +169,12 @@ export default function CommandPalette() {
             <Play className="mr-2 h-4 w-4" />
             <span>Live Project Demos</span>
           </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/contact-hub'))}
+          >
+            <MessageCircle className="mr-2 h-4 w-4" />
+            <span>Universal Contact Hub</span>
+          </CommandItem>
         </CommandGroup>
 
         <CommandSeparator />
