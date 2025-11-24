@@ -209,6 +209,12 @@ export default function CommandPalette() {
             <Code2 className="mr-2 h-4 w-4" />
             <span>Code Snippets Library</span>
           </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/projects-timeline'))}
+          >
+            <Calendar className="mr-2 h-4 w-4" />
+            <span>Project Timeline</span>
+          </CommandItem>
         </CommandGroup>
 
         <CommandSeparator />

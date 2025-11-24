@@ -51,6 +51,7 @@ export default function Navigation() {
     { name: "Analytics", href: "/analytics" },
     { name: "Calendar", href: "/calendar" },
     { name: "Code Snippets", href: "/code" },
+    { name: "Project Timeline", href: "/projects-timeline" },
   ]
 
   const allLinks = [...mainLinks, ...contentLinks]
