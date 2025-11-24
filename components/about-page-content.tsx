@@ -1,9 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, MapPin, GraduationCap, Code, Rocket, Sparkles, Camera, Award, Coffee, Book } from 'lucide-react'
+import { Heart, MapPin, GraduationCap, Code, Rocket, Sparkles, Camera, Award, Coffee, Book, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const timeline = [
   {
@@ -146,7 +147,16 @@ export default function AboutPageContent() {
         transition={{ duration: 0.8, delay: 0.4 }}
         className="mb-16"
       >
-        <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">My Journey</h2>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold">My Journey</h2>
+          <Link
+            href="/timeline"
+            className="text-sm text-primary hover:underline flex items-center gap-1"
+          >
+            View Full Timeline
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
         <div className="relative">
           {/* Timeline Line */}
           <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-primary/20 transform md:-translate-x-1/2" />
