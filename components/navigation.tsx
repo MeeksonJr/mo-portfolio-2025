@@ -55,6 +55,7 @@ export default function Navigation() {
   // Tools dropdown - Interactive tools and utilities
   const toolsLinks = [
     { name: "AI Assistant", href: "/portfolio-assistant" },
+    { name: "Project Analyzer", href: "/project-analyzer" },
     { name: "Skills Match", href: "/skills-match" },
     { name: "ROI Calculator", href: "/roi-calculator" },
     { name: "Assessment", href: "/assessment" },
