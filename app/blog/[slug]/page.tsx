@@ -3,6 +3,8 @@ import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import BlogPostContent from '@/components/blog-post-content'
 import StructuredData from '@/components/structured-data'
+import ArticleSchema from '@/components/structured-data/article-schema'
+import BreadcrumbSchema from '@/components/structured-data/breadcrumb-schema'
 import PageViewTracker from '@/components/page-view-tracker'
 import AchievementTrackerClient from '@/components/achievement-tracker-client'
 import { generateMetadata as genMeta } from '@/lib/seo'
@@ -107,15 +109,23 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <>
-      <StructuredData
-        type="Article"
+      <ArticleSchema
         title={post.title}
-        description={post.excerpt || undefined}
+        description={post.excerpt}
         url={`/blog/${post.slug}`}
         image={image}
-        publishedTime={post.published_at || undefined}
-        modifiedTime={post.updated_at || post.published_at || undefined}
+        publishedTime={post.published_at}
+        modifiedTime={post.updated_at || post.published_at}
         author="Mohamed Datt"
+        tags={post.tags}
+        category={post.category}
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Blog', url: '/blog' },
+          { name: post.title, url: `/blog/${post.slug}` },
+        ]}
       />
       <div className="min-h-screen bg-background">
         <PageViewTracker contentType="blog_post" contentId={post.id} />

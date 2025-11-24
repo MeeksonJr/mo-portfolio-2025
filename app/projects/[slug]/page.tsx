@@ -3,6 +3,8 @@ import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import ProjectContent from '@/components/project-content'
 import StructuredData from '@/components/structured-data'
+import ProjectSchema from '@/components/structured-data/project-schema'
+import BreadcrumbSchema from '@/components/structured-data/breadcrumb-schema'
 import PageViewTracker from '@/components/page-view-tracker'
 import { generateMetadata as genMeta } from '@/lib/seo'
 import { Metadata } from 'next'
@@ -117,15 +119,23 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <>
-      <StructuredData
-        type="Article"
-        title={project.name}
-        description={project.description || undefined}
+      <ProjectSchema
+        name={project.name}
+        description={project.description}
         url={`/projects/${slug}`}
         image={image}
-        publishedTime={project.created_at || undefined}
-        modifiedTime={project.updated_at || project.created_at || undefined}
-        author="Mohamed Datt"
+        githubUrl={project.github_url}
+        homepageUrl={project.homepage_url}
+        techStack={project.tech_stack}
+        dateCreated={project.created_at}
+        dateModified={project.updated_at || project.created_at}
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Projects', url: '/projects' },
+          { name: project.name, url: `/projects/${slug}` },
+        ]}
       />
       <div className="min-h-screen bg-background">
         <PageViewTracker contentType="project" contentId={project.id} />

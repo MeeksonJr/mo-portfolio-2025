@@ -19,6 +19,7 @@ import { OfflineIndicator } from "@/components/pwa/offline-indicator"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { ErrorHandler } from "@/components/error-handler"
 import FloatingActionMenu from "@/components/floating-action-menu"
+import VisitorProfileProvider from "@/components/personalization/visitor-profile-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -94,9 +95,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <PreferencesProvider>
-            <ErrorHandler />
-            <ErrorBoundary>
-              {children}
+            <VisitorProfileProvider>
+              <ErrorHandler />
+              <ErrorBoundary>
+                {children}
               <CommandPalette />
               <AchievementTracker />
               <KeyboardShortcutHint />
@@ -107,6 +109,7 @@ export default function RootLayout({
               <OfflineIndicator />
               <FloatingActionMenu />
             </ErrorBoundary>
+            </VisitorProfileProvider>
           </PreferencesProvider>
         </ThemeProvider>
         <Analytics />

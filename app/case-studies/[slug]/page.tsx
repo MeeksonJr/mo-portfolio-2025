@@ -3,6 +3,8 @@ import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import CaseStudyContent from '@/components/case-study-content'
 import StructuredData from '@/components/structured-data'
+import ArticleSchema from '@/components/structured-data/article-schema'
+import BreadcrumbSchema from '@/components/structured-data/breadcrumb-schema'
 import PageViewTracker from '@/components/page-view-tracker'
 import AchievementTrackerClient from '@/components/achievement-tracker-client'
 import { generateMetadata as genMeta } from '@/lib/seo'
@@ -98,15 +100,23 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
 
   return (
     <>
-      <StructuredData
-        type="Article"
+      <ArticleSchema
         title={caseStudy.title}
-        description={caseStudy.description || undefined}
+        description={caseStudy.description}
         url={`/case-studies/${caseStudy.slug}`}
         image={image}
-        publishedTime={caseStudy.published_at || undefined}
-        modifiedTime={caseStudy.updated_at || caseStudy.published_at || undefined}
+        publishedTime={caseStudy.published_at}
+        modifiedTime={caseStudy.updated_at || caseStudy.published_at}
         author="Mohamed Datt"
+        tags={caseStudy.tech_stack}
+        category="Case Study"
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Case Studies', url: '/case-studies' },
+          { name: caseStudy.title, url: `/case-studies/${caseStudy.slug}` },
+        ]}
       />
       <div className="min-h-screen bg-background">
           <PageViewTracker contentType="case_study" contentId={caseStudy.id} />
