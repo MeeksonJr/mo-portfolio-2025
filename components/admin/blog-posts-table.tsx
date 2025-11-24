@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, Plus, Edit, Trash2, Eye, Calendar, FileText, CheckSquare, Square } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Eye, Calendar, FileText, CheckSquare, Square, Download } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +14,12 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { toast } from 'sonner'
 import {
   Select,
@@ -260,6 +266,38 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
     return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>
   }
 
+  const handleExport = async (format: 'json' | 'csv' = 'json') => {
+    try {
+      const statusParam = filterStatus !== 'all' ? filterStatus : 'all'
+      const url = `/api/admin/content/export?type=blog&format=${format}&status=${statusParam}`
+      
+      const response = await fetch(url, {
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to export posts')
+      }
+
+      const blob = await response.blob()
+      const downloadUrl = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      
+      const extension = format === 'csv' ? 'csv' : 'json'
+      link.download = `blog-posts-export-${new Date().toISOString().split('T')[0]}.${extension}`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(downloadUrl)
+
+      toast.success(`Exported ${filteredPosts.length} post(s) as ${format.toUpperCase()}`)
+    } catch (error) {
+      console.error('Error exporting posts:', error)
+      toast.error('Failed to export posts. Please try again.')
+    }
+  }
+
   return (
     <div className="space-y-4 w-full max-w-full overflow-hidden">
       {/* Bulk Actions Bar */}
@@ -372,6 +410,24 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
               <SelectItem value="96">96/page</SelectItem>
             </SelectContent>
           </Select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex-shrink-0">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExport('json')}>
+                <FileText className="h-4 w-4 mr-2" />
+                Export as JSON
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('csv')}>
+                <FileText className="h-4 w-4 mr-2" />
+                Export as CSV
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button onClick={() => setCreateModalOpen(true)} className="flex-shrink-0">
             <Plus className="h-4 w-4 mr-2" />
             New Post

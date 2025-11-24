@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, Plus, Edit, Trash2, Eye, Calendar, Briefcase } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Eye, Calendar, Briefcase, Download, FileText } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
@@ -42,6 +42,12 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import ContentCreationModal from '@/components/admin/content-creation-modal'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { format } from 'date-fns'
 
 interface CaseStudy {
@@ -232,6 +238,38 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
     return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>
   }
 
+  const handleExport = async (format: 'json' | 'csv' = 'json') => {
+    try {
+      const statusParam = filterStatus !== 'all' ? filterStatus : 'all'
+      const url = `/api/admin/content/export?type=case-study&format=${format}&status=${statusParam}`
+      
+      const response = await fetch(url, {
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to export case studies')
+      }
+
+      const blob = await response.blob()
+      const downloadUrl = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      
+      const extension = format === 'csv' ? 'csv' : 'json'
+      link.download = `case-studies-export-${new Date().toISOString().split('T')[0]}.${extension}`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(downloadUrl)
+
+      toast.success(`Exported ${filteredCaseStudies.length} case study(ies) as ${format.toUpperCase()}`)
+    } catch (error) {
+      console.error('Error exporting case studies:', error)
+      toast.error('Failed to export case studies. Please try again.')
+    }
+  }
+
   return (
     <div className="space-y-4 w-full max-w-full overflow-hidden">
       {/* Bulk Actions Bar */}
@@ -325,6 +363,24 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
               <SelectItem value="96">96/page</SelectItem>
             </SelectContent>
           </Select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex-shrink-0">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleExport('json')}>
+                <FileText className="h-4 w-4 mr-2" />
+                Export as JSON
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('csv')}>
+                <FileText className="h-4 w-4 mr-2" />
+                Export as CSV
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button onClick={() => setCreateModalOpen(true)} className="flex-shrink-0">
             <Plus className="h-4 w-4 mr-2" />
             New Case Study

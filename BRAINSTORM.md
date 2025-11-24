@@ -1535,6 +1535,7 @@ content/
   - [x] Content list views with filters, search, pagination
   - [x] Edit and delete functionality
   - [x] Bulk operations (delete, status change, featured toggle for projects) ✅
+  - [x] Export functionality (CSV/JSON) ✅
 
 - [x] **Blog System (Public)** ✅
   - [x] Blog listing page
