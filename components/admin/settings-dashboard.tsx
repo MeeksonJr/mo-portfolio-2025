@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Settings, Github, Sparkles, FileText, Mail, Loader2, CheckCircle2 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
 interface SettingsData {
@@ -32,8 +32,6 @@ export default function SettingsDashboard() {
   })
   const [hasChanges, setHasChanges] = useState(false)
 
-  const supabase = createClient()
-
   useEffect(() => {
     loadSettings()
   }, [])
@@ -55,7 +53,7 @@ export default function SettingsDashboard() {
 
       if (response.ok) {
         const data = await response.json()
-        const settingsMap: SettingsData = {}
+        const settingsMap: Partial<SettingsData> = {}
         
         // Convert array of settings to object
         if (data.settings) {
@@ -73,7 +71,14 @@ export default function SettingsDashboard() {
           })
         }
 
-        setSettings(settingsMap)
+        // Merge with defaults to ensure all required properties exist
+        setSettings({
+          github_sync_enabled: settingsMap.github_sync_enabled ?? true,
+          github_sync_frequency: settingsMap.github_sync_frequency ?? 'daily',
+          default_ai_model: settingsMap.default_ai_model ?? 'gemini',
+          image_generation_model: settingsMap.image_generation_model ?? 'stabilityai/stable-diffusion-xl-base-1.0',
+          ...settingsMap,
+        })
       }
     } catch (error) {
       console.error('Error loading settings:', error)

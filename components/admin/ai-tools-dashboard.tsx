@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Wand2, Image as ImageIcon, FileText, Sparkles, Loader2 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
 export default function AIToolsDashboard() {
@@ -27,8 +27,6 @@ export default function AIToolsDashboard() {
   const [contentTopic, setContentTopic] = useState('')
   const [contentLength, setContentLength] = useState('medium')
   const [contentTone, setContentTone] = useState('professional')
-
-  const supabase = createClient()
 
   const handleGenerateImage = async () => {
     if (!imagePrompt.trim()) {
