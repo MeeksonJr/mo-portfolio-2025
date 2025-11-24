@@ -69,6 +69,7 @@ const interests = [
 ]
 
 import { ImageLightbox, useImageLightbox } from '@/components/image-lightbox/image-lightbox'
+import InteractiveTimeline from '@/components/timeline/interactive-timeline'
 
 export default function AboutPageContent() {
   const { isOpen, images, initialIndex, openLightbox, closeLightbox } = useImageLightbox()
@@ -146,63 +147,14 @@ export default function AboutPageContent() {
         </div>
       </motion.section>
 
-      {/* Timeline */}
+      {/* Interactive Timeline */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.4 }}
         className="mb-16"
       >
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold">My Journey</h2>
-          <Link
-            href="/timeline"
-            className="text-sm text-primary hover:underline flex items-center gap-1"
-          >
-            View Full Timeline
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-        <div className="relative">
-          {/* Timeline Line */}
-          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-0.5 bg-primary/20 transform md:-translate-x-1/2" />
-
-          <div className="space-y-12">
-            {timeline.map((milestone, index) => {
-              const Icon = milestone.icon
-              const isEven = index % 2 === 0
-              
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: isEven ? -50 : 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className={`relative flex items-center gap-6 ${
-                    isEven ? 'md:flex-row' : 'md:flex-row-reverse'
-                  }`}
-                >
-                  {/* Timeline Dot */}
-                  <div className="relative z-10 flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 border-4 border-primary flex items-center justify-center">
-                    <Icon className="text-primary" size={24} />
-                  </div>
-
-                  {/* Content Card */}
-                  <div className={`flex-1 glass rounded-xl p-6 ${isEven ? 'md:mr-auto md:max-w-md' : 'md:ml-auto md:max-w-md'}`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-primary font-bold text-lg">{milestone.year}</span>
-                      <span className="text-muted-foreground text-sm">•</span>
-                      <span className="text-muted-foreground text-sm">{milestone.location}</span>
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">{milestone.title}</h3>
-                    <p className="text-foreground/70">{milestone.description}</p>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </div>
-        </div>
+        <InteractiveTimeline />
       </motion.section>
 
       {/* Skills */}
