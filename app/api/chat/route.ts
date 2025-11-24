@@ -81,17 +81,17 @@ async function tryGroqModels(messages: any[]) {
         model: groq(modelName),
         system: systemPrompt,
         messages,
-        maxTokens: 500,
       })
 
       console.log(`✅ Groq model ${modelName} succeeded!`)
       return result
-    } catch (error) {
-      console.error(`❌ Groq model ${modelName} failed:`, error.message)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      console.error(`❌ Groq model ${modelName} failed:`, errorMessage)
 
       if (i === GROQ_MODELS.length - 1) {
         console.error("💥 All Groq models failed!")
-        throw new Error(`All Groq models failed. Last error: ${error.message}`)
+        throw new Error(`All Groq models failed. Last error: ${errorMessage}`)
       }
     }
   }
@@ -157,14 +157,14 @@ export async function POST(req: Request) {
                 model: google(geminiModel),
                 system: profileData,
                 messages,
-                maxTokens: 500,
                 temperature: 0.7,
               })
               console.log(`✅ Gemini model ${geminiModel} succeeded!`)
               geminiSuccess = true
               break
-            } catch (geminiError) {
-              console.error(`❌ Gemini model ${geminiModel} failed:`, geminiError.message)
+            } catch (geminiError: unknown) {
+              const errorMessage = geminiError instanceof Error ? geminiError.message : 'Unknown error'
+              console.error(`❌ Gemini model ${geminiModel} failed:`, errorMessage)
               continue
             }
           }
@@ -180,19 +180,13 @@ export async function POST(req: Request) {
       console.log("🔍 Result type:", typeof result)
       console.log("🔍 Result constructor:", result?.constructor?.name)
       
-      // Try different methods available on the result object
-      if (typeof result.toTextStreamResponse === 'function') {
+      // Use toTextStreamResponse - this is the standard method for StreamTextResult
+      if (result && typeof result.toTextStreamResponse === 'function') {
         console.log("✅ Using toTextStreamResponse method")
         return result.toTextStreamResponse()
-      } else if (typeof result.toUIMessageStreamResponse === 'function') {
+      } else if (result && typeof result.toUIMessageStreamResponse === 'function') {
         console.log("✅ Using toUIMessageStreamResponse method")
         return result.toUIMessageStreamResponse()
-      } else if (typeof result.toDataStreamResponse === 'function') {
-        console.log("✅ Using toDataStreamResponse method")
-        return result.toDataStreamResponse()
-      } else if (typeof result.toResponse === 'function') {
-        console.log("✅ Using toResponse method")
-        return result.toResponse()
       } else if (result instanceof Response) {
         console.log("✅ Result is already a Response object")
         return result
@@ -204,11 +198,13 @@ export async function POST(req: Request) {
           headers: { 'Content-Type': 'application/json' },
         })
       }
-    } catch (modelError) {
+    } catch (modelError: unknown) {
+      const errorMessage = modelError instanceof Error ? modelError.message : 'Unknown error'
+      const errorStack = modelError instanceof Error ? modelError.stack : undefined
       console.error("🔥 Chat API: Model-specific error:", {
         model,
-        error: modelError.message,
-        stack: modelError.stack,
+        error: errorMessage,
+        stack: errorStack,
       })
       
       // Return a user-friendly error response instead of throwing
@@ -221,11 +217,14 @@ export async function POST(req: Request) {
         headers: { 'Content-Type': 'application/json' },
       })
     }
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorStack = error instanceof Error ? error.stack : undefined
+    const errorName = error instanceof Error ? error.name : 'Error'
     console.error("💥 Chat API Error:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
+      message: errorMessage,
+      stack: errorStack,
+      name: errorName,
     })
 
     return new Response(

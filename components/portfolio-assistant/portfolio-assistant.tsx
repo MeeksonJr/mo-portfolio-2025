@@ -137,6 +137,7 @@ Try asking me something like "Show me projects using React" or "What's your expe
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
       let assistantContent = ''
+      let buffer = ''
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -151,23 +152,46 @@ Try asking me something like "Show me projects using React" or "What's your expe
         try {
           while (true) {
             const { done, value } = await reader.read()
-            if (done) break
-
-            const chunk = decoder.decode(value, { stream: true })
-            
-            // toTextStreamResponse returns plain text chunks
-            // Each chunk may contain partial text, so we accumulate it
-            assistantContent += chunk
-            
-            // Update the message content in real-time
-            setMessages(prev => {
-              const updated = [...prev]
-              const lastMsg = updated[updated.length - 1]
-              if (lastMsg && lastMsg.role === 'assistant') {
-                lastMsg.content = assistantContent
+            if (done) {
+              // Process any remaining buffer
+              if (buffer.trim()) {
+                assistantContent += buffer
+                setMessages(prev => {
+                  const updated = [...prev]
+                  const lastMsg = updated[updated.length - 1]
+                  if (lastMsg && lastMsg.role === 'assistant') {
+                    lastMsg.content = assistantContent.trim()
+                  }
+                  return updated
+                })
               }
-              return updated
-            })
+              break
+            }
+
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            
+            // Keep the last incomplete line in buffer
+            buffer = lines.pop() || ''
+
+            // Process complete lines
+            for (const line of lines) {
+              if (!line.trim()) continue
+              
+              // toTextStreamResponse returns plain text chunks
+              // Each chunk is just the text content, no JSON formatting
+              assistantContent += line + '\n'
+              
+              // Update the message content in real-time
+              setMessages(prev => {
+                const updated = [...prev]
+                const lastMsg = updated[updated.length - 1]
+                if (lastMsg && lastMsg.role === 'assistant') {
+                  lastMsg.content = assistantContent.trim()
+                }
+                return updated
+              })
+            }
           }
           
           // Ensure final content is set
@@ -177,6 +201,16 @@ Try asking me something like "Show me projects using React" or "What's your expe
               const lastMsg = updated[updated.length - 1]
               if (lastMsg && lastMsg.role === 'assistant') {
                 lastMsg.content = assistantContent
+              }
+              return updated
+            })
+          } else {
+            // If no content was received, show an error
+            setMessages(prev => {
+              const updated = [...prev]
+              const lastMsg = updated[updated.length - 1]
+              if (lastMsg && lastMsg.role === 'assistant') {
+                lastMsg.content = 'Sorry, I received an empty response. Please try again.'
               }
               return updated
             })
@@ -193,6 +227,16 @@ Try asking me something like "Show me projects using React" or "What's your expe
             return updated
           })
         }
+      } else {
+        // No reader available
+        setMessages(prev => {
+          const updated = [...prev]
+          const lastMsg = updated[updated.length - 1]
+          if (lastMsg && lastMsg.role === 'assistant') {
+            lastMsg.content = 'Sorry, I could not read the response stream. Please try again.'
+          }
+          return updated
+        })
       }
     } catch (error) {
       console.error('Error sending message:', error)
