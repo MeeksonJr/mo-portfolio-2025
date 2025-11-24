@@ -26,6 +26,16 @@ interface CaseStudiesListingProps {
 
 export default function CaseStudiesListing({ caseStudies }: CaseStudiesListingProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedTechStack, setSelectedTechStack] = useState<string | null>(null)
+
+  // Extract all unique tech stacks
+  const allTechStacks = useMemo(() => {
+    const techSet = new Set<string>()
+    caseStudies.forEach((cs) => {
+      cs.tech_stack?.forEach((tech) => techSet.add(tech))
+    })
+    return Array.from(techSet).sort()
+  }, [caseStudies])
 
   // Filter case studies
   const filteredCaseStudies = useMemo(() => {
@@ -40,8 +50,14 @@ export default function CaseStudiesListing({ caseStudies }: CaseStudiesListingPr
       )
     }
 
+    if (selectedTechStack) {
+      filtered = filtered.filter((cs) =>
+        cs.tech_stack?.some((tech) => tech === selectedTechStack)
+      )
+    }
+
     return filtered
-  }, [caseStudies, searchQuery])
+  }, [caseStudies, searchQuery, selectedTechStack])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -53,8 +69,8 @@ export default function CaseStudiesListing({ caseStudies }: CaseStudiesListingPr
         </p>
       </div>
 
-      {/* Search */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
+      {/* Search and Filters */}
+      <div className="flex flex-col gap-4 mb-8">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
@@ -64,6 +80,40 @@ export default function CaseStudiesListing({ caseStudies }: CaseStudiesListingPr
             className="pl-10"
           />
         </div>
+
+        {/* Tech Stack Filter */}
+        {allTechStacks.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium">Filter by Tech Stack:</p>
+              {selectedTechStack && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedTechStack(null)}
+                  className="h-7 text-xs"
+                >
+                  Clear filter
+                </Button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {allTechStacks.map((tech) => (
+                <Button
+                  key={tech}
+                  variant={selectedTechStack === tech ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() =>
+                    setSelectedTechStack(selectedTechStack === tech ? null : tech)
+                  }
+                  className="h-8 text-xs"
+                >
+                  {tech}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Case Studies Grid */}

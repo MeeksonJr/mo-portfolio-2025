@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getAuthenticatedUser } from '@/lib/supabase/api-helpers'
+import { uploadImageToStorage, base64ToArrayBuffer } from '@/lib/supabase/storage'
 
 // Groq models to try in order (using current production models)
 const GROQ_MODELS = [
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { readmeContent, contentType, repoName, repoDescription } = await request.json()
+    const { readmeContent, contentType, repoName, repoDescription, saveToStorage } = await request.json()
 
     const groqApiKey = process.env.GROQ_API_KEY
     if (!groqApiKey) {
@@ -299,13 +300,31 @@ Return only the image description text, nothing else.`
       }
     }
     
-    const imageDataUrl = `data:${mimeType};base64,${base64Image}`
+    let imageUrl = `data:${mimeType};base64,${base64Image}`
+    let storageUrl: string | null = null
+    let storagePath: string | null = null
+
+    // Optionally save to Supabase Storage
+    if (saveToStorage) {
+      try {
+        const fileName = `${contentType || 'generated'}-${Date.now()}.${mimeType.split('/')[1] || 'png'}`
+        const result = await uploadImageToStorage(imageBuffer, fileName, mimeType)
+        storageUrl = result.url
+        storagePath = result.path
+        imageUrl = storageUrl // Use storage URL if available
+      } catch (storageError: any) {
+        console.error('Error uploading to storage:', storageError)
+        // Continue with data URL if storage upload fails
+      }
+    }
 
     return NextResponse.json({
       success: true,
       imageDescription,
-      imageUrl: imageDataUrl,
+      imageUrl,
       imageBase64: base64Image,
+      storageUrl,
+      storagePath,
     })
   } catch (error: any) {
     console.error('Error generating image:', error)

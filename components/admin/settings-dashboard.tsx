@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -17,6 +18,14 @@ interface SettingsData {
   github_sync_frequency: string
   default_ai_model: string
   image_generation_model: string
+  site_name?: string
+  site_description?: string
+  site_url?: string
+  maintenance_mode?: boolean
+  default_blog_category?: string
+  default_tags?: string
+  default_content_status?: string
+  auto_generate_slug?: boolean
   [key: string]: any
 }
 
@@ -29,6 +38,10 @@ export default function SettingsDashboard() {
     github_sync_frequency: 'daily',
     default_ai_model: 'gemini',
     image_generation_model: 'stabilityai/stable-diffusion-xl-base-1.0',
+    site_name: 'Mohamed Datt',
+    site_description: 'Creative Full Stack Developer specializing in AI-powered web applications',
+    site_url: process.env.NEXT_PUBLIC_SITE_URL || 'https://mohameddatt.com',
+    maintenance_mode: false,
   })
   const [hasChanges, setHasChanges] = useState(false)
 
@@ -188,8 +201,59 @@ export default function SettingsDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-sm text-muted-foreground">
-                General settings coming soon. This will include site name, description, and other basic configurations.
+              <div className="space-y-2">
+                <Label htmlFor="site-name">Site Name</Label>
+                <Input
+                  id="site-name"
+                  placeholder="Mohamed Datt"
+                  value={settings.site_name || ''}
+                  onChange={(e) => updateSetting('site_name', e.target.value)}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Your portfolio site name
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="site-description">Site Description</Label>
+                <Textarea
+                  id="site-description"
+                  placeholder="Creative Full Stack Developer..."
+                  value={settings.site_description || ''}
+                  onChange={(e) => updateSetting('site_description', e.target.value)}
+                  rows={3}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Default meta description for SEO
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="site-url">Site URL</Label>
+                <Input
+                  id="site-url"
+                  type="url"
+                  placeholder="https://mohameddatt.com"
+                  value={settings.site_url || process.env.NEXT_PUBLIC_SITE_URL || ''}
+                  onChange={(e) => updateSetting('site_url', e.target.value)}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Your portfolio website URL
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="maintenance-mode">Maintenance Mode</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Show maintenance page to visitors
+                  </p>
+                </div>
+                <Switch
+                  id="maintenance-mode"
+                  checked={settings.maintenance_mode || false}
+                  onCheckedChange={(checked) => updateSetting('maintenance_mode', checked)}
+                />
               </div>
             </CardContent>
           </Card>
@@ -337,8 +401,64 @@ export default function SettingsDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-sm text-muted-foreground">
-                Content default settings coming soon. This will include default categories, tags, and other content preferences.
+              <div className="space-y-2">
+                <Label htmlFor="default-blog-category">Default Blog Category</Label>
+                <Input
+                  id="default-blog-category"
+                  placeholder="Technology"
+                  value={settings.default_blog_category || ''}
+                  onChange={(e) => updateSetting('default_blog_category', e.target.value)}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Default category for new blog posts
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="default-tags">Default Tags (comma-separated)</Label>
+                <Input
+                  id="default-tags"
+                  placeholder="Next.js, TypeScript, React"
+                  value={settings.default_tags || ''}
+                  onChange={(e) => updateSetting('default_tags', e.target.value)}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Default tags to apply to new content
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="default-content-status">Default Content Status</Label>
+                <Select
+                  value={settings.default_content_status || 'draft'}
+                  onValueChange={(value) => updateSetting('default_content_status', value)}
+                >
+                  <SelectTrigger id="default-content-status">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground">
+                  Default status for new content
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="auto-generate-slug">Auto-generate Slug</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Automatically generate URL slugs from titles
+                  </p>
+                </div>
+                <Switch
+                  id="auto-generate-slug"
+                  checked={settings.auto_generate_slug !== false}
+                  onCheckedChange={(checked) => updateSetting('auto_generate_slug', checked)}
+                />
               </div>
             </CardContent>
           </Card>

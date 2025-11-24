@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, Plus, Edit, Trash2, Eye, Calendar, FileText } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Eye, Calendar, FileText, CheckSquare, Square } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,6 +13,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import { toast } from 'sonner'
 import {
   Select,
   SelectContent,
@@ -76,6 +78,9 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [postToEdit, setPostToEdit] = useState<BlogPost | null>(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set())
+  const [isBulkOperating, setIsBulkOperating] = useState(false)
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
 
   // Get unique categories
   const categories = useMemo(
@@ -119,6 +124,102 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
   const endIndex = startIndex + itemsPerPage
   const paginatedPosts = filteredPosts.slice(startIndex, endIndex)
 
+  // Select all on current page
+  const allSelectedOnPage = paginatedPosts.length > 0 && paginatedPosts.every((post) => selectedPosts.has(post.id))
+  const someSelectedOnPage = paginatedPosts.some((post) => selectedPosts.has(post.id))
+
+  const handleSelectAll = () => {
+    if (allSelectedOnPage) {
+      // Deselect all on current page
+      const newSelected = new Set(selectedPosts)
+      paginatedPosts.forEach((post) => newSelected.delete(post.id))
+      setSelectedPosts(newSelected)
+    } else {
+      // Select all on current page
+      const newSelected = new Set(selectedPosts)
+      paginatedPosts.forEach((post) => newSelected.add(post.id))
+      setSelectedPosts(newSelected)
+    }
+  }
+
+  const handleSelectPost = (postId: string) => {
+    const newSelected = new Set(selectedPosts)
+    if (newSelected.has(postId)) {
+      newSelected.delete(postId)
+    } else {
+      newSelected.add(postId)
+    }
+    setSelectedPosts(newSelected)
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedPosts.size === 0) return
+
+    setIsBulkOperating(true)
+    try {
+      const response = await fetch('/api/admin/content/blog/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ids: Array.from(selectedPosts),
+          action: 'delete',
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete posts')
+      }
+
+      // Remove from local state
+      setPosts(posts.filter((post) => !selectedPosts.has(post.id)))
+      setSelectedPosts(new Set())
+      setBulkDeleteDialogOpen(false)
+      toast.success(`Deleted ${selectedPosts.size} post(s) successfully`)
+    } catch (error) {
+      console.error('Error deleting posts:', error)
+      toast.error('Failed to delete posts. Please try again.')
+    } finally {
+      setIsBulkOperating(false)
+    }
+  }
+
+  const handleBulkStatusChange = async (status: 'draft' | 'published' | 'scheduled') => {
+    if (selectedPosts.size === 0) return
+
+    setIsBulkOperating(true)
+    try {
+      const response = await fetch('/api/admin/content/blog/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ids: Array.from(selectedPosts),
+          action: 'update_status',
+          value: status,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update posts')
+      }
+
+      // Update local state
+      setPosts(
+        posts.map((post) =>
+          selectedPosts.has(post.id) ? { ...post, status } : post
+        )
+      )
+      setSelectedPosts(new Set())
+      toast.success(`Updated ${selectedPosts.size} post(s) to ${status}`)
+    } catch (error) {
+      console.error('Error updating posts:', error)
+      toast.error('Failed to update posts. Please try again.')
+    } finally {
+      setIsBulkOperating(false)
+    }
+  }
+
   const handleDelete = async () => {
     if (!postToDelete) return
 
@@ -161,6 +262,50 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
 
   return (
     <div className="space-y-4 w-full max-w-full overflow-hidden">
+      {/* Bulk Actions Bar */}
+      {selectedPosts.size > 0 && (
+        <div className="flex items-center justify-between p-4 bg-primary/10 border border-primary/20 rounded-lg">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">
+              {selectedPosts.size} post(s) selected
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select
+              value=""
+              onValueChange={(value) => handleBulkStatusChange(value as 'draft' | 'published' | 'scheduled')}
+              disabled={isBulkOperating}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Change status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="published">Set to Published</SelectItem>
+                <SelectItem value="draft">Set to Draft</SelectItem>
+                <SelectItem value="scheduled">Set to Scheduled</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setBulkDeleteDialogOpen(true)}
+              disabled={isBulkOperating}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Selected
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedPosts(new Set())}
+              disabled={isBulkOperating}
+            >
+              Clear Selection
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Filters and Actions */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between sticky top-0 z-10 bg-background pb-4 w-full">
         <div className="flex flex-1 gap-2 w-full sm:w-auto min-w-0">
@@ -239,6 +384,13 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={allSelectedOnPage}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all"
+                />
+              </TableHead>
               <TableHead className="min-w-[200px]">Title</TableHead>
               <TableHead className="w-[100px]">Status</TableHead>
               <TableHead className="w-[120px]">Category</TableHead>
@@ -259,6 +411,13 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
             ) : (
               paginatedPosts.map((post) => (
                 <TableRow key={post.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedPosts.has(post.id)}
+                      onCheckedChange={() => handleSelectPost(post.id)}
+                      aria-label={`Select ${post.title}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium max-w-[300px]">
                     <div className="flex items-center gap-2 min-w-0">
                       {post.featured_image && (
@@ -411,6 +570,28 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Selected Posts</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedPosts.size} post(s)? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              disabled={isBulkOperating}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isBulkOperating ? 'Deleting...' : `Delete ${selectedPosts.size} post(s)`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

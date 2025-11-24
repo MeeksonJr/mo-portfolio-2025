@@ -1549,7 +1549,7 @@ content/
   - [x] Case study template
   - [x] Search functionality
   - [x] Related case studies
-  - [ ] Filter by tech stack (future enhancement)
+  - [x] Filter by tech stack ✅
 
 - [x] **Resources (Public)** ✅
   - [x] Resources listing page
@@ -1710,7 +1710,7 @@ content/
   - [x] Build image generation UI in admin
   - [x] Multiple model support with fallback
   - [ ] Image editing features (future)
-  - [ ] Save to Supabase Storage (future)
+  - [x] Save to Supabase Storage ✅
 - [x] AI Content Generation
   - [x] Blog post generator API
   - [x] Case study generator API

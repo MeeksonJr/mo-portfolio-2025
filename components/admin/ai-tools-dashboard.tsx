@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Wand2, Image as ImageIcon, FileText, Sparkles, Loader2 } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
 import { supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
@@ -21,6 +22,7 @@ export default function AIToolsDashboard() {
   // Image generation state
   const [imagePrompt, setImagePrompt] = useState('')
   const [imageModel, setImageModel] = useState('stabilityai/stable-diffusion-xl-base-1.0')
+  const [saveToStorage, setSaveToStorage] = useState(false)
   
   // Content generation state
   const [contentType, setContentType] = useState('blog')
@@ -56,6 +58,7 @@ export default function AIToolsDashboard() {
           contentType: 'blog', // Default content type
           repoName: 'Custom Image',
           repoDescription: imagePrompt,
+          saveToStorage,
         }),
       })
 
@@ -67,7 +70,13 @@ export default function AIToolsDashboard() {
 
       if (result.imageUrl) {
         setGeneratedImage(result.imageUrl)
-        toast.success('Image generated successfully!')
+        if (result.storageUrl) {
+          toast.success('Image generated and saved to storage!', {
+            description: `Storage URL: ${result.storageUrl.substring(0, 50)}...`,
+          })
+        } else {
+          toast.success('Image generated successfully!')
+        }
       } else {
         throw new Error('No image URL returned')
       }
@@ -191,6 +200,20 @@ export default function AIToolsDashboard() {
                 value={imagePrompt}
                 onChange={(e) => setImagePrompt(e.target.value)}
                 rows={4}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="save-to-storage">Save to Supabase Storage</Label>
+                <p className="text-sm text-muted-foreground">
+                  Upload generated image to Supabase Storage for permanent storage
+                </p>
+              </div>
+              <Switch
+                id="save-to-storage"
+                checked={saveToStorage}
+                onCheckedChange={setSaveToStorage}
               />
             </div>
 
