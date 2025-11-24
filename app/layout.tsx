@@ -10,6 +10,7 @@ import TerminalBackground from "@/components/terminal-background"
 import { Toaster } from "@/components/ui/sonner"
 import AchievementTracker from "@/components/achievements/achievement-tracker"
 import KeyboardShortcutHint from "@/components/keyboard-shortcut-hint"
+import InteractiveOnboarding from "@/components/onboarding/interactive-onboarding"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -88,6 +89,7 @@ export default function RootLayout({
           <CommandPalette />
           <AchievementTracker />
           <KeyboardShortcutHint />
+          <InteractiveOnboarding />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
