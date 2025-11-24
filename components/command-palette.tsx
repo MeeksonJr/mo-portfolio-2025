@@ -39,13 +39,16 @@ import {
   Activity,
   Sparkles,
 } from 'lucide-react'
+import { GlobalSearch } from '@/components/search/global-search'
 
 export default function CommandPalette() {
   const [open, setOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
+      // Command Palette (Ctrl/Cmd + K)
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
         setOpen((open) => {
@@ -57,15 +60,24 @@ export default function CommandPalette() {
           return newOpen
         })
       }
+      // Global Search (Ctrl/Cmd + S)
+      if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        setSearchOpen(true)
+      }
       // Close with Escape
-      if (e.key === 'Escape' && open) {
-        setOpen(false)
+      if (e.key === 'Escape') {
+        if (searchOpen) {
+          setSearchOpen(false)
+        } else if (open) {
+          setOpen(false)
+        }
       }
     }
 
     document.addEventListener('keydown', down)
     return () => document.removeEventListener('keydown', down)
-  }, [open])
+  }, [open, searchOpen])
 
   const runCommand = (command: () => void) => {
     setOpen(false)
@@ -73,10 +85,27 @@ export default function CommandPalette() {
   }
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder="Type a command or search..." />
-      <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+    <>
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder="Type a command or search..." />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+
+          {/* Quick Search */}
+          <CommandGroup heading="Search">
+            <CommandItem
+              onSelect={() => {
+                setOpen(false)
+                setSearchOpen(true)
+              }}
+            >
+              <Search className="mr-2 h-4 w-4" />
+              <span>Search All Content</span>
+              <CommandShortcut>⌘S</CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+
+          <CommandSeparator />
 
         {/* Navigation */}
         <CommandGroup heading="Navigation">
@@ -280,6 +309,10 @@ export default function CommandPalette() {
         </CommandGroup>
       </CommandList>
     </CommandDialog>
+
+    {/* Global Search Dialog */}
+    <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+    </>
   )
 }
 
