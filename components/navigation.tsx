@@ -37,6 +37,7 @@ export default function Navigation() {
     { name: "Blog", href: "/blog" },
     { name: "Case Studies", href: "/case-studies" },
     { name: "Resources", href: "/resources" },
+    { name: "Testimonials", href: "/testimonials" },
     { name: "Timeline", href: "/timeline" },
     { name: "Music", href: "/music" },
     { name: "Achievements", href: "/achievements" },
