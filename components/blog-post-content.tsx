@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 import SocialShareButton from '@/components/social-share/social-share-button'
 import ReadingMode from '@/components/reading-mode/reading-mode'
 import { ContentPerformanceInsights } from '@/components/analytics/content-performance-insights'
+import SmartRecommendations from '@/components/recommendations/smart-recommendations'
 
 interface BlogPost {
   id: string
@@ -238,6 +239,22 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
           />
         </div>
       )}
+
+      {/* Smart Recommendations */}
+      <SmartRecommendations
+        currentItem={{
+          id: post.id,
+          title: post.title,
+          description: post.excerpt || undefined,
+          tags: post.tags || [],
+          category: post.category || undefined,
+          type: 'blog',
+          views: post.views,
+          createdAt: post.published_at || undefined,
+        }}
+        contentType="blog"
+        limit={3}
+      />
     </article>
   )
 }

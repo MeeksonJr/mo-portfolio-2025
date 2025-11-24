@@ -1,5 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { getGitHubData, formatGitHubDataForAI } from "@/lib/github-data"
+import { createRateLimitMiddleware, rateLimitConfigs, getClientIdentifier } from "@/lib/rate-limiting"
+import { sanitizeText } from "@/lib/input-sanitization"
 
 const MOHAMED_PROFILE_DATA = `
 You are Mohamed Datt, a Full Stack Developer. Answer questions about yourself in first person, naturally and conversationally.
@@ -49,6 +51,16 @@ export const maxDuration = 30
 export async function POST(req: Request) {
   console.log("🚀 Simple Chat API: Request received")
 
+  // Apply rate limiting
+  const rateLimitMiddleware = createRateLimitMiddleware({
+    ...rateLimitConfigs.ai,
+    identifier: getClientIdentifier(req),
+  })
+  const rateLimitResponse = await rateLimitMiddleware(req)
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
+
   try {
     const body = await req.json()
     console.log("📝 Simple Chat API: Request body:", {
@@ -57,7 +69,16 @@ export async function POST(req: Request) {
       historyLength: body.history?.length || 0,
     })
 
-    const { message, model = "gemini", history = [] } = body
+    // Sanitize input
+    const { message: rawMessage, model = "gemini", history = [] } = body
+    const message = sanitizeText(rawMessage || '')
+    
+    if (!message || message.trim().length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Message is required and cannot be empty' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
 
     if (!message) {
       console.error("❌ Simple Chat API: No message provided")
@@ -83,15 +104,18 @@ export async function POST(req: Request) {
       model,
       timestamp: new Date().toISOString(),
     })
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorStack = error instanceof Error ? error.stack : undefined
+    
     console.error("💥 Simple Chat API Error:", {
-      message: error.message,
-      stack: error.stack,
+      message: errorMessage,
+      stack: errorStack,
     })
 
     return Response.json(
       {
-        error: `Failed to process request: ${error.message}`,
+        error: `Failed to process request: ${errorMessage}`,
         timestamp: new Date().toISOString(),
       },
       { status: 500 },
@@ -100,6 +124,8 @@ export async function POST(req: Request) {
 }
 
 async function handleGeminiRequest(message: string, history: any[]): Promise<string> {
+  // Sanitize message
+  const sanitizedMessage = sanitizeText(message)
   console.log("🌟 Gemini: Initializing Google GenAI")
 
   if (!process.env.GEMINI_API_KEY) {
@@ -150,8 +176,9 @@ async function handleGeminiRequest(message: string, history: any[]): Promise<str
 
       console.log(`✅ Gemini: ${modelName} succeeded!`)
       return text.trim()
-    } catch (modelError) {
-      console.error(`❌ Gemini: ${modelName} failed:`, modelError.message)
+    } catch (modelError: unknown) {
+      const errorMsg = modelError instanceof Error ? modelError.message : 'Unknown error'
+      console.error(`❌ Gemini: ${modelName} failed:`, errorMsg)
       continue
     }
   }
@@ -211,8 +238,9 @@ async function handleGroqRequest(message: string, history: any[]): Promise<strin
 
       console.log(`✅ Groq: ${modelName} succeeded!`)
       return data.choices[0].message.content.trim()
-    } catch (modelError) {
-      console.error(`❌ Groq: ${modelName} failed:`, modelError.message)
+    } catch (modelError: unknown) {
+      const errorMsg = modelError instanceof Error ? modelError.message : 'Unknown error'
+      console.error(`❌ Groq: ${modelName} failed:`, errorMsg)
       continue
     }
   }

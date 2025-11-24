@@ -1,6 +1,7 @@
 'use client'
 
 import { Calendar, Eye, ArrowLeft, CheckCircle2, Lightbulb, Target, TrendingUp, DollarSign, Clock, Users, BarChart3, Download } from 'lucide-react'
+import SmartRecommendations from '@/components/recommendations/smart-recommendations'
 import SocialShareButton from '@/components/social-share/social-share-button'
 import { ContentPerformanceInsights } from '@/components/analytics/content-performance-insights'
 import { Badge } from '@/components/ui/badge'
@@ -408,6 +409,21 @@ export default function CaseStudyContent({ caseStudy, relatedCaseStudies }: Case
           contentTitle={caseStudy.title}
         />
       </div>
+
+      {/* Smart Recommendations */}
+      <SmartRecommendations
+        currentItem={{
+          id: caseStudy.id,
+          title: caseStudy.title,
+          description: caseStudy.description || undefined,
+          tags: caseStudy.tech_stack || [],
+          type: 'case-study',
+          views: caseStudy.views,
+          createdAt: caseStudy.published_at || undefined,
+        }}
+        contentType="case-study"
+        limit={3}
+      />
     </article>
   )
 }
