@@ -161,6 +161,42 @@ export const ACHIEVEMENTS: Achievement[] = [
     rarity: 'rare',
     points: 30,
   },
+  {
+    id: 'streak-3',
+    title: 'On Fire',
+    description: 'Visit 3 days in a row',
+    icon: '🔥',
+    category: 'milestone',
+    rarity: 'common',
+    points: 20,
+  },
+  {
+    id: 'streak-7',
+    title: 'Week Warrior',
+    description: 'Visit 7 days in a row',
+    icon: '⚡',
+    category: 'milestone',
+    rarity: 'rare',
+    points: 50,
+  },
+  {
+    id: 'streak-14',
+    title: 'Dedicated Explorer',
+    description: 'Visit 14 days in a row',
+    icon: '🌟',
+    category: 'milestone',
+    rarity: 'epic',
+    points: 100,
+  },
+  {
+    id: 'streak-30',
+    title: 'Legendary Streak',
+    description: 'Visit 30 days in a row',
+    icon: '👑',
+    category: 'milestone',
+    rarity: 'legendary',
+    points: 200,
+  },
 ]
 
 const STORAGE_KEY = 'portfolio_achievements'

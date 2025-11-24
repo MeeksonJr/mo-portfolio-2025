@@ -11,6 +11,7 @@ import {
   trackTimeOnSite,
   ACHIEVEMENTS,
 } from '@/lib/achievements'
+import { updateStreak, getStreakAchievement } from '@/lib/achievement-streaks'
 import AchievementNotification from './achievement-notification'
 
 export default function AchievementTracker() {
@@ -46,8 +47,17 @@ export default function AchievementTracker() {
     // Track page visit
     if (pathname) {
       trackPageVisit(pathname)
+      // Update streak on page visit
+      const { isNewStreak, streak } = updateStreak()
+      if (isNewStreak && streak > 0) {
+        // Check for streak achievements
+        const streakAchievementId = getStreakAchievement(streak)
+        if (streakAchievementId) {
+          checkAndUnlock(streakAchievementId)
+        }
+      }
     }
-  }, [pathname])
+  }, [pathname, checkAndUnlock])
 
   useEffect(() => {
     // Track time on site (check every minute)

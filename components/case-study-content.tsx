@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, Eye, ArrowLeft, CheckCircle2, Lightbulb, Target } from 'lucide-react'
+import { Calendar, Eye, ArrowLeft, CheckCircle2, Lightbulb, Target, TrendingUp, DollarSign, Clock, Users, BarChart3, Download } from 'lucide-react'
 import SocialShareButton from '@/components/social-share/social-share-button'
 import { ContentPerformanceInsights } from '@/components/analytics/content-performance-insights'
 import { Badge } from '@/components/ui/badge'
@@ -24,6 +24,20 @@ interface CaseStudy {
   challenges: string[] | null
   results: string | null
   lessons_learned: string[] | null
+  metrics?: {
+    performance_improvement?: string
+    cost_savings?: string
+    time_saved?: string
+    user_growth?: string
+    revenue_impact?: string
+    efficiency_gain?: string
+  } | null
+  roi_data?: {
+    investment?: string
+    return?: string
+    payback_period?: string
+    annual_savings?: string
+  } | null
 }
 
 interface RelatedCaseStudy {
@@ -217,9 +231,120 @@ export default function CaseStudyContent({ caseStudy, relatedCaseStudies }: Case
       {/* Results */}
       {caseStudy.results && (
         <section className="mb-8 p-6 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900">
-          <h2 className="text-2xl font-semibold mb-4 text-blue-900 dark:text-blue-100">Results</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-blue-900 dark:text-blue-100 flex items-center gap-2">
+            <TrendingUp className="h-6 w-6" />
+            Results & Impact
+          </h2>
           <div className="prose prose-blue dark:prose-invert max-w-none">
             <ReactMarkdown>{caseStudy.results}</ReactMarkdown>
+          </div>
+        </section>
+      )}
+
+      {/* Metrics & KPIs */}
+      {caseStudy.metrics && (
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+            <BarChart3 className="h-6 w-6" />
+            Key Metrics & KPIs
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {caseStudy.metrics.performance_improvement && (
+              <div className="p-4 bg-muted rounded-lg border">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="h-5 w-5 text-green-600" />
+                  <h3 className="font-semibold">Performance</h3>
+                </div>
+                <p className="text-2xl font-bold text-green-600">{caseStudy.metrics.performance_improvement}</p>
+                <p className="text-sm text-muted-foreground mt-1">Improvement</p>
+              </div>
+            )}
+            {caseStudy.metrics.cost_savings && (
+              <div className="p-4 bg-muted rounded-lg border">
+                <div className="flex items-center gap-2 mb-2">
+                  <DollarSign className="h-5 w-5 text-blue-600" />
+                  <h3 className="font-semibold">Cost Savings</h3>
+                </div>
+                <p className="text-2xl font-bold text-blue-600">{caseStudy.metrics.cost_savings}</p>
+                <p className="text-sm text-muted-foreground mt-1">Annual savings</p>
+              </div>
+            )}
+            {caseStudy.metrics.time_saved && (
+              <div className="p-4 bg-muted rounded-lg border">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="h-5 w-5 text-purple-600" />
+                  <h3 className="font-semibold">Time Saved</h3>
+                </div>
+                <p className="text-2xl font-bold text-purple-600">{caseStudy.metrics.time_saved}</p>
+                <p className="text-sm text-muted-foreground mt-1">Per week/month</p>
+              </div>
+            )}
+            {caseStudy.metrics.user_growth && (
+              <div className="p-4 bg-muted rounded-lg border">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="h-5 w-5 text-orange-600" />
+                  <h3 className="font-semibold">User Growth</h3>
+                </div>
+                <p className="text-2xl font-bold text-orange-600">{caseStudy.metrics.user_growth}</p>
+                <p className="text-sm text-muted-foreground mt-1">Increase</p>
+              </div>
+            )}
+            {caseStudy.metrics.revenue_impact && (
+              <div className="p-4 bg-muted rounded-lg border">
+                <div className="flex items-center gap-2 mb-2">
+                  <DollarSign className="h-5 w-5 text-green-600" />
+                  <h3 className="font-semibold">Revenue Impact</h3>
+                </div>
+                <p className="text-2xl font-bold text-green-600">{caseStudy.metrics.revenue_impact}</p>
+                <p className="text-sm text-muted-foreground mt-1">Additional revenue</p>
+              </div>
+            )}
+            {caseStudy.metrics.efficiency_gain && (
+              <div className="p-4 bg-muted rounded-lg border">
+                <div className="flex items-center gap-2 mb-2">
+                  <BarChart3 className="h-5 w-5 text-indigo-600" />
+                  <h3 className="font-semibold">Efficiency</h3>
+                </div>
+                <p className="text-2xl font-bold text-indigo-600">{caseStudy.metrics.efficiency_gain}</p>
+                <p className="text-sm text-muted-foreground mt-1">Gain</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ROI Section */}
+      {caseStudy.roi_data && (
+        <section className="mb-8 p-6 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 rounded-lg border border-green-200 dark:border-green-900">
+          <h2 className="text-2xl font-semibold mb-6 text-green-900 dark:text-green-100 flex items-center gap-2">
+            <DollarSign className="h-6 w-6" />
+            Return on Investment (ROI)
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {caseStudy.roi_data.investment && (
+              <div className="p-4 bg-background/50 rounded-lg">
+                <h3 className="font-semibold mb-2 text-muted-foreground">Investment</h3>
+                <p className="text-3xl font-bold">{caseStudy.roi_data.investment}</p>
+              </div>
+            )}
+            {caseStudy.roi_data.return && (
+              <div className="p-4 bg-background/50 rounded-lg">
+                <h3 className="font-semibold mb-2 text-muted-foreground">Return</h3>
+                <p className="text-3xl font-bold text-green-600">{caseStudy.roi_data.return}</p>
+              </div>
+            )}
+            {caseStudy.roi_data.payback_period && (
+              <div className="p-4 bg-background/50 rounded-lg">
+                <h3 className="font-semibold mb-2 text-muted-foreground">Payback Period</h3>
+                <p className="text-3xl font-bold">{caseStudy.roi_data.payback_period}</p>
+              </div>
+            )}
+            {caseStudy.roi_data.annual_savings && (
+              <div className="p-4 bg-background/50 rounded-lg">
+                <h3 className="font-semibold mb-2 text-muted-foreground">Annual Savings</h3>
+                <p className="text-3xl font-bold text-blue-600">{caseStudy.roi_data.annual_savings}</p>
+              </div>
+            )}
           </div>
         </section>
       )}

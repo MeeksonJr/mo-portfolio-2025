@@ -10,8 +10,10 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { Trophy, Lock, CheckCircle2, TrendingUp } from 'lucide-react'
+import { Trophy, Lock, CheckCircle2, TrendingUp, Flame } from 'lucide-react'
 import AchievementBadge from './achievement-badge'
+import ShareAchievement from './share-achievement'
+import { getStreakData } from '@/lib/achievement-streaks'
 
 export default function AchievementsPage() {
   const [achievements, setAchievements] = useState(
@@ -19,6 +21,7 @@ export default function AchievementsPage() {
   )
   const [totalPoints, setTotalPoints] = useState(getTotalPoints())
   const [unlockedCount, setUnlockedCount] = useState(getUnlockedAchievements().length)
+  const [streakData, setStreakData] = useState(getStreakData())
 
   useEffect(() => {
     const updateAchievements = () => {
@@ -28,7 +31,10 @@ export default function AchievementsPage() {
     }
 
     // Update every second to catch real-time unlocks
-    const interval = setInterval(updateAchievements, 1000)
+    const interval = setInterval(() => {
+      updateAchievements()
+      setStreakData(getStreakData())
+    }, 1000)
     return () => clearInterval(interval)
   }, [])
 
@@ -110,23 +116,51 @@ export default function AchievementsPage() {
         </Card>
       </div>
 
-      {/* Progress Bar */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Overall Progress</CardTitle>
-          <CardDescription>
-            {unlockedCount} of {ACHIEVEMENTS.length} achievements unlocked
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-4 w-full overflow-hidden rounded-full bg-muted">
-            <div
-              className="h-full bg-primary transition-all duration-500"
-              style={{ width: `${completionPercentage}%` }}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-2 mb-8">
+        {/* Progress Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Overall Progress</CardTitle>
+            <CardDescription>
+              {unlockedCount} of {ACHIEVEMENTS.length} achievements unlocked
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-4 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full bg-primary transition-all duration-500"
+                style={{ width: `${completionPercentage}%` }}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              {completionPercentage}% Complete
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Streak Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Flame className="h-5 w-5 text-orange-500" />
+              Visit Streak
+            </CardTitle>
+            <CardDescription>
+              Consecutive days visiting the portfolio
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold mb-2">
+              {streakData.currentStreak} {streakData.currentStreak === 1 ? 'day' : 'days'}
+            </div>
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <span>Longest: {streakData.longestStreak} days</span>
+              <span>Total: {streakData.totalDays} days</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Achievements Tabs */}
       <Tabs defaultValue="all" className="w-full">
@@ -159,29 +193,33 @@ export default function AchievementsPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-3">
                       <div className="flex gap-2">
                         <Badge variant="secondary">{achievement.rarity}</Badge>
                         <Badge variant="outline">{achievement.points} pts</Badge>
                       </div>
-                      {achievement.progress && !unlocked && (
-                        <div className="text-xs text-muted-foreground">
-                          {achievement.progress.progress} / {achievement.progress.maxProgress}
-                        </div>
-                      )}
+                      {unlocked && <ShareAchievement achievement={achievement} />}
                     </div>
                     {achievement.progress && !unlocked && (
-                      <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full bg-primary transition-all"
-                          style={{
-                            width: `${
-                              (achievement.progress.progress /
-                                achievement.progress.maxProgress) *
-                              100
-                            }%`,
-                          }}
-                        />
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>Progress</span>
+                          <span>
+                            {achievement.progress.progress} / {achievement.progress.maxProgress}
+                          </span>
+                        </div>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                          <div
+                            className="h-full bg-primary transition-all"
+                            style={{
+                              width: `${
+                                (achievement.progress.progress /
+                                  achievement.progress.maxProgress) *
+                                100
+                              }%`,
+                            }}
+                          />
+                        </div>
                       </div>
                     )}
                   </CardContent>
@@ -213,29 +251,33 @@ export default function AchievementsPage() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between mb-3">
                         <div className="flex gap-2">
                           <Badge variant="secondary">{achievement.rarity}</Badge>
                           <Badge variant="outline">{achievement.points} pts</Badge>
                         </div>
-                        {achievement.progress && !unlocked && (
-                          <div className="text-xs text-muted-foreground">
-                            {achievement.progress.progress} / {achievement.progress.maxProgress}
-                          </div>
-                        )}
+                        {unlocked && <ShareAchievement achievement={achievement} />}
                       </div>
                       {achievement.progress && !unlocked && (
-                        <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
-                          <div
-                            className="h-full bg-primary transition-all"
-                            style={{
-                              width: `${
-                                (achievement.progress.progress /
-                                  achievement.progress.maxProgress) *
-                                100
-                              }%`,
-                            }}
-                          />
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>Progress</span>
+                            <span>
+                              {achievement.progress.progress} / {achievement.progress.maxProgress}
+                            </span>
+                          </div>
+                          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                            <div
+                              className="h-full bg-primary transition-all"
+                              style={{
+                                width: `${
+                                  (achievement.progress.progress /
+                                    achievement.progress.maxProgress) *
+                                  100
+                                }%`,
+                              }}
+                            />
+                          </div>
                         </div>
                       )}
                     </CardContent>
