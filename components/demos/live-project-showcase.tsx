@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ExternalLink, Github, Monitor, Maximize2, Minimize2, X, 
-  Play, Code, Zap, TrendingUp, Users, Award, ArrowRight
+  Play, Code, Zap, TrendingUp, Users, Award, ArrowRight, Video, Image as ImageIcon
 } from 'lucide-react'
+import { BeforeAfterSlider } from './before-after-slider'
+import { VideoWalkthrough } from './video-walkthrough'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -26,6 +28,9 @@ interface Project {
   is_featured: boolean
   views: number
   slug: string
+  before_image?: string | null
+  after_image?: string | null
+  video_walkthrough?: string | null
 }
 
 export default function LiveProjectShowcase() {
@@ -340,21 +345,69 @@ export default function LiveProjectShowcase() {
                 </div>
               </div>
 
-              {/* Iframe */}
-              <div className="flex-1 relative overflow-hidden">
-                {selectedProject.homepage_url ? (
-                  <iframe
-                    src={selectedProject.homepage_url}
-                    className="w-full h-full border-0"
-                    title={`${selectedProject.name} Live Demo`}
-                    allow="camera; microphone; geolocation; encrypted-media"
-                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-muted-foreground">Demo URL not available</p>
-                  </div>
-                )}
+              {/* Content Tabs */}
+              <div className="flex-1 relative overflow-hidden flex flex-col">
+                <Tabs defaultValue="demo" className="flex-1 flex flex-col">
+                  <TabsList className="mx-4 mt-4">
+                    {selectedProject.homepage_url && (
+                      <TabsTrigger value="demo" className="gap-2">
+                        <Monitor className="h-4 w-4" />
+                        Live Demo
+                      </TabsTrigger>
+                    )}
+                    {selectedProject.before_image && selectedProject.after_image && (
+                      <TabsTrigger value="comparison" className="gap-2">
+                        <ImageIcon className="h-4 w-4" />
+                        Before/After
+                      </TabsTrigger>
+                    )}
+                    {selectedProject.video_walkthrough && (
+                      <TabsTrigger value="video" className="gap-2">
+                        <Video className="h-4 w-4" />
+                        Walkthrough
+                      </TabsTrigger>
+                    )}
+                  </TabsList>
+
+                  {/* Live Demo Tab */}
+                  {selectedProject.homepage_url && (
+                    <TabsContent value="demo" className="flex-1 m-0 p-0">
+                      <div className="h-full">
+                        <iframe
+                          src={selectedProject.homepage_url}
+                          className="w-full h-full border-0"
+                          title={`${selectedProject.name} Live Demo`}
+                          allow="camera; microphone; geolocation; encrypted-media"
+                          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+                        />
+                      </div>
+                    </TabsContent>
+                  )}
+
+                  {/* Before/After Tab */}
+                  {selectedProject.before_image && selectedProject.after_image && (
+                    <TabsContent value="comparison" className="flex-1 m-0 p-4 overflow-auto">
+                      <BeforeAfterSlider
+                        beforeImage={selectedProject.before_image}
+                        afterImage={selectedProject.after_image}
+                        beforeLabel="Before"
+                        afterLabel="After"
+                      />
+                    </TabsContent>
+                  )}
+
+                  {/* Video Walkthrough Tab */}
+                  {selectedProject.video_walkthrough && (
+                    <TabsContent value="video" className="flex-1 m-0 p-4 overflow-auto">
+                      <VideoWalkthrough
+                        videoUrl={selectedProject.video_walkthrough}
+                        title={`${selectedProject.name} Walkthrough`}
+                        description={selectedProject.description || undefined}
+                        thumbnail={selectedProject.featured_image || undefined}
+                      />
+                    </TabsContent>
+                  )}
+                </Tabs>
               </div>
 
               {/* Footer */}
