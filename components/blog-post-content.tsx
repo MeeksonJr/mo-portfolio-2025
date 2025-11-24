@@ -1,12 +1,13 @@
 'use client'
 
-import { Calendar, Eye, Clock, ArrowLeft, Share2 } from 'lucide-react'
+import { Calendar, Eye, Clock, ArrowLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import ReactMarkdown from 'react-markdown'
 import { useEffect } from 'react'
+import SocialShareButton from '@/components/social-share/social-share-button'
 
 interface BlogPost {
   id: string
@@ -44,23 +45,6 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
     window.scrollTo(0, 0)
   }, [])
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: post.title,
-          text: post.excerpt || '',
-          url: window.location.href,
-        })
-      } catch (err) {
-        // User cancelled or error occurred
-      }
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(window.location.href)
-      alert('Link copied to clipboard!')
-    }
-  }
 
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -103,15 +87,15 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
             <Eye className="h-4 w-4" />
             <span>{post.views || 0} views</span>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleShare}
-            className="ml-auto"
-          >
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
-          </Button>
+          <div className="ml-auto">
+            <SocialShareButton
+              url={typeof window !== 'undefined' ? window.location.href : ''}
+              title={post.title}
+              description={post.excerpt || ''}
+              variant="ghost"
+              size="sm"
+            />
+          </div>
         </div>
 
         {/* Featured Image */}

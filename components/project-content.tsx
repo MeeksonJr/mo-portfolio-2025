@@ -1,9 +1,10 @@
 'use client'
 
-import { Eye, ArrowLeft, Share2, ExternalLink, Github, Star, FolderGit2 } from 'lucide-react'
+import { Eye, ArrowLeft, ExternalLink, Github, Star, FolderGit2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import SocialShareButton from '@/components/social-share/social-share-button'
 
 interface Project {
   id: string
@@ -42,23 +43,6 @@ const createSlug = (name: string): string => {
 }
 
 export default function ProjectContent({ project, relatedProjects }: ProjectContentProps) {
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: project.name,
-          text: project.description || '',
-          url: window.location.href,
-        })
-      } catch (err) {
-        // User cancelled or error occurred
-      }
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(window.location.href)
-      alert('Link copied to clipboard!')
-    }
-  }
 
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -94,15 +78,15 @@ export default function ProjectContent({ project, relatedProjects }: ProjectCont
             <Eye className="h-4 w-4" />
             <span>{project.views || 0} views</span>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleShare}
-            className="ml-auto"
-          >
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
-          </Button>
+          <div className="ml-auto">
+            <SocialShareButton
+              url={typeof window !== 'undefined' ? window.location.href : ''}
+              title={project.name}
+              description={project.description || ''}
+              variant="ghost"
+              size="sm"
+            />
+          </div>
         </div>
 
         {/* Featured Image */}

@@ -1,6 +1,7 @@
 'use client'
 
-import { Calendar, Eye, ArrowLeft, Share2, CheckCircle2, Lightbulb, Target } from 'lucide-react'
+import { Calendar, Eye, ArrowLeft, CheckCircle2, Lightbulb, Target } from 'lucide-react'
+import SocialShareButton from '@/components/social-share/social-share-button'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -39,23 +40,6 @@ interface CaseStudyContentProps {
 }
 
 export default function CaseStudyContent({ caseStudy, relatedCaseStudies }: CaseStudyContentProps) {
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: caseStudy.title,
-          text: caseStudy.description || '',
-          url: window.location.href,
-        })
-      } catch (err) {
-        // User cancelled or error occurred
-      }
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(window.location.href)
-      alert('Link copied to clipboard!')
-    }
-  }
 
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -93,15 +77,15 @@ export default function CaseStudyContent({ caseStudy, relatedCaseStudies }: Case
             <Eye className="h-4 w-4" />
             <span>{caseStudy.views || 0} views</span>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleShare}
-            className="ml-auto"
-          >
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
-          </Button>
+          <div className="ml-auto">
+            <SocialShareButton
+              url={typeof window !== 'undefined' ? window.location.href : ''}
+              title={caseStudy.title}
+              description={caseStudy.description || ''}
+              variant="ghost"
+              size="sm"
+            />
+          </div>
         </div>
 
         {/* Featured Image */}
