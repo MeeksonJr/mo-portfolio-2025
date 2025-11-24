@@ -37,6 +37,7 @@ import {
   Calendar,
   Code2,
   Activity,
+  Sparkles,
 } from 'lucide-react'
 
 export default function CommandPalette() {
@@ -227,6 +228,12 @@ export default function CommandPalette() {
           >
             <Activity className="mr-2 h-4 w-4" />
             <span>Live Activity Feed</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/recommendations'))}
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            <span>AI Recommendations</span>
           </CommandItem>
         </CommandGroup>
 
