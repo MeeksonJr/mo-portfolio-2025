@@ -8,6 +8,7 @@ import { format } from 'date-fns'
 import ReactMarkdown from 'react-markdown'
 import { useEffect } from 'react'
 import SocialShareButton from '@/components/social-share/social-share-button'
+import ReadingMode from '@/components/reading-mode/reading-mode'
 
 interface BlogPost {
   id: string
@@ -121,8 +122,8 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
         )}
       </header>
 
-      {/* Content */}
-      <div className="prose prose-lg prose-slate max-w-none dark:prose-invert prose-headings:font-bold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-gray-100 dark:prose-pre:bg-gray-900 prose-pre:border prose-pre:border-border">
+      {/* Content with Reading Mode */}
+      <ReadingMode title={post.title} estimatedReadingTime={post.reading_time}>
         <ReactMarkdown
           components={{
             // Custom styling for code blocks
@@ -186,7 +187,7 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
         >
           {post.content}
         </ReactMarkdown>
-      </div>
+      </ReadingMode>
 
       {/* Related Posts */}
       {relatedPosts.length > 0 && (
