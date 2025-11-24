@@ -50,6 +50,21 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
     }
   }, [preferences.animations])
 
+  // Apply high contrast mode
+  useEffect(() => {
+    const root = document.documentElement
+    
+    if (preferences.highContrast) {
+      root.classList.add('high-contrast')
+    } else {
+      root.classList.remove('high-contrast')
+    }
+
+    return () => {
+      root.classList.remove('high-contrast')
+    }
+  }, [preferences.highContrast])
+
   return <>{children}</>
 }
 

@@ -2,6 +2,7 @@ export interface UserPreferences {
   theme: 'light' | 'dark' | 'auto'
   fontSize: 'small' | 'medium' | 'large' | 'xlarge'
   animations: 'enabled' | 'reduced' | 'disabled'
+  highContrast: boolean
   contentFilters: {
     showProjects: boolean
     showBlog: boolean
@@ -19,6 +20,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'auto',
   fontSize: 'medium',
   animations: 'enabled',
+  highContrast: false,
   contentFilters: {
     showProjects: true,
     showBlog: true,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Settings, X, RotateCcw, Palette, Type, Zap, Filter, BookOpen } from 'lucide-react'
+import { Settings, X, RotateCcw, Palette, Type, Zap, Filter, BookOpen, Contrast } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -164,6 +164,37 @@ export function UserPreferencesDialog() {
             <p className="text-sm text-muted-foreground">
               Respects your system's "prefers-reduced-motion" setting when set to "Reduced Motion"
             </p>
+          </div>
+
+          <Separator />
+
+          {/* High Contrast Mode */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Contrast className="h-4 w-4 text-muted-foreground" />
+              <Label className="text-base font-semibold">High Contrast Mode</Label>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Increase contrast for better visibility (WCAG AAA compliant)
+            </p>
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="high-contrast" className="cursor-pointer">
+                  Enable High Contrast
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Improves readability for users with visual impairments
+                </p>
+              </div>
+              <Switch
+                id="high-contrast"
+                checked={preferences.highContrast}
+                onCheckedChange={(checked) => {
+                  updatePreferences({ highContrast: checked })
+                  toast.success(checked ? 'High contrast mode enabled' : 'High contrast mode disabled')
+                }}
+              />
+            </div>
           </div>
 
           <Separator />
