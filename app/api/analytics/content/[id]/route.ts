@@ -5,14 +5,15 @@ export const maxDuration = 30
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { searchParams } = new URL(request.url)
     const contentType = searchParams.get('type') // 'blog_post', 'case_study', 'project', 'resource'
     const days = parseInt(searchParams.get('days') || '30')
 
-    if (!contentType || !params.id) {
+    if (!contentType || !id) {
       return NextResponse.json(
         { error: 'Content type and ID are required' },
         { status: 400 }
@@ -30,7 +31,7 @@ export async function GET(
       .select('created_at')
       .eq('event_type', 'view')
       .eq('content_type', contentType)
-      .eq('content_id', params.id)
+      .eq('content_id', id)
       .gte('created_at', startDate.toISOString())
       .order('created_at', { ascending: true })
 
@@ -53,7 +54,7 @@ export async function GET(
       .from('analytics')
       .select('event_type, created_at')
       .eq('content_type', contentType)
-      .eq('content_id', params.id)
+      .eq('content_id', id)
       .in('event_type', ['click', 'share'])
       .gte('created_at', startDate.toISOString())
 
@@ -71,7 +72,7 @@ export async function GET(
       .select('metadata, created_at')
       .eq('event_type', 'view')
       .eq('content_type', contentType)
-      .eq('content_id', params.id)
+      .eq('content_id', id)
       .gte('created_at', startDate.toISOString())
       .not('metadata', 'is', null)
 
@@ -104,7 +105,7 @@ export async function GET(
       .select('metadata')
       .eq('event_type', 'share')
       .eq('content_type', contentType)
-      .eq('content_id', params.id)
+      .eq('content_id', id)
       .gte('created_at', startDate.toISOString())
 
     const sharePlatforms = shareData?.reduce((acc, item) => {
@@ -120,7 +121,7 @@ export async function GET(
       .select('referrer')
       .eq('event_type', 'view')
       .eq('content_type', contentType)
-      .eq('content_id', params.id)
+      .eq('content_id', id)
       .gte('created_at', startDate.toISOString())
       .not('referrer', 'is', null)
 
@@ -162,7 +163,7 @@ export async function GET(
     }))
 
     return NextResponse.json({
-      contentId: params.id,
+      contentId: id,
       contentType,
       period: days,
       totalViews,
