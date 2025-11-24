@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Animation preferences */
+.no-animations *,
+.no-animations *::before,
+.no-animations *::after {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: var(--animation-duration, 0.1s) !important;
+  transition-duration: var(--animation-duration, 0.1s) !important;
+}
+
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);

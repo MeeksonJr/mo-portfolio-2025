@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import CommandPalette from "@/components/command-palette"
 import { ThemeProvider } from "@/components/theme-provider"
+import { PreferencesProvider } from "@/components/preferences/preferences-provider"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import TerminalBackground from "@/components/terminal-background"
@@ -85,11 +86,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <CommandPalette />
-          <AchievementTracker />
-          <KeyboardShortcutHint />
-          <InteractiveOnboarding />
+          <PreferencesProvider>
+            {children}
+            <CommandPalette />
+            <AchievementTracker />
+            <KeyboardShortcutHint />
+            <InteractiveOnboarding />
+          </PreferencesProvider>
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { UserPreferencesDialog } from "@/components/preferences/user-preferences-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -189,6 +190,7 @@ export default function Navigation() {
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
+            <UserPreferencesDialog />
             <ThemeToggle />
             <a
               href="/resume"
@@ -328,6 +330,10 @@ export default function Navigation() {
 
               {/* Footer Actions */}
               <div className="border-t border-border pt-3 mt-2 space-y-2">
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-sm font-medium text-foreground/70">Preferences</span>
+                  <UserPreferencesDialog />
+                </div>
                 <div className="flex items-center justify-between py-2">
                   <span className="text-sm font-medium text-foreground/70">Theme</span>
                   <ThemeToggle />
