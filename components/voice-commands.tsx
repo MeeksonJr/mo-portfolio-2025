@@ -260,6 +260,21 @@ export default function VoiceCommands() {
       action: () => router.push('/candidate-summary'),
       description: 'Navigate to candidate summary for recruiters',
     },
+    {
+      command: 'go to portfolio comparison',
+      action: () => router.push('/portfolio-comparison'),
+      description: 'Navigate to portfolio comparison tool',
+    },
+    {
+      command: 'go to agent dashboard',
+      action: () => router.push('/agent-dashboard'),
+      description: 'Navigate to agent dashboard',
+    },
+    {
+      command: 'go to portfolio code',
+      action: () => router.push('/portfolio-code'),
+      description: 'Navigate to portfolio code viewer',
+    },
     // Utilities
     {
       command: 'open command palette',

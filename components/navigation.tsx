@@ -58,6 +58,7 @@ export default function Navigation() {
     { name: "AI Assistant", href: "/portfolio-assistant" },
     { name: "Project Analyzer", href: "/project-analyzer" },
     { name: "Code Playground", href: "/code-playground" },
+    { name: "Portfolio Code", href: "/portfolio-code" },
     { name: "Skills Match", href: "/skills-match" },
     { name: "ROI Calculator", href: "/roi-calculator" },
     { name: "Assessment", href: "/assessment" },
@@ -86,6 +87,8 @@ export default function Navigation() {
   // For Agents & Recruiters
   const agentLinks = [
     { name: "Candidate Summary", href: "/candidate-summary" },
+    { name: "Portfolio Comparison", href: "/portfolio-comparison" },
+    { name: "Agent Dashboard", href: "/agent-dashboard" },
   ]
 
   // All links for mobile menu
