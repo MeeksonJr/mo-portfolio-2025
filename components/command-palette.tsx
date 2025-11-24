@@ -31,6 +31,7 @@ import {
   BarChart3,
   Target,
   Calculator,
+  Play,
 } from 'lucide-react'
 
 export default function CommandPalette() {
@@ -161,6 +162,12 @@ export default function CommandPalette() {
           >
             <Calculator className="mr-2 h-4 w-4" />
             <span>ROI Calculator</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/demos'))}
+          >
+            <Play className="mr-2 h-4 w-4" />
+            <span>Live Project Demos</span>
           </CommandItem>
         </CommandGroup>
 

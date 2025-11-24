@@ -44,6 +44,7 @@ export default function Navigation() {
     { name: "Assessment", href: "/assessment" },
     { name: "Skills Match", href: "/skills-match" },
     { name: "ROI Calculator", href: "/roi-calculator" },
+    { name: "Live Demos", href: "/demos" },
   ]
 
   const allLinks = [...mainLinks, ...contentLinks]

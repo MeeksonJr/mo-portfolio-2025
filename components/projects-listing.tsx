@@ -84,13 +84,21 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">Projects</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Portfolio of projects, applications, and technical implementations
-        </p>
-      </div>
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Projects</h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
+              Portfolio of projects, applications, and technical implementations
+            </p>
+            <Link
+              href="/demos"
+              className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+            >
+              <Eye className="h-4 w-4" />
+              View Live Demos
+              <ExternalLink className="h-4 w-4" />
+            </Link>
+          </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
