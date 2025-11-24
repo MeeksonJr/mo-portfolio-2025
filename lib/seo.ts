@@ -17,10 +17,21 @@ export interface SEOProps {
   nofollow?: boolean
 }
 
+/**
+ * Generate dynamic OG image URL
+ */
+function generateOGImageUrl(title?: string, description?: string, type: string = 'website'): string {
+  const params = new URLSearchParams()
+  if (title) params.set('title', title)
+  if (description) params.set('description', description)
+  params.set('type', type)
+  return `${siteUrl}/api/og?${params.toString()}`
+}
+
 export function generateMetadata({
   title,
   description = defaultDescription,
-  image = `${siteUrl}/og-image.png`,
+  image,
   type = 'website',
   publishedTime,
   modifiedTime,
@@ -31,6 +42,9 @@ export function generateMetadata({
 }: SEOProps): Metadata {
   const fullTitle = title ? `${title} | ${siteName}` : `${siteName} | Full Stack Developer`
   const url = siteUrl
+  
+  // Use provided image, or generate dynamic OG image, or fallback to static
+  const ogImage = image || generateOGImageUrl(fullTitle, description, type)
 
   return {
     title: fullTitle,
@@ -51,14 +65,14 @@ export function generateMetadata({
       },
     },
     openGraph: {
-      type,
+      type: type === 'article' ? 'article' : 'website',
       url,
       title: fullTitle,
       description,
       siteName,
       images: [
         {
-          url: image,
+          url: ogImage,
           width: 1200,
           height: 630,
           alt: fullTitle,
@@ -68,12 +82,13 @@ export function generateMetadata({
       modifiedTime,
       authors,
       tags,
+      locale: 'en_US',
     },
     twitter: {
       card: 'summary_large_image',
       title: fullTitle,
       description,
-      images: [image],
+      images: [ogImage],
       creator: '@MohamedDatt', // Update with your actual Twitter handle
     },
     alternates: {

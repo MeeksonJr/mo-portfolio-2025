@@ -3035,6 +3035,11 @@ content/
   - Referrer policy
 - **Tech:** Next.js headers, middleware
 - **Priority:** 🟡 Medium
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Enhanced CSP with better organization and Hugging Face API support
+  - [x] Added Cross-Origin policies (COEP, COOP, CORP) for additional security
+  - [x] Improved Permissions Policy with more restrictions
+  - [x] All security headers properly configured in middleware
 
 #### 3. **Input Sanitization**
 - **Description:** Enhanced input validation
@@ -3080,6 +3085,11 @@ content/
   - News sitemaps (if applicable)
 - **Tech:** next-sitemap (already using)
 - **Priority:** 🟡 Medium
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Enhanced sitemap with featured images for blog posts, case studies, resources, and projects
+  - [x] Added additional static pages (about, testimonials, contact) with proper priorities
+  - [x] Improved changefreq and priority values based on content type
+  - [x] Using admin client for reliable data fetching
 
 #### 3. **Open Graph Enhancements**
 - **Description:** Rich social media previews
@@ -3091,6 +3101,12 @@ content/
   - Facebook previews
 - **Tech:** @vercel/og, or custom
 - **Priority:** 🟡 Medium
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Created dynamic OG image generation API route using @vercel/og
+  - [x] Updated SEO utility to automatically generate OG images when no image provided
+  - [x] Enhanced Open Graph metadata with locale and better image handling
+  - [x] OG images include title, description, and type badge with terminal aesthetic
+  - [x] Fallback handling for error cases
 
 ### 🎨 Design System Improvements
 

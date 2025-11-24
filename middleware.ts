@@ -4,26 +4,41 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const response = NextResponse.next()
 
+  // Build CSP directives with better organization
+  const cspDirectives = [
+    "default-src 'self'",
+    // Scripts - allow inline for Next.js and analytics
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://*.vercel-analytics.com https://*.googletagmanager.com https://www.googletagmanager.com",
+    // Styles - allow inline for Tailwind and component styles
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    // Fonts
+    "font-src 'self' https://fonts.gstatic.com data:",
+    // Images - allow all HTTPS for external images (Supabase, GitHub, etc.)
+    "img-src 'self' data: https: blob:",
+    // Connections - API endpoints
+    "connect-src 'self' https://*.vercel-analytics.com https://*.supabase.co https://api.github.com https://*.googleapis.com https://*.groq.com https://api-inference.huggingface.co wss://*.supabase.co",
+    // Frames - embedded content
+    "frame-src 'self' https://*.youtube.com https://*.vimeo.com https://*.cal.com",
+    // Media
+    "media-src 'self' data: blob:",
+    // Disallow object/embed
+    "object-src 'none'",
+    // Base URI
+    "base-uri 'self'",
+    // Form actions
+    "form-action 'self'",
+    // Frame ancestors
+    "frame-ancestors 'self'",
+    // Upgrade insecure requests
+    "upgrade-insecure-requests",
+  ]
+
   // Security Headers
   const securityHeaders = {
     // Content Security Policy
-    'Content-Security-Policy': [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://*.vercel-analytics.com https://*.googletagmanager.com https://www.googletagmanager.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com data:",
-      "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://*.vercel-analytics.com https://*.supabase.co https://api.github.com https://*.googleapis.com https://*.groq.com wss://*.supabase.co",
-      "frame-src 'self' https://*.youtube.com https://*.vimeo.com https://*.cal.com",
-      "media-src 'self' data: blob:",
-      "object-src 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-      "frame-ancestors 'self'",
-      "upgrade-insecure-requests",
-    ].join('; '),
+    'Content-Security-Policy': cspDirectives.join('; '),
     
-    // XSS Protection
+    // XSS Protection (legacy but still useful)
     'X-XSS-Protection': '1; mode=block',
     
     // Prevent MIME type sniffing
@@ -41,12 +56,23 @@ export function middleware(request: NextRequest) {
       'microphone=()',
       'geolocation=()',
       'interest-cohort=()',
+      'payment=()',
+      'usb=()',
     ].join(', '),
     
     // Strict Transport Security (HSTS) - Only in production
     ...(process.env.NODE_ENV === 'production' && {
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
     }),
+    
+    // Cross-Origin Embedder Policy (optional, can be relaxed if needed)
+    'Cross-Origin-Embedder-Policy': 'require-corp',
+    
+    // Cross-Origin Opener Policy
+    'Cross-Origin-Opener-Policy': 'same-origin',
+    
+    // Cross-Origin Resource Policy
+    'Cross-Origin-Resource-Policy': 'same-origin',
   }
 
   // Apply security headers
