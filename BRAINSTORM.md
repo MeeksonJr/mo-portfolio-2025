@@ -1534,7 +1534,7 @@ content/
   - [x] Projects CRUD
   - [x] Content list views with filters, search, pagination
   - [x] Edit and delete functionality
-  - [ ] Bulk operations (future enhancement)
+  - [x] Bulk operations (delete, status change, featured toggle for projects) ✅
 
 - [x] **Blog System (Public)** ✅
   - [x] Blog listing page

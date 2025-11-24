@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from 'react'
 import { Search, Plus, Edit, Trash2, Eye, Calendar, Briefcase } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -74,6 +76,9 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [caseStudyToEdit, setCaseStudyToEdit] = useState<CaseStudy | null>(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [selectedCaseStudies, setSelectedCaseStudies] = useState<Set<string>>(new Set())
+  const [isBulkOperating, setIsBulkOperating] = useState(false)
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
 
   // Filter case studies
   const filteredCaseStudies = useMemo(() => {
@@ -99,6 +104,99 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const paginatedCaseStudies = filteredCaseStudies.slice(startIndex, endIndex)
+
+  // Select all on current page
+  const allSelectedOnPage = paginatedCaseStudies.length > 0 && paginatedCaseStudies.every((cs) => selectedCaseStudies.has(cs.id))
+  const someSelectedOnPage = paginatedCaseStudies.some((cs) => selectedCaseStudies.has(cs.id))
+
+  const handleSelectAll = () => {
+    if (allSelectedOnPage) {
+      const newSelected = new Set(selectedCaseStudies)
+      paginatedCaseStudies.forEach((cs) => newSelected.delete(cs.id))
+      setSelectedCaseStudies(newSelected)
+    } else {
+      const newSelected = new Set(selectedCaseStudies)
+      paginatedCaseStudies.forEach((cs) => newSelected.add(cs.id))
+      setSelectedCaseStudies(newSelected)
+    }
+  }
+
+  const handleSelectCaseStudy = (caseStudyId: string) => {
+    const newSelected = new Set(selectedCaseStudies)
+    if (newSelected.has(caseStudyId)) {
+      newSelected.delete(caseStudyId)
+    } else {
+      newSelected.add(caseStudyId)
+    }
+    setSelectedCaseStudies(newSelected)
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedCaseStudies.size === 0) return
+
+    setIsBulkOperating(true)
+    try {
+      const response = await fetch('/api/admin/content/case-studies/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ids: Array.from(selectedCaseStudies),
+          action: 'delete',
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete case studies')
+      }
+
+      setCaseStudies(caseStudies.filter((cs) => !selectedCaseStudies.has(cs.id)))
+      setSelectedCaseStudies(new Set())
+      setBulkDeleteDialogOpen(false)
+      toast.success(`Deleted ${selectedCaseStudies.size} case study(ies) successfully`)
+    } catch (error) {
+      console.error('Error deleting case studies:', error)
+      toast.error('Failed to delete case studies. Please try again.')
+    } finally {
+      setIsBulkOperating(false)
+    }
+  }
+
+  const handleBulkStatusChange = async (status: 'draft' | 'published' | 'scheduled') => {
+    if (selectedCaseStudies.size === 0) return
+
+    setIsBulkOperating(true)
+    try {
+      const response = await fetch('/api/admin/content/case-studies/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ids: Array.from(selectedCaseStudies),
+          action: 'update_status',
+          value: status,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update case studies')
+      }
+
+      setCaseStudies(
+        caseStudies.map((cs) =>
+          selectedCaseStudies.has(cs.id) ? { ...cs, status } : cs
+        )
+      )
+      const count = selectedCaseStudies.size
+      setSelectedCaseStudies(new Set())
+      toast.success(`Updated ${count} case study(ies) to ${status}`)
+    } catch (error) {
+      console.error('Error updating case studies:', error)
+      toast.error('Failed to update case studies. Please try again.')
+    } finally {
+      setIsBulkOperating(false)
+    }
+  }
 
   const handleDelete = async () => {
     if (!caseStudyToDelete) return
@@ -136,6 +234,50 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
 
   return (
     <div className="space-y-4 w-full max-w-full overflow-hidden">
+      {/* Bulk Actions Bar */}
+      {selectedCaseStudies.size > 0 && (
+        <div className="flex items-center justify-between p-4 bg-primary/10 border border-primary/20 rounded-lg">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">
+              {selectedCaseStudies.size} case study(ies) selected
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select
+              value=""
+              onValueChange={(value) => handleBulkStatusChange(value as 'draft' | 'published' | 'scheduled')}
+              disabled={isBulkOperating}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Change status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="published">Set to Published</SelectItem>
+                <SelectItem value="draft">Set to Draft</SelectItem>
+                <SelectItem value="scheduled">Set to Scheduled</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setBulkDeleteDialogOpen(true)}
+              disabled={isBulkOperating}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Selected
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedCaseStudies(new Set())}
+              disabled={isBulkOperating}
+            >
+              Clear Selection
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between sticky top-0 z-10 bg-background pb-4 w-full">
         <div className="flex flex-1 gap-2 w-full sm:w-auto min-w-0">
           <div className="relative flex-1 max-w-sm min-w-0">
@@ -194,6 +336,13 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={allSelectedOnPage}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all"
+                />
+              </TableHead>
               <TableHead className="min-w-[200px]">Title</TableHead>
               <TableHead className="w-[100px]">Status</TableHead>
               <TableHead className="w-[180px]">Tech Stack</TableHead>
@@ -205,7 +354,7 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
           <TableBody>
             {paginatedCaseStudies.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   <Briefcase className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p>No case studies found</p>
                 </TableCell>
@@ -213,6 +362,13 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
             ) : (
               paginatedCaseStudies.map((cs) => (
                 <TableRow key={cs.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedCaseStudies.has(cs.id)}
+                      onCheckedChange={() => handleSelectCaseStudy(cs.id)}
+                      aria-label={`Select ${cs.title}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium max-w-[300px]">
                     <div className="flex items-center gap-2 min-w-0">
                       {cs.featured_image && (
@@ -359,6 +515,28 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Selected Case Studies</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedCaseStudies.size} case study(ies)? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              disabled={isBulkOperating}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isBulkOperating ? 'Deleting...' : `Delete ${selectedCaseStudies.size} case study(ies)`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

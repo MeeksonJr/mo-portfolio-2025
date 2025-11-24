@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from 'react'
 import { Search, Plus, Edit, Trash2, Eye, Calendar, Package } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -77,6 +79,9 @@ export default function ResourcesTable({ initialResources }: ResourcesTableProps
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [resourceToEdit, setResourceToEdit] = useState<Resource | null>(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [selectedResources, setSelectedResources] = useState<Set<string>>(new Set())
+  const [isBulkOperating, setIsBulkOperating] = useState(false)
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
 
   const filteredResources = useMemo(() => {
     let filtered = resources
@@ -105,6 +110,100 @@ export default function ResourcesTable({ initialResources }: ResourcesTableProps
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const paginatedResources = filteredResources.slice(startIndex, endIndex)
+
+  // Select all on current page
+  const allSelectedOnPage = paginatedResources.length > 0 && paginatedResources.every((r) => selectedResources.has(r.id))
+  const someSelectedOnPage = paginatedResources.some((r) => selectedResources.has(r.id))
+
+  const handleSelectAll = () => {
+    if (allSelectedOnPage) {
+      const newSelected = new Set(selectedResources)
+      paginatedResources.forEach((r) => newSelected.delete(r.id))
+      setSelectedResources(newSelected)
+    } else {
+      const newSelected = new Set(selectedResources)
+      paginatedResources.forEach((r) => newSelected.add(r.id))
+      setSelectedResources(newSelected)
+    }
+  }
+
+  const handleSelectResource = (resourceId: string) => {
+    const newSelected = new Set(selectedResources)
+    if (newSelected.has(resourceId)) {
+      newSelected.delete(resourceId)
+    } else {
+      newSelected.add(resourceId)
+    }
+    setSelectedResources(newSelected)
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedResources.size === 0) return
+
+    setIsBulkOperating(true)
+    try {
+      const response = await fetch('/api/admin/content/resources/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ids: Array.from(selectedResources),
+          action: 'delete',
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete resources')
+      }
+
+      setResources(resources.filter((r) => !selectedResources.has(r.id)))
+      const count = selectedResources.size
+      setSelectedResources(new Set())
+      setBulkDeleteDialogOpen(false)
+      toast.success(`Deleted ${count} resource(s) successfully`)
+    } catch (error) {
+      console.error('Error deleting resources:', error)
+      toast.error('Failed to delete resources. Please try again.')
+    } finally {
+      setIsBulkOperating(false)
+    }
+  }
+
+  const handleBulkStatusChange = async (status: 'draft' | 'published' | 'scheduled') => {
+    if (selectedResources.size === 0) return
+
+    setIsBulkOperating(true)
+    try {
+      const response = await fetch('/api/admin/content/resources/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ids: Array.from(selectedResources),
+          action: 'update_status',
+          value: status,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update resources')
+      }
+
+      setResources(
+        resources.map((r) =>
+          selectedResources.has(r.id) ? { ...r, status } : r
+        )
+      )
+      const count = selectedResources.size
+      setSelectedResources(new Set())
+      toast.success(`Updated ${count} resource(s) to ${status}`)
+    } catch (error) {
+      console.error('Error updating resources:', error)
+      toast.error('Failed to update resources. Please try again.')
+    } finally {
+      setIsBulkOperating(false)
+    }
+  }
 
   const handleDelete = async () => {
     if (!resourceToDelete) return
@@ -142,6 +241,50 @@ export default function ResourcesTable({ initialResources }: ResourcesTableProps
 
   return (
     <div className="space-y-4 w-full max-w-full overflow-hidden">
+      {/* Bulk Actions Bar */}
+      {selectedResources.size > 0 && (
+        <div className="flex items-center justify-between p-4 bg-primary/10 border border-primary/20 rounded-lg">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">
+              {selectedResources.size} resource(s) selected
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select
+              value=""
+              onValueChange={(value) => handleBulkStatusChange(value as 'draft' | 'published' | 'scheduled')}
+              disabled={isBulkOperating}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Change status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="published">Set to Published</SelectItem>
+                <SelectItem value="draft">Set to Draft</SelectItem>
+                <SelectItem value="scheduled">Set to Scheduled</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setBulkDeleteDialogOpen(true)}
+              disabled={isBulkOperating}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Selected
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedResources(new Set())}
+              disabled={isBulkOperating}
+            >
+              Clear Selection
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between sticky top-0 z-10 bg-background pb-4 w-full">
         <div className="flex flex-1 gap-2 w-full sm:w-auto min-w-0">
           <div className="relative flex-1 max-w-sm min-w-0">
@@ -217,6 +360,13 @@ export default function ResourcesTable({ initialResources }: ResourcesTableProps
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={allSelectedOnPage}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all"
+                />
+              </TableHead>
               <TableHead className="min-w-[200px]">Title</TableHead>
               <TableHead className="w-[100px]">Type</TableHead>
               <TableHead className="w-[100px]">Status</TableHead>
@@ -229,7 +379,7 @@ export default function ResourcesTable({ initialResources }: ResourcesTableProps
           <TableBody>
             {paginatedResources.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p>No resources found</p>
                 </TableCell>
@@ -237,6 +387,13 @@ export default function ResourcesTable({ initialResources }: ResourcesTableProps
             ) : (
               paginatedResources.map((resource) => (
                 <TableRow key={resource.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedResources.has(resource.id)}
+                      onCheckedChange={() => handleSelectResource(resource.id)}
+                      aria-label={`Select ${resource.title}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium max-w-[300px]">
                     <div className="flex items-center gap-2 min-w-0">
                       {resource.featured_image && (
@@ -375,6 +532,28 @@ export default function ResourcesTable({ initialResources }: ResourcesTableProps
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Selected Resources</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedResources.size} resource(s)? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              disabled={isBulkOperating}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isBulkOperating ? 'Deleting...' : `Delete ${selectedResources.size} resource(s)`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

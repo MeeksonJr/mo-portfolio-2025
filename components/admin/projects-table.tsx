@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from 'react'
 import { Search, Plus, Edit, Trash2, Eye, Calendar, FolderGit2, Star } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -78,6 +80,9 @@ export default function ProjectsTable({ initialProjects }: ProjectsTableProps) {
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [projectToEdit, setProjectToEdit] = useState<Project | null>(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [selectedProjects, setSelectedProjects] = useState<Set<string>>(new Set())
+  const [isBulkOperating, setIsBulkOperating] = useState(false)
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
 
   const filteredProjects = useMemo(() => {
     let filtered = projects
@@ -108,6 +113,136 @@ export default function ProjectsTable({ initialProjects }: ProjectsTableProps) {
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const paginatedProjects = filteredProjects.slice(startIndex, endIndex)
+
+  // Select all on current page
+  const allSelectedOnPage = paginatedProjects.length > 0 && paginatedProjects.every((p) => selectedProjects.has(p.id))
+  const someSelectedOnPage = paginatedProjects.some((p) => selectedProjects.has(p.id))
+
+  const handleSelectAll = () => {
+    if (allSelectedOnPage) {
+      const newSelected = new Set(selectedProjects)
+      paginatedProjects.forEach((p) => newSelected.delete(p.id))
+      setSelectedProjects(newSelected)
+    } else {
+      const newSelected = new Set(selectedProjects)
+      paginatedProjects.forEach((p) => newSelected.add(p.id))
+      setSelectedProjects(newSelected)
+    }
+  }
+
+  const handleSelectProject = (projectId: string) => {
+    const newSelected = new Set(selectedProjects)
+    if (newSelected.has(projectId)) {
+      newSelected.delete(projectId)
+    } else {
+      newSelected.add(projectId)
+    }
+    setSelectedProjects(newSelected)
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedProjects.size === 0) return
+
+    setIsBulkOperating(true)
+    try {
+      const response = await fetch('/api/admin/content/projects/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ids: Array.from(selectedProjects),
+          action: 'delete',
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete projects')
+      }
+
+      setProjects(projects.filter((p) => !selectedProjects.has(p.id)))
+      const count = selectedProjects.size
+      setSelectedProjects(new Set())
+      setBulkDeleteDialogOpen(false)
+      toast.success(`Deleted ${count} project(s) successfully`)
+    } catch (error) {
+      console.error('Error deleting projects:', error)
+      toast.error('Failed to delete projects. Please try again.')
+    } finally {
+      setIsBulkOperating(false)
+    }
+  }
+
+  const handleBulkStatusChange = async (status: 'draft' | 'published' | 'archived') => {
+    if (selectedProjects.size === 0) return
+
+    setIsBulkOperating(true)
+    try {
+      const response = await fetch('/api/admin/content/projects/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ids: Array.from(selectedProjects),
+          action: 'update_status',
+          value: status,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update projects')
+      }
+
+      setProjects(
+        projects.map((p) =>
+          selectedProjects.has(p.id) ? { ...p, status } : p
+        )
+      )
+      const count = selectedProjects.size
+      setSelectedProjects(new Set())
+      toast.success(`Updated ${count} project(s) to ${status}`)
+    } catch (error) {
+      console.error('Error updating projects:', error)
+      toast.error('Failed to update projects. Please try again.')
+    } finally {
+      setIsBulkOperating(false)
+    }
+  }
+
+  const handleBulkFeaturedToggle = async (featured: boolean) => {
+    if (selectedProjects.size === 0) return
+
+    setIsBulkOperating(true)
+    try {
+      const response = await fetch('/api/admin/content/projects/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ids: Array.from(selectedProjects),
+          action: 'update_featured',
+          value: featured,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update projects')
+      }
+
+      setProjects(
+        projects.map((p) =>
+          selectedProjects.has(p.id) ? { ...p, is_featured: featured } : p
+        )
+      )
+      const count = selectedProjects.size
+      setSelectedProjects(new Set())
+      toast.success(`${featured ? 'Featured' : 'Unfeatured'} ${count} project(s)`)
+    } catch (error) {
+      console.error('Error updating projects:', error)
+      toast.error('Failed to update projects. Please try again.')
+    } finally {
+      setIsBulkOperating(false)
+    }
+  }
 
   const handleDelete = async () => {
     if (!projectToDelete) return
@@ -145,6 +280,67 @@ export default function ProjectsTable({ initialProjects }: ProjectsTableProps) {
 
   return (
     <div className="space-y-4 w-full max-w-full overflow-hidden">
+      {/* Bulk Actions Bar */}
+      {selectedProjects.size > 0 && (
+        <div className="flex items-center justify-between p-4 bg-primary/10 border border-primary/20 rounded-lg">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">
+              {selectedProjects.size} project(s) selected
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select
+              value=""
+              onValueChange={(value) => handleBulkStatusChange(value as 'draft' | 'published' | 'archived')}
+              disabled={isBulkOperating}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Change status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="published">Set to Published</SelectItem>
+                <SelectItem value="draft">Set to Draft</SelectItem>
+                <SelectItem value="archived">Set to Archived</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleBulkFeaturedToggle(true)}
+              disabled={isBulkOperating}
+            >
+              <Star className="h-4 w-4 mr-2" />
+              Feature
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleBulkFeaturedToggle(false)}
+              disabled={isBulkOperating}
+            >
+              Unfeature
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setBulkDeleteDialogOpen(true)}
+              disabled={isBulkOperating}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Selected
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedProjects(new Set())}
+              disabled={isBulkOperating}
+            >
+              Clear Selection
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between sticky top-0 z-10 bg-background pb-4 w-full">
         <div className="flex flex-1 gap-2 w-full sm:w-auto min-w-0">
           <div className="relative flex-1 max-w-sm min-w-0">
@@ -216,6 +412,13 @@ export default function ProjectsTable({ initialProjects }: ProjectsTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={allSelectedOnPage}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all"
+                />
+              </TableHead>
               <TableHead className="min-w-[200px]">Name</TableHead>
               <TableHead className="w-[100px]">Status</TableHead>
               <TableHead className="w-[180px]">Tech Stack</TableHead>
@@ -228,7 +431,7 @@ export default function ProjectsTable({ initialProjects }: ProjectsTableProps) {
           <TableBody>
             {paginatedProjects.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   <FolderGit2 className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p>No projects found</p>
                 </TableCell>
@@ -236,6 +439,13 @@ export default function ProjectsTable({ initialProjects }: ProjectsTableProps) {
             ) : (
               paginatedProjects.map((project) => (
                 <TableRow key={project.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedProjects.has(project.id)}
+                      onCheckedChange={() => handleSelectProject(project.id)}
+                      aria-label={`Select ${project.name}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium max-w-[300px]">
                     <div className="flex items-center gap-2 min-w-0">
                       {project.featured_image && (
@@ -388,6 +598,28 @@ export default function ProjectsTable({ initialProjects }: ProjectsTableProps) {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Selected Projects</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedProjects.size} project(s)? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              disabled={isBulkOperating}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isBulkOperating ? 'Deleting...' : `Delete ${selectedProjects.size} project(s)`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
