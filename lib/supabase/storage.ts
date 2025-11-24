@@ -59,7 +59,9 @@ export async function uploadImageToStorage(
   const randomStr = Math.random().toString(36).substring(7)
   const fileExt = mimeType.split('/')[1] || 'png'
   const uniqueFileName = `${timestamp}-${randomStr}.${fileExt}`
-  const filePath = `ai-generated/${uniqueFileName}`
+  // Use different paths based on bucket
+  const basePath = bucketName === 'page-images' ? 'pages' : 'ai-generated'
+  const filePath = `${basePath}/${uniqueFileName}`
 
   // Convert to Uint8Array if needed
   let uint8Array: Uint8Array
