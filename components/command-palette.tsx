@@ -32,6 +32,7 @@ import {
   Target,
   Calculator,
   Play,
+  Bot,
 } from 'lucide-react'
 
 export default function CommandPalette() {
@@ -174,6 +175,12 @@ export default function CommandPalette() {
           >
             <MessageCircle className="mr-2 h-4 w-4" />
             <span>Universal Contact Hub</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/portfolio-assistant'))}
+          >
+            <Bot className="mr-2 h-4 w-4" />
+            <span>AI Portfolio Assistant</span>
           </CommandItem>
         </CommandGroup>
 

@@ -46,6 +46,7 @@ export default function Navigation() {
     { name: "ROI Calculator", href: "/roi-calculator" },
     { name: "Live Demos", href: "/demos" },
     { name: "Contact Hub", href: "/contact-hub" },
+    { name: "AI Assistant", href: "/portfolio-assistant" },
   ]
 
   const allLinks = [...mainLinks, ...contentLinks]
