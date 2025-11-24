@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { toast } from 'sonner'
+import { supabase } from '@/lib/supabase/client'
 import {
   Select,
   SelectContent,
@@ -268,11 +269,19 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
 
   const handleExport = async (format: 'json' | 'csv' = 'json') => {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const headers: HeadersInit = {}
+      
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+
       const statusParam = filterStatus !== 'all' ? filterStatus : 'all'
       const url = `/api/admin/content/export?type=blog&format=${format}&status=${statusParam}`
       
       const response = await fetch(url, {
         credentials: 'include',
+        headers,
       })
 
       if (!response.ok) {

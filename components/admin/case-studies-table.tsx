@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { Search, Plus, Edit, Trash2, Eye, Calendar, Briefcase, Download, FileText } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
+import { supabase } from '@/lib/supabase/client'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -240,11 +241,19 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
 
   const handleExport = async (format: 'json' | 'csv' = 'json') => {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const headers: HeadersInit = {}
+      
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+
       const statusParam = filterStatus !== 'all' ? filterStatus : 'all'
       const url = `/api/admin/content/export?type=case-study&format=${format}&status=${statusParam}`
       
       const response = await fetch(url, {
         credentials: 'include',
+        headers,
       })
 
       if (!response.ok) {
