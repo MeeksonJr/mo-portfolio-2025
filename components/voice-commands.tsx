@@ -254,6 +254,12 @@ export default function VoiceCommands() {
       action: () => router.push('/calendar'),
       description: 'Navigate to availability calendar',
     },
+    // For Agents & Recruiters
+    {
+      command: 'go to candidate summary',
+      action: () => router.push('/candidate-summary'),
+      description: 'Navigate to candidate summary for recruiters',
+    },
     // Utilities
     {
       command: 'open command palette',

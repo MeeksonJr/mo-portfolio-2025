@@ -83,6 +83,11 @@ export default function Navigation() {
     { name: "Calendar", href: "/calendar" },
   ]
 
+  // For Agents & Recruiters
+  const agentLinks = [
+    { name: "Candidate Summary", href: "/candidate-summary" },
+  ]
+
   // All links for mobile menu
   const allLinks = [
     ...(isHomePage ? homePageLinks : []),
@@ -90,6 +95,7 @@ export default function Navigation() {
     ...toolsLinks,
     ...analyticsLinks,
     ...developerLinks,
+    ...agentLinks,
   ]
 
   return (
@@ -185,6 +191,23 @@ export default function Navigation() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 {developerLinks.map((link) => (
+                  <DropdownMenuItem key={link.name} asChild>
+                    <Link href={link.href} className="cursor-pointer">
+                      {link.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Agents & Recruiters Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors flex items-center gap-1 outline-none">
+                For Agents
+                <ChevronDown className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {agentLinks.map((link) => (
                   <DropdownMenuItem key={link.name} asChild>
                     <Link href={link.href} className="cursor-pointer">
                       {link.name}
