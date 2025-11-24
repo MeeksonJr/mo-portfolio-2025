@@ -23,11 +23,11 @@ export default function Home() {
         description="Creative Full Stack Developer specializing in AI-powered web applications, Next.js, TypeScript, and modern web technologies"
         url="/"
       />
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background/95 backdrop-blur-sm relative">
         <ScrollProgress />
         <Navigation />
 
-      <main>
+      <main className="relative z-10">
         <HeroLight />
         <QuickStats />
         <TechSnapshot />

@@ -48,6 +48,44 @@ export async function PUT(
     const body = await request.json()
     const adminClient = createAdminClient()
 
+    // Validate github_url if it's being updated (required field)
+    if (body.github_url !== undefined) {
+      if (!body.github_url || body.github_url.trim() === '') {
+        // Try to get it from existing project or repo cache as fallback
+        const { data: existingProject } = await adminClient
+          .from('projects')
+          .select('github_repo_id, github_url')
+          .eq('id', id)
+          .single()
+
+        if (existingProject?.github_url) {
+          body.github_url = existingProject.github_url
+        } else if (existingProject?.github_repo_id) {
+          const { data: repoData } = await adminClient
+            .from('github_repos_cache')
+            .select('html_url')
+            .eq('id', existingProject.github_repo_id)
+            .single()
+
+          if (repoData?.html_url) {
+            body.github_url = repoData.html_url
+          } else {
+            return NextResponse.json(
+              { error: 'github_url is required and cannot be empty' },
+              { status: 400 }
+            )
+          }
+        } else {
+          return NextResponse.json(
+            { error: 'github_url is required and cannot be empty' },
+            { status: 400 }
+          )
+        }
+      } else {
+        body.github_url = body.github_url.trim()
+      }
+    }
+
     const { data, error } = await adminClient
       .from('projects')
       .update({

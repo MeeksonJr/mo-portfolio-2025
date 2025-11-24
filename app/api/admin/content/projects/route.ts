@@ -38,6 +38,25 @@ export async function POST(request: Request) {
       )
     }
 
+    // Validate github_url is provided (required field)
+    if (!github_url || github_url.trim() === '') {
+      // Try to get it from the repo cache as fallback
+      const { data: repoData } = await adminClient
+        .from('github_repos_cache')
+        .select('html_url')
+        .eq('id', github_repo_id)
+        .single()
+
+      if (repoData?.html_url) {
+        github_url = repoData.html_url
+      } else {
+        return NextResponse.json(
+          { error: 'github_url is required and cannot be empty' },
+          { status: 400 }
+        )
+      }
+    }
+
     // Use upsert in case project already exists for this repo
     const { data, error } = await adminClient
       .from('projects')
@@ -48,7 +67,7 @@ export async function POST(request: Request) {
           description,
           tech_stack: tech_stack || [],
           homepage_url: homepage_url || null,
-          github_url,
+          github_url: github_url.trim(),
           is_featured: is_featured || false,
           display_order: display_order || 0,
           status: status || 'draft',

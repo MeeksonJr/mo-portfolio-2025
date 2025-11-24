@@ -82,7 +82,7 @@ function TerminalGrid() {
 
 export default function Terminal3DBackground() {
   return (
-    <div className="fixed inset-0 -z-10 opacity-80 dark:opacity-60 pointer-events-none">
+    <div className="fixed inset-0 z-[1] opacity-80 dark:opacity-60 pointer-events-none">
       <Canvas
         camera={{ position: [0, 0, 10], fov: 75 }}
         gl={{ alpha: true, antialias: true }}

@@ -631,6 +631,18 @@ export default function ContentCreationModal({
         github_repo_id: repo?.id || initialData?.github_repo_id,
       }
 
+      // For projects, ensure github_url is always provided
+      if (selectedType === 'project') {
+        // If github_url is empty or missing, use repo's html_url as fallback
+        if (!payload.github_url || payload.github_url === '') {
+          payload.github_url = repo?.html_url || initialData?.github_url || ''
+        }
+        // Ensure github_url is never removed or null for projects
+        if (!payload.github_url) {
+          throw new Error('GitHub URL is required for projects. Please provide a valid GitHub URL.')
+        }
+      }
+
       console.log('Submitting payload:', { endpoint, method, payload })
 
       // Clean up payload: remove undefined, convert empty strings to null for optional fields
@@ -640,8 +652,8 @@ export default function ContentCreationModal({
         } else if (payload[key] === '' && ['excerpt', 'category', 'seo_title', 'seo_description', 'published_at', 'description', 'url', 'homepage_url'].includes(key)) {
           // Convert empty strings to null for optional fields
           payload[key] = null
-        } else if (payload[key] === '') {
-          // Remove empty strings for other fields
+        } else if (payload[key] === '' && key !== 'github_url') {
+          // Remove empty strings for other fields (except github_url which is required for projects)
           delete payload[key]
         }
       })
