@@ -12,13 +12,11 @@ export async function getAuthenticatedUser(request?: Request) {
     // This is important for FormData requests where Next.js cookies() might not work
     if (request) {
       const cookieHeader = request.headers.get('cookie') || ''
-      console.log('Auth: Cookie header present:', cookieHeader ? 'Yes' : 'No', cookieHeader.substring(0, 100))
       
       if (cookieHeader) {
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
         const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || ''
-        console.log('Auth: Project ref:', projectRef)
         
         // Parse cookies
         const cookies: Record<string, string> = {}
@@ -29,18 +27,13 @@ export async function getAuthenticatedUser(request?: Request) {
           }
         })
         
-        console.log('Auth: Parsed cookies:', Object.keys(cookies).filter(k => k.includes('auth')).join(', '))
-        
         // Try to find auth token
         const authCookieName = `sb-${projectRef}-auth-token`
         const authCookie = cookies[authCookieName] || cookies[`${authCookieName}.0`] || cookies[`${authCookieName}.1`]
         
-        console.log('Auth: Looking for cookie:', authCookieName, 'Found:', !!authCookie)
-        
         if (authCookie) {
           try {
             const parsed = typeof authCookie === 'string' ? JSON.parse(authCookie) : authCookie
-            console.log('Auth: Parsed cookie has access_token:', !!parsed?.access_token, 'has user:', !!parsed?.user)
             
             if (parsed?.access_token) {
               const tempClient = createClient(supabaseUrl, supabaseAnonKey, {
@@ -52,24 +45,15 @@ export async function getAuthenticatedUser(request?: Request) {
               })
               const { data } = await tempClient.auth.getUser()
               if (data?.user) {
-                console.log('Auth: Found user from request cookie (access_token)')
                 return data.user
-              } else {
-                console.log('Auth: access_token found but getUser() returned no user')
               }
             } else if (parsed?.user) {
-              console.log('Auth: Found user from request cookie (user object)')
               return parsed.user
             }
           } catch (e) {
-            console.log('Auth: Error parsing cookie:', e)
             // Cookie might not be JSON, continue
           }
-        } else {
-          console.log('Auth: No auth cookie found in request headers')
         }
-      } else {
-        console.log('Auth: No cookie header in request')
       }
     }
 
@@ -80,18 +64,15 @@ export async function getAuthenticatedUser(request?: Request) {
       // Try getSession first
       const { data: sessionData } = await supabase.auth.getSession()
       if (sessionData?.session?.user) {
-        console.log('Auth: Found user from createServerClient.getSession()')
         return sessionData.session.user
       }
 
       // Try getUser as fallback
       const { data: userData } = await supabase.auth.getUser()
       if (userData?.user) {
-        console.log('Auth: Found user from createServerClient.getUser()')
         return userData.user
       }
     } catch (error) {
-      console.log('createServerClient method failed, trying alternatives...')
     }
 
     // Try reading from cookies directly (from both cookies() and request headers)

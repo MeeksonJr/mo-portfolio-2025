@@ -1542,7 +1542,7 @@ content/
   - [x] Search functionality
   - [x] Category filters
   - [x] Related posts
-  - [ ] RSS feed (future enhancement)
+  - [x] RSS feed (`/feed`) ✅
 
 - [x] **Case Studies (Public)** ✅
   - [x] Case studies listing page
