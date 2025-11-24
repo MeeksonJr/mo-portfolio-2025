@@ -53,6 +53,7 @@ export default function Navigation() {
     { name: "Code Snippets", href: "/code" },
     { name: "Project Timeline", href: "/projects-timeline" },
     { name: "Skill Tree", href: "/skills-tree" },
+    { name: "Activity", href: "/activity" },
   ]
 
   const allLinks = [...mainLinks, ...contentLinks]

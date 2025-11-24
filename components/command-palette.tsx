@@ -36,6 +36,7 @@ import {
   CreditCard,
   Calendar,
   Code2,
+  Activity,
 } from 'lucide-react'
 
 export default function CommandPalette() {
@@ -220,6 +221,12 @@ export default function CommandPalette() {
           >
             <Target className="mr-2 h-4 w-4" />
             <span>Interactive Skill Tree</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/activity'))}
+          >
+            <Activity className="mr-2 h-4 w-4" />
+            <span>Live Activity Feed</span>
           </CommandItem>
         </CommandGroup>
 
