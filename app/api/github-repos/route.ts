@@ -1,4 +1,11 @@
-import { NextResponse } from "next/server"
+import { NextRequest } from "next/server"
+import { 
+  createSuccessResponse, 
+  createErrorResponse, 
+  withPerformanceMonitoring,
+  deduplicateRequest,
+  getRequestMetadata
+} from "@/lib/api-optimization"
 
 const GITHUB_USERNAME = "MeeksonJr"
 const GITHUB_API_BASE = "https://api.github.com"
@@ -8,10 +15,12 @@ const FEATURED_REPOS = ["edusphere-ai", "interview-prep-ai", "ai-content-generat
 
 export const maxDuration = 30
 
-export async function GET() {
-  console.log("🐙 GitHub API: Fetching repositories")
+export async function GET(request: NextRequest) {
+  const metadata = getRequestMetadata(request)
+  console.log("🐙 GitHub API: Fetching repositories", { ip: metadata.ip })
 
-  try {
+  return withPerformanceMonitoring('github-repos-fetch', async () => {
+    try {
     const headers: HeadersInit = {
       Accept: "application/vnd.github.v3+json",
       "User-Agent": "portfolio-app",
@@ -102,29 +111,25 @@ export async function GET() {
     console.log("✅ GitHub API: Data transformed successfully")
     console.log(`📊 GitHub API: Stats - ${stats.total_repos} repos, ${stats.total_stars} stars`)
 
-    return NextResponse.json({
-      success: true,
-      repositories: transformedRepos,
-      stats,
-      fetched_at: new Date().toISOString(),
-      rate_limit_remaining: reposResponse.headers.get("x-ratelimit-remaining"),
-    })
-  } catch (error) {
-    console.error("💥 GitHub API Error:", {
-      message: error.message,
-      stack: error.stack,
-    })
-
-    // Return fallback data with success: false to indicate it's fallback
-    return NextResponse.json({
-      success: false,
-      error: error.message,
-      repositories: getFallbackRepos(),
-      stats: getFallbackStats(),
-      fetched_at: new Date().toISOString(),
-      is_fallback: true,
-    })
-  }
+      return createSuccessResponse({
+        success: true,
+        repositories: transformedRepos,
+        stats,
+        fetched_at: new Date().toISOString(),
+        rate_limit_remaining: reposResponse.headers.get("x-ratelimit-remaining"),
+      }, 200, 'static')
+    } catch (error) {
+      // Return fallback data with success: false to indicate it's fallback
+      return createSuccessResponse({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        repositories: getFallbackRepos(),
+        stats: getFallbackStats(),
+        fetched_at: new Date().toISOString(),
+        is_fallback: true,
+      }, 200, 'static')
+    }
+  })
 }
 
 // Fallback data if API fails

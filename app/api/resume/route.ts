@@ -1,16 +1,22 @@
-import { NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { resumeData } from '@/lib/resume-data'
+import { 
+  createSuccessResponse, 
+  createErrorResponse, 
+  withPerformanceMonitoring 
+} from '@/lib/api-optimization'
 
-export async function GET() {
-  try {
-    return NextResponse.json(resumeData, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
-      },
-    })
-  } catch (error) {
-    console.error('Error fetching resume data:', error)
-    return NextResponse.json({ error: 'Failed to fetch resume data' }, { status: 500 })
-  }
+export async function GET(request: NextRequest) {
+  return withPerformanceMonitoring('resume-fetch', async () => {
+    try {
+      return createSuccessResponse(resumeData, 200, 'static')
+    } catch (error) {
+      return createErrorResponse(
+        error instanceof Error ? error : new Error('Failed to fetch resume data'),
+        500,
+        'RESUME_FETCH_ERROR'
+      )
+    }
+  })
 }
 

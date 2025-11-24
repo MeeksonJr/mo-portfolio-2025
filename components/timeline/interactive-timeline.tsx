@@ -1,387 +1,215 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { MapPin, GraduationCap, Code, Rocket, Book, Heart, Award, Camera, ChevronRight, X } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import Image from 'next/image'
-import { usePageImages } from '@/hooks/use-page-cms'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { Calendar, MapPin, GraduationCap, Briefcase, Heart } from 'lucide-react'
 
-export interface TimelineMilestone {
-  id: string
+interface TimelineEvent {
   year: string
-  location: string
   title: string
+  location: string
   description: string
-  longDescription?: string
-  icon: typeof MapPin
+  icon: React.ReactNode
   color: string
-  photos?: Array<{ url: string; alt: string; caption?: string }>
-  achievements?: string[]
-  tags?: string[]
+  images?: string[]
 }
 
-const milestones: TimelineMilestone[] = [
+const timelineEvents: TimelineEvent[] = [
   {
-    id: 'born-guinea',
-    year: '2004',
-    location: 'Conakry, Guinea',
+    year: '2000s',
     title: 'Born in Guinea',
-    description: 'Started my journey in Conakry, Guinea, where I was born and spent my early childhood.',
-    longDescription: 'Born in Conakry, the capital of Guinea, West Africa. This is where my story began - a place rich in culture, family, and early memories that would shape my perspective on life and learning.',
-    icon: MapPin,
-    color: 'bg-green-500',
-    tags: ['Birth', 'Guinea', 'West Africa'],
-  },
-  {
-    id: 'moved-nyc',
-    year: '2011',
-    location: 'New York City, USA',
-    title: 'Moved to NYC',
-    description: 'Moved to New York City with my family at age 6. Faced early challenges with language barriers and adapting to a new culture.',
-    longDescription: 'At just 6 years old, I moved to New York City with my family. This was a major transition - new country, new language, new everything. The early days were challenging, but they taught me resilience and adaptability that would serve me throughout my life.',
-    icon: Heart,
+    location: 'Conakry, Guinea',
+    description: 'Born and raised in Guinea, West Africa. Early years shaped by curiosity and resilience.',
+    icon: <MapPin className="w-6 h-6" />,
     color: 'bg-blue-500',
-    tags: ['Immigration', 'NYC', 'Family'],
   },
   {
-    id: 'learned-english',
-    year: '2011-2012',
-    location: 'New York City, USA',
-    title: 'Learning Through Cartoons',
-    description: 'Learned English in just 3 months by watching cartoons like Dora the Explorer. This experience taught me resilience and creative problem-solving.',
-    longDescription: 'Facing language barriers in school, I discovered an unexpected teacher: cartoons. Shows like Dora the Explorer became my classroom. In just 3 months, I went from knowing no English to being fluent. This experience taught me that learning can happen anywhere, and creativity often comes from unexpected places. It also showed me the power of persistence and finding your own path to success.',
-    icon: Book,
-    color: 'bg-purple-500',
-    tags: ['Learning', 'Resilience', 'Language'],
-    achievements: ['Fluent English in 3 months'],
+    year: '2010s',
+    title: 'Moved to New York City',
+    location: 'New York, USA',
+    description: 'Moved to NYC as a child. Faced early challenges with language barriers but learned English in just 3 months using cartoons like Dora. This experience taught resilience and adaptability.',
+    icon: <Heart className="w-6 h-6" />,
+    color: 'bg-green-500',
   },
   {
-    id: 'discovered-coding',
-    year: '2018',
-    location: 'Queens, NYC',
-    title: 'Discovered Coding',
-    description: 'Moved to Queens and discovered my passion for coding. Started learning programming fundamentals and building my first projects.',
-    longDescription: 'After moving to Queens, I discovered the world of programming. What started as curiosity quickly became a passion. I spent countless hours learning, experimenting, and building. This was when I realized that code could be a creative outlet and a way to solve real problems.',
-    icon: Code,
-    color: 'bg-orange-500',
-    tags: ['Programming', 'Discovery', 'Passion'],
-  },
-  {
-    id: 'started-college',
     year: '2022',
+    title: 'Started College Journey',
     location: 'Norfolk, Virginia',
-    title: 'Started Computer Science',
-    description: 'Started Computer Science at Tidewater Community College, focusing on full-stack development and modern web technologies.',
-    longDescription: 'Enrolled at Tidewater Community College to formally study Computer Science. This was a pivotal moment - combining my self-taught skills with structured learning. I focused on full-stack development, learning both frontend and backend technologies, and began to see how all the pieces fit together.',
-    icon: GraduationCap,
-    color: 'bg-indigo-500',
-    tags: ['Education', 'Computer Science', 'TCC'],
+    description: 'Began A.S. in Computer Science at Tidewater Community College. Discovered passion for programming and web development.',
+    icon: <GraduationCap className="w-6 h-6" />,
+    color: 'bg-purple-500',
   },
   {
-    id: 'competition-win',
     year: '2024',
-    location: 'Norfolk, Virginia',
-    title: 'Competition Winner',
-    description: 'Graduated from TCC and won 1st place out of 13 teams in an internship competition, showcasing my technical skills and problem-solving abilities.',
-    longDescription: 'After graduating from TCC, I participated in an internship competition with 13 teams. The challenge was intense, but I applied everything I had learned - technical skills, problem-solving, and the resilience I developed over the years. Winning 1st place was validation that my journey, though unconventional, was working.',
-    icon: Award,
-    color: 'bg-yellow-500',
-    tags: ['Achievement', 'Competition', 'Graduation'],
-    achievements: ['1st Place - Internship Competition', 'TCC Graduate'],
+    title: 'Software Developer Intern',
+    location: 'Product Manager Accelerator',
+    description: 'Joined as Software Developer Intern. Won 1st place out of 13 teams for best final app. Gained real-world experience in full-stack development.',
+    icon: <Briefcase className="w-6 h-6" />,
+    color: 'bg-orange-500',
   },
   {
-    id: 'building-saas',
-    year: '2023-2024',
-    location: 'Norfolk, Virginia',
-    title: 'Building SaaS Products',
-    description: 'Designed and shipped multiple AI-powered SaaS products from prototypes to live platforms with real users.',
-    longDescription: 'During and after college, I began building real products. I created multiple AI-powered SaaS applications, taking them from concept to deployment. These weren\'t just projects - they were live platforms with real users. This experience taught me product development, user experience, and the importance of shipping.',
-    icon: Code,
-    color: 'bg-pink-500',
-    tags: ['SaaS', 'AI', 'Products'],
-    achievements: ['5+ AI-powered SaaS applications', 'Real users and deployments'],
+    year: '2024',
+    title: 'Graduated A.S.',
+    location: 'Tidewater Community College',
+    description: 'Completed Associate of Science in Computer Science. Built foundation in algorithms, data structures, and software engineering principles.',
+    icon: <GraduationCap className="w-6 h-6" />,
+    color: 'bg-indigo-500',
   },
   {
-    id: 'current',
     year: '2025',
-    location: 'Norfolk, Virginia',
-    title: 'Full Stack Developer',
-    description: '20-year-old Full Stack Developer specializing in AI-powered web applications, available for freelance, partnerships, and full-time roles.',
-    longDescription: 'Today, I\'m a 20-year-old Full Stack Developer with a unique journey. From Guinea to NYC to Norfolk, from cartoons to code, I\'ve learned that success comes from persistence, creativity, and never being afraid to find your own path. I specialize in AI-powered web applications and am always looking for new challenges and opportunities to grow.',
-    icon: Rocket,
-    color: 'bg-primary',
-    tags: ['Current', 'Full Stack', 'AI', 'Developer'],
+    title: 'B.S. in Computer Science',
+    location: 'Old Dominion University',
+    description: 'Currently pursuing Bachelor of Science in Computer Science. Continuing to grow as a developer and explore AI-powered solutions.',
+    icon: <GraduationCap className="w-6 h-6" />,
+    color: 'bg-pink-500',
   },
 ]
 
 export default function InteractiveTimeline() {
-  const [selectedMilestone, setSelectedMilestone] = useState<TimelineMilestone | null>(null)
-  const [activeMilestone, setActiveMilestone] = useState<string | null>(null)
+  const [activeEvent, setActiveEvent] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
   })
 
-  // Calculate progress along timeline
   const timelineProgress = useTransform(scrollYProgress, [0, 1], [0, 100])
-
-  // Fetch images for each milestone from CMS
-  const milestoneImageHooks = milestones.reduce((acc, milestone) => {
-    acc[milestone.id] = usePageImages('timeline', milestone.id, [])
-    return acc
-  }, {} as Record<string, ReturnType<typeof usePageImages>>)
-
-  // Enhance milestones with CMS images
-  const enhancedMilestones = milestones.map((milestone) => {
-    const imageHook = milestoneImageHooks[milestone.id]
-    const cmsImages = imageHook.images.map(img => ({
-      url: img.src,
-      alt: img.alt,
-      caption: img.caption,
-    }))
-    
-    return {
-      ...milestone,
-      photos: cmsImages.length > 0 ? cmsImages : milestone.photos,
-    }
-  })
 
   return (
     <div ref={containerRef} className="relative py-20 px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">My Journey</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From Guinea to NYC to Norfolk - A timeline of growth, learning, and building
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            My Journey
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            From Guinea to New York to Norfolk - A story of resilience and growth
           </p>
         </motion.div>
 
-        {/* Timeline */}
         <div className="relative">
-          {/* Vertical Timeline Line */}
-          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-primary/50 to-primary transform md:-translate-x-1/2" />
+          {/* Timeline line */}
+          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 transform md:-translate-x-1/2" />
 
-          {/* Progress Indicator */}
+          {/* Progress indicator */}
           <motion.div
-            className="absolute left-8 md:left-1/2 top-0 w-1 bg-primary transform md:-translate-x-1/2 origin-top"
-            style={{
-              height: useTransform(scrollYProgress, [0, 1], ['0%', '100%']),
-            }}
+            className="absolute left-8 md:left-1/2 top-0 w-1 bg-white dark:bg-gray-900 transform md:-translate-x-1/2 origin-top"
+            style={{ scaleY: timelineProgress }}
           />
 
-          {/* Milestones */}
-          <div className="space-y-24 md:space-y-32">
-            {enhancedMilestones.map((milestone, index) => {
-              const Icon = milestone.icon
-              const isEven = index % 2 === 0
-              const ref = useRef<HTMLDivElement>(null)
-              const isInView = useInView(ref, { once: true, margin: '-100px' })
-
-              return (
-                <motion.div
-                  key={milestone.id}
-                  ref={ref}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className={`relative flex flex-col md:flex-row items-start md:items-center gap-6 ${
-                    isEven ? 'md:flex-row' : 'md:flex-row-reverse'
-                  }`}
-                >
-                  {/* Timeline Dot */}
-                  <div className="relative z-10 flex-shrink-0">
-                    <motion.button
-                      onClick={() => setSelectedMilestone(milestone)}
-                      className={`w-16 h-16 md:w-20 md:h-20 rounded-full ${milestone.color} border-4 border-background shadow-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-transform group`}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Icon className="text-white" size={28} />
-                    </motion.button>
-                    {/* Pulse animation for active milestone */}
-                    {activeMilestone === milestone.id && (
-                      <motion.div
-                        className={`absolute inset-0 rounded-full ${milestone.color} opacity-50`}
-                        animate={{ scale: [1, 1.5, 1.5], opacity: [0.5, 0, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      />
-                    )}
-                  </div>
-
-                  {/* Content Card */}
-                  <motion.div
-                    className={`flex-1 ${isEven ? 'md:mr-auto md:max-w-md' : 'md:ml-auto md:max-w-md'}`}
-                    onMouseEnter={() => setActiveMilestone(milestone.id)}
-                    onMouseLeave={() => setActiveMilestone(null)}
-                  >
-                    <Card className="glass hover:shadow-xl transition-all cursor-pointer group">
-                      <CardHeader>
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <Badge variant="outline" className="mb-2">
-                              {milestone.year}
-                            </Badge>
-                            <CardTitle className="text-xl mb-1">{milestone.title}</CardTitle>
-                            <CardDescription className="flex items-center gap-1 mt-1">
-                              <MapPin className="h-3 w-3" />
-                              {milestone.location}
-                            </CardDescription>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">{milestone.description}</p>
-                        {milestone.achievements && milestone.achievements.length > 0 && (
-                          <div className="mb-4">
-                            {milestone.achievements.map((achievement, idx) => (
-                              <Badge key={idx} variant="secondary" className="mr-2 mb-2">
-                                {achievement}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-                        {milestone.tags && milestone.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-4">
-                            {milestone.tags.map((tag) => (
-                              <Badge key={tag} variant="outline" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setSelectedMilestone(milestone)}
-                          className="w-full group-hover:text-primary"
-                        >
-                          Read More
-                          <ChevronRight className="ml-1 h-4 w-4" />
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                </motion.div>
-              )
-            })}
+          {/* Timeline events */}
+          <div className="space-y-16 md:space-y-24">
+            {timelineEvents.map((event, index) => (
+              <TimelineEventCard
+                key={index}
+                event={event}
+                index={index}
+                isActive={activeEvent === index}
+                onActivate={() => setActiveEvent(activeEvent === index ? null : index)}
+              />
+            ))}
           </div>
         </div>
       </div>
-
-      {/* Milestone Detail Modal */}
-      {selectedMilestone && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          onClick={() => setSelectedMilestone(null)}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-card rounded-lg shadow-2xl border"
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-4 top-4 z-10"
-              onClick={() => setSelectedMilestone(null)}
-              aria-label="Close"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-
-            <div className="p-6 md:p-8">
-              <div className="flex items-start gap-4 mb-6">
-                <div className={`w-16 h-16 rounded-full ${selectedMilestone.color} flex items-center justify-center flex-shrink-0`}>
-                  {(() => {
-                    const Icon = selectedMilestone.icon
-                    return <Icon className="text-white" size={32} />
-                  })()}
-                </div>
-                <div className="flex-1">
-                  <Badge variant="outline" className="mb-2">
-                    {selectedMilestone.year}
-                  </Badge>
-                  <h2 className="text-3xl font-bold mb-2">{selectedMilestone.title}</h2>
-                  <p className="text-muted-foreground flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    {selectedMilestone.location}
-                  </p>
-                </div>
-              </div>
-
-              <div className="prose prose-slate dark:prose-invert max-w-none mb-6">
-                <p className="text-lg leading-relaxed">
-                  {selectedMilestone.longDescription || selectedMilestone.description}
-                </p>
-              </div>
-
-              {selectedMilestone.achievements && selectedMilestone.achievements.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-3">Achievements</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedMilestone.achievements.map((achievement, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-sm">
-                        {achievement}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {selectedMilestone.photos && selectedMilestone.photos.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-3">Photos</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {selectedMilestone.photos.map((photo, idx) => (
-                      <div key={idx} className="relative aspect-square rounded-lg overflow-hidden">
-                        <Image
-                          src={photo.url}
-                          alt={photo.alt}
-                          fill
-                          className="object-cover"
-                        />
-                        {photo.caption && (
-                          <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-2">
-                            {photo.caption}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {selectedMilestone.tags && selectedMilestone.tags.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedMilestone.tags.map((tag) => (
-                      <Badge key={tag} variant="outline">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
     </div>
   )
 }
 
+interface TimelineEventCardProps {
+  event: TimelineEvent
+  index: number
+  isActive: boolean
+  onActivate: () => void
+}
+
+function TimelineEventCard({ event, index, isActive, onActivate }: TimelineEventCardProps) {
+  const isEven = index % 2 === 0
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: isEven ? -50 : 50 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: '-100px' }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      className={`relative flex items-center ${
+        isEven ? 'md:flex-row' : 'md:flex-row-reverse'
+      } flex-col md:flex-row`}
+    >
+      {/* Content Card */}
+      <div
+        className={`flex-1 ${
+          isEven ? 'md:pr-8 md:text-right' : 'md:pl-8 md:text-left'
+        } text-center md:text-left mb-4 md:mb-0`}
+      >
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg cursor-pointer border-2 border-transparent hover:border-blue-500 transition-all"
+          onClick={onActivate}
+        >
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold mb-3 ${event.color} text-white`}>
+            <Calendar className="w-4 h-4" />
+            {event.year}
+          </div>
+          <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">
+            {event.title}
+          </h3>
+          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-3 justify-center md:justify-start">
+            <MapPin className="w-4 h-4" />
+            <span>{event.location}</span>
+          </div>
+          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+            {event.description}
+          </p>
+
+          {/* Expanded content */}
+          {isActive && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+            >
+              {event.images && event.images.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2">
+                  {event.images.map((image, imgIndex) => (
+                    <img
+                      key={imgIndex}
+                      src={image}
+                      alt={`${event.title} - Image ${imgIndex + 1}`}
+                      className="rounded-lg w-full h-32 object-cover"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                  More details coming soon...
+                </p>
+              )}
+            </motion.div>
+          )}
+        </motion.div>
+      </div>
+
+      {/* Timeline marker */}
+      <div className="relative z-10 flex-shrink-0">
+        <motion.div
+          whileHover={{ scale: 1.2 }}
+          className={`w-16 h-16 rounded-full ${event.color} flex items-center justify-center text-white shadow-lg cursor-pointer border-4 border-white dark:border-gray-900`}
+          onClick={onActivate}
+        >
+          {event.icon}
+        </motion.div>
+      </div>
+
+      {/* Spacer for mobile */}
+      <div className="flex-1 md:hidden" />
+    </motion.div>
+  )
+}
