@@ -215,6 +215,12 @@ export default function CommandPalette() {
             <Calendar className="mr-2 h-4 w-4" />
             <span>Project Timeline</span>
           </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/skills-tree'))}
+          >
+            <Target className="mr-2 h-4 w-4" />
+            <span>Interactive Skill Tree</span>
+          </CommandItem>
         </CommandGroup>
 
         <CommandSeparator />
