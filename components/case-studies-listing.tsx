@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { trackClick } from '@/lib/analytics'
 
 interface CaseStudy {
   id: string
@@ -128,6 +129,7 @@ export default function CaseStudiesListing({ caseStudies }: CaseStudiesListingPr
               key={caseStudy.id}
               href={`/case-studies/${caseStudy.slug}`}
               className="group glass rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
+              onClick={() => trackClick('case_study', caseStudy.id, { source: 'listing' })}
             >
               {caseStudy.featured_image && (
                 <div className="relative w-full h-48 overflow-hidden">

@@ -15,6 +15,7 @@ import {
 import Link from 'next/link'
 import Image from 'next/image'
 import { format } from 'date-fns'
+import { trackClick } from '@/lib/analytics'
 
 interface BlogPost {
   id: string
@@ -117,6 +118,7 @@ export default function BlogListing({ posts }: BlogListingProps) {
               key={post.id}
               href={`/blog/${post.slug}`}
               className="group glass rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
+              onClick={() => trackClick('blog_post', post.id, { source: 'listing' })}
             >
               {post.featured_image && (
                 <div className="relative w-full h-48 overflow-hidden">

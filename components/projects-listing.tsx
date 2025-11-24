@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import Link from 'next/link'
+import { trackClick } from '@/lib/analytics'
 
 interface Project {
   id: string
@@ -138,6 +139,7 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
                   key={project.id}
                   href={`/projects/${slug}`}
                   className="group glass rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 border-2 border-primary/20"
+                  onClick={() => trackClick('project', project.id, { source: 'featured-grid' })}
                 >
                   {project.featured_image && (
                     <div className="relative w-full h-48 overflow-hidden">
@@ -215,6 +217,7 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
                   key={project.id}
                   href={`/projects/${slug}`}
                   className="group glass rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
+                  onClick={() => trackClick('project', project.id, { source: 'all-projects' })}
                 >
                   {project.featured_image && (
                     <div className="relative w-full h-48 overflow-hidden">

@@ -6,6 +6,7 @@ import { useActionState, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { submitContactForm } from "@/app/actions/contact"
 import { useAchievementTracking } from "@/hooks/use-achievement-tracking"
+import { trackDownload } from "@/lib/analytics"
 
 export default function Contact() {
   const router = useRouter()
@@ -175,6 +176,7 @@ export default function Contact() {
                 className="flex items-center justify-center gap-2 p-4 glass rounded-lg hover:shadow-lg transition-all text-sm font-mono group"
                 whileHover={{ scale: 1.02, y: -2 }}
                 rel="noreferrer"
+                onClick={() => trackDownload('resume-2025')}
               >
                 <Zap size={16} className="text-primary" />
                 <span className="text-primary font-semibold">DOWNLOAD RESUME</span>

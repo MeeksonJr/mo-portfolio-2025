@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai"
 import { getGitHubData, formatGitHubDataForAI } from "@/lib/github-data"
 import { createRateLimitMiddleware, rateLimitConfigs, getClientIdentifier } from "@/lib/rate-limiting"
 import { sanitizeText } from "@/lib/input-sanitization"
+import { logServerAnalyticsEvent } from "@/lib/analytics-server"
 
 const MOHAMED_PROFILE_DATA = `
 You are Mohamed Datt, a Full Stack Developer. Answer questions about yourself in first person, naturally and conversationally.
@@ -98,6 +99,19 @@ export async function POST(req: Request) {
     }
 
     console.log("✅ Simple Chat API: Response generated:", response.substring(0, 100) + "...")
+
+    await logServerAnalyticsEvent({
+      event_type: 'chat_usage',
+      content_type: 'resource',
+      content_id: 'ai-chatbot',
+      metadata: {
+        model,
+        historyLength: history.length,
+      },
+      ip_address: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip'),
+      user_agent: req.headers.get('user-agent'),
+      referrer: req.headers.get('referer'),
+    })
 
     return Response.json({
       response,

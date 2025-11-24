@@ -5,7 +5,15 @@
 export interface AnalyticsEvent {
   content_type?: 'blog_post' | 'case_study' | 'resource' | 'project'
   content_id?: string
-  event_type: 'view' | 'click' | 'share' | 'download' | 'search' | 'form_submit'
+  event_type:
+    | 'view'
+    | 'click'
+    | 'share'
+    | 'download'
+    | 'search'
+    | 'form_submit'
+    | 'feature_use'
+    | 'chat_usage'
   metadata?: Record<string, any>
 }
 
@@ -27,7 +35,6 @@ export async function trackEvent(event: AnalyticsEvent) {
       console.error('Failed to track event:', response.statusText)
     }
   } catch (error) {
-    // Silently fail - analytics should not break the app
     console.error('Analytics tracking error:', error)
   }
 }
@@ -46,11 +53,16 @@ export function trackPageView(contentType?: AnalyticsEvent['content_type'], cont
 /**
  * Track content click
  */
-export function trackClick(contentType: AnalyticsEvent['content_type'], contentId: string) {
+export function trackClick(
+  contentType: AnalyticsEvent['content_type'],
+  contentId: string,
+  metadata?: Record<string, any>,
+) {
   trackEvent({
     content_type: contentType,
     content_id: contentId,
     event_type: 'click',
+    metadata,
   })
 }
 
@@ -67,6 +79,42 @@ export function trackShare(
     content_id: contentId,
     event_type: 'share',
     metadata: { platform },
+  })
+}
+
+/**
+ * Track downloads
+ */
+export function trackDownload(resourceId: string, metadata?: Record<string, any>) {
+  trackEvent({
+    content_type: 'resource',
+    content_id: resourceId,
+    event_type: 'download',
+    metadata,
+  })
+}
+
+/**
+ * Track form submission events
+ */
+export function trackFormSubmit(formId: string, metadata?: Record<string, any>) {
+  trackEvent({
+    content_type: 'resource',
+    content_id: formId,
+    event_type: 'form_submit',
+    metadata,
+  })
+}
+
+/**
+ * Track custom feature usage
+ */
+export function trackFeatureUsage(feature: string, metadata?: Record<string, any>) {
+  trackEvent({
+    content_type: 'resource',
+    content_id: feature,
+    event_type: 'feature_use',
+    metadata: { feature, ...metadata },
   })
 }
 

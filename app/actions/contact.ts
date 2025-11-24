@@ -2,11 +2,14 @@
 
 import { Resend } from "resend"
 import { ContactEmail } from "@/components/emails/contact-email"
+import { headers } from "next/headers"
+import { logServerAnalyticsEvent } from "@/lib/analytics-server"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function submitContactForm(prevState: any, formData: FormData) {
   console.log("📧 Contact Form: Submission received")
+  const headerList = await headers()
 
   try {
     const name = formData.get("name")
@@ -81,6 +84,18 @@ export async function submitContactForm(prevState: any, formData: FormData) {
     }
 
     console.log("✅ Contact Form: Email sent successfully:", data)
+
+    await logServerAnalyticsEvent({
+      event_type: 'form_submit',
+      content_type: 'resource',
+      content_id: 'contact-form',
+      metadata: {
+        source: 'contact-section',
+      },
+      ip_address: headerList.get('x-forwarded-for') || headerList.get('x-real-ip'),
+      user_agent: headerList.get('user-agent'),
+      referrer: headerList.get('referer'),
+    })
 
     return {
       success: true,

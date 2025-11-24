@@ -1100,6 +1100,10 @@ Comprehensive AI integration using free APIs (Gemini, Groq, Hugging Face) for co
   - Download counts
   - Feature usage
 - **Priority:** 🟢 Low
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Added client-side click/download tracking helpers with metadata support
+  - [x] Instrumented blog/case study/project listings, resume downloads, and contact form
+  - [x] Server-side logging for chatbot usage and contact submissions via service role
 
 ### 🎮 Interactive Features
 
