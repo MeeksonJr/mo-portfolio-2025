@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { X, Sparkles, Image as ImageIcon, Save, Eye } from 'lucide-react'
+import MDXEditor from '@/components/admin/mdx-editor'
 
 type ContentType = 'blog' | 'case-study' | 'resource' | 'project'
 
@@ -839,11 +840,11 @@ export default function ContentCreationModal({
                         </Button>
                       )}
                     </div>
-                    <Textarea
-                      id="content"
-                      {...form.register('content')}
-                      rows={10}
-                      placeholder="Write your blog post content (MDX supported)"
+                    <MDXEditor
+                      value={form.watch('content') || ''}
+                      onChange={(value) => form.setValue('content', value || '', { shouldValidate: true })}
+                      placeholder="Write your blog post content in Markdown/MDX format..."
+                      minHeight={400}
                     />
                     {form.formState.errors.content && (
                       <p className="text-sm text-destructive">
@@ -1052,7 +1053,17 @@ export default function ContentCreationModal({
                         </Button>
                       )}
                     </div>
-                    <Textarea id="content" {...form.register('content')} rows={10} />
+                    <MDXEditor
+                      value={form.watch('content') || ''}
+                      onChange={(value) => form.setValue('content', value || '', { shouldValidate: true })}
+                      placeholder="Write your case study content in Markdown/MDX format..."
+                      minHeight={400}
+                    />
+                    {form.formState.errors.content && (
+                      <p className="text-sm text-destructive">
+                        {form.formState.errors.content.message as string}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">

@@ -75,6 +75,10 @@ export default function MusicPlayer() {
       audio.pause()
     } else {
       audio.play()
+      // Track achievement when music is played
+      if (typeof window !== 'undefined' && (window as any).unlockAchievement) {
+        ;(window as any).unlockAchievement('music-player')
+      }
     }
     setIsPlaying(!isPlaying)
   }
@@ -144,6 +148,7 @@ export default function MusicPlayer() {
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-white hover:bg-white/20 rounded-full p-1 transition"
+                aria-label="Close music player"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -162,16 +167,22 @@ export default function MusicPlayer() {
 
               {/* Progress Bar */}
               <div className="mb-4">
+                <label htmlFor="music-progress" className="sr-only">
+                  Music progress
+                </label>
                 <input
+                  id="music-progress"
                   type="range"
                   min="0"
                   max="100"
                   value={progress}
                   onChange={handleSeek}
                   className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                  // Dynamic gradient based on progress - inline style required for real-time updates
                   style={{
                     background: `linear-gradient(to right, #a855f7 0%, #a855f7 ${progress}%, #e5e7eb ${progress}%, #e5e7eb 100%)`,
                   }}
+                  aria-label="Music progress"
                 />
               </div>
 

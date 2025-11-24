@@ -5,12 +5,14 @@ import { Send, CheckCircle, AlertCircle, Terminal, Code, Zap, MessageSquare, Cof
 import { useActionState, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { submitContactForm } from "@/app/actions/contact"
+import { useAchievementTracking } from "@/hooks/use-achievement-tracking"
 
 export default function Contact() {
   const router = useRouter()
   const [state, formAction, isPending] = useActionState(submitContactForm, null)
   const [showCursor, setShowCursor] = useState(true)
   const [activeField, setActiveField] = useState("")
+  const { trackAchievement } = useAchievementTracking()
 
   // Blinking cursor effect - FIXED: Properly using useEffect
   useEffect(() => {
@@ -20,15 +22,16 @@ export default function Contact() {
     return () => clearInterval(interval)
   }, [])
 
-  // Redirect to success page on successful submission
+  // Redirect to success page on successful submission and track achievement
   useEffect(() => {
     if (state?.success) {
+      trackAchievement('contact-form')
       const timer = setTimeout(() => {
         router.push('/contact/success')
       }, 1500) // Wait 1.5 seconds to show success message
       return () => clearTimeout(timer)
     }
-  }, [state?.success, router])
+  }, [state?.success, router, trackAchievement])
 
   const terminalCommands = [
     "$ whoami",

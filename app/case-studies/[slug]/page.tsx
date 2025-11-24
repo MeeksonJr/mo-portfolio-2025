@@ -4,6 +4,7 @@ import FooterLight from '@/components/footer-light'
 import CaseStudyContent from '@/components/case-study-content'
 import StructuredData from '@/components/structured-data'
 import PageViewTracker from '@/components/page-view-tracker'
+import AchievementTrackerClient from '@/components/achievement-tracker-client'
 import { generateMetadata as genMeta } from '@/lib/seo'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -108,7 +109,8 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
         author="Mohamed Datt"
       />
       <div className="min-h-screen bg-background">
-        <PageViewTracker contentType="case_study" contentId={caseStudy.id} />
+          <PageViewTracker contentType="case_study" contentId={caseStudy.id} />
+          <AchievementTrackerClient achievementId="read-case-study" />
         <Navigation />
         <main className="pt-20 pb-16">
           <CaseStudyContent caseStudy={caseStudy} relatedCaseStudies={relatedCaseStudies} />

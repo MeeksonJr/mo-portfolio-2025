@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Search, Eye, ExternalLink, Github, Star, FolderGit2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -42,6 +42,19 @@ const createSlug = (name: string): string => {
 export default function ProjectsListing({ projects }: ProjectsListingProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterFeatured, setFilterFeatured] = useState<string>('all')
+
+  // Track achievement when projects page is viewed
+  useEffect(() => {
+    if (typeof window !== 'undefined' && projects.length > 0) {
+      // Track viewing all projects
+      const viewedProjects = JSON.parse(localStorage.getItem('viewed_projects') || '[]')
+      const allViewed = projects.every((p) => viewedProjects.includes(p.id))
+      
+      if (allViewed && (window as any).unlockAchievement) {
+        ;(window as any).unlockAchievement('view-all-projects')
+      }
+    }
+  }, [projects])
 
   // Filter projects
   const filteredProjects = useMemo(() => {

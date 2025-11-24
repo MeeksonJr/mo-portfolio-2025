@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import TerminalBackground from "@/components/terminal-background"
 import { Toaster } from "@/components/ui/sonner"
+import AchievementTracker from "@/components/achievements/achievement-tracker"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -84,6 +85,7 @@ export default function RootLayout({
         >
           {children}
           <CommandPalette />
+          <AchievementTracker />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

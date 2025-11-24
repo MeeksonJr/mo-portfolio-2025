@@ -32,6 +32,11 @@ export default function AIChatbotEnhanced() {
     e.preventDefault()
     if (!input.trim()) return
     
+    // Track achievement when chatting with AI
+    if (typeof window !== 'undefined' && (window as any).unlockAchievement) {
+      ;(window as any).unlockAchievement('chat-ai')
+    }
+    
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -93,6 +98,7 @@ export default function AIChatbotEnhanced() {
         className="fixed bottom-6 right-6 w-16 h-16 bg-primary text-primary-foreground rounded-full shadow-2xl hover:scale-110 transition-transform z-50 flex items-center justify-center"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
+        aria-label={isOpen ? "Close chat" : "Open chat"}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -136,6 +142,7 @@ export default function AIChatbotEnhanced() {
                       setInput("")
                     }}
                     className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full text-xs transition-colors backdrop-blur-sm flex items-center gap-1"
+                    aria-label="Reset conversation"
                   >
                     <RefreshCw size={12} />
                     Reset
@@ -161,6 +168,7 @@ export default function AIChatbotEnhanced() {
                           }, 100)
                         }}
                         className="flex items-center gap-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full text-xs transition-colors backdrop-blur-sm"
+                        aria-label={action.label}
                       >
                         <Icon size={12} />
                         {action.label.split(" ")[0]}
@@ -216,6 +224,8 @@ export default function AIChatbotEnhanced() {
                         strong: ({ children }) => <strong className="font-bold text-primary">{children}</strong>,
                         ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
                         ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                        // ReactMarkdown ensures li elements are always inside ul/ol at runtime
+                        // @ts-ignore - false positive: li is always rendered within ul/ol by ReactMarkdown
                         li: ({ children }) => <li className="text-sm">{children}</li>,
                         a: ({ href, children }) => <a href={href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">{children}</a>,
                         code: ({ children }) => <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
@@ -236,14 +246,8 @@ export default function AIChatbotEnhanced() {
                   <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded-2xl rounded-tl-none">
                     <div className="flex gap-1">
                       <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
-                      <div
-                        className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}
-                      />
-                      <div
-                        className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      />
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.1s]" />
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.2s]" />
                     </div>
                   </div>
                 </motion.div>
@@ -269,6 +273,7 @@ export default function AIChatbotEnhanced() {
                   type="submit"
                   disabled={isLoading || !input.trim()}
                   className="px-4 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                  aria-label="Send message"
                 >
                   <Send size={18} />
                 </button>

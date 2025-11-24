@@ -4,6 +4,7 @@ import FooterLight from '@/components/footer-light'
 import BlogPostContent from '@/components/blog-post-content'
 import StructuredData from '@/components/structured-data'
 import PageViewTracker from '@/components/page-view-tracker'
+import AchievementTrackerClient from '@/components/achievement-tracker-client'
 import { generateMetadata as genMeta } from '@/lib/seo'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -121,6 +122,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <Navigation />
         <main className="pt-20 pb-16">
           <BlogPostContent post={post} relatedPosts={relatedPosts} />
+          <AchievementTrackerClient achievementId="read-blog-post" />
         </main>
         <FooterLight />
       </div>

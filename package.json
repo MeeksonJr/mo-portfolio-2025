@@ -50,6 +50,7 @@
     "@react-three/fiber": "^9.4.0",
     "@supabase/supabase-js": "^2.76.1",
     "@tailwindcss/typography": "^0.5.19",
+    "@uiw/react-md-editor": "^4.0.8",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
     "ai": "latest",

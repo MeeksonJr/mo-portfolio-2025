@@ -267,3 +267,40 @@ html {
     transform: translateY(100vh);
   }
 }
+
+/* MDX Editor Styles */
+.md-editor-wrapper {
+  @apply border border-border rounded-b-lg overflow-hidden;
+}
+
+.md-editor-wrapper .w-md-editor {
+  @apply bg-background;
+}
+
+.md-editor-wrapper .w-md-editor-text {
+  @apply bg-background text-foreground;
+}
+
+.md-editor-wrapper .w-md-editor-text-textarea {
+  @apply bg-background text-foreground;
+}
+
+.md-editor-wrapper .w-md-editor-preview {
+  @apply bg-background text-foreground;
+}
+
+.md-editor-wrapper .w-md-editor-preview .wmde-markdown {
+  @apply bg-background text-foreground;
+}
+
+.md-editor-wrapper .w-md-editor-toolbar {
+  @apply bg-muted border-b border-border;
+}
+
+.md-editor-wrapper .w-md-editor-toolbar button {
+  @apply text-foreground hover:bg-muted-foreground/20;
+}
+
+.md-editor-wrapper .w-md-editor-toolbar button.active {
+  @apply bg-primary text-primary-foreground;
+}
