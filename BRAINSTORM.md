@@ -826,6 +826,10 @@ CREATE TABLE settings (
   - Filter by project
   - Social proof
 - **Priority:** 🟡 Medium
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Added project filters, advanced sorting, and rating/type distribution insights
+  - [x] Embedded video modal viewer with in-page playback
+  - [x] Improved featured state, persona filters, and UX polish
 
 #### 7. **Resources** (`/resources`)
 - **Description:** Curated resources, tools, and links
@@ -1064,6 +1068,10 @@ Comprehensive AI integration using free APIs (Gemini, Groq, Hugging Face) for co
   - Related blog posts
   - Personalized suggestions
 - **Priority:** 🟡 Medium
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Implemented similarity + behavior-based recommendation engine
+  - [x] Added reusable component to blog posts and case studies
+  - [x] Includes trending fallback, personalized storage, and content fetcher
 
 ### 📊 Analytics & Tracking
 
@@ -1078,6 +1086,10 @@ Comprehensive AI integration using free APIs (Gemini, Groq, Hugging Face) for co
   - Geographic data
 - **Tech:** Vercel Analytics, Plausible, or custom
 - **Priority:** 🟡 Medium
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Added referrer/device/unique visitor tracking with anonymized aggregation
+  - [x] Surfaced engagement rate, event breakdown, and average views/day cards
+  - [x] Enhanced daily trends visualization and top content metadata
 
 #### 2. **Interaction Tracking**
 - **Description:** Track user interactions
@@ -2905,6 +2917,10 @@ content/
   - Certificates (optional)
 - **Tech:** Custom implementation
 - **Priority:** 🟢 Low
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] `/learning-paths` page with configurable focus/level/time commitment
+  - [x] Progress persistence, estimated timelines, and downloadable plans
+  - [x] Navigation, voice, and command palette integration
 
 ### 🎮 Gamification Enhancements
 
@@ -2979,6 +2995,10 @@ content/
   - Retry-after headers
 - **Tech:** Upstash Redis, or custom
 - **Priority:** 🟡 Medium
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Added reusable middleware with strict/standard/lenient/AI presets
+  - [x] Exposed helper for API routes with Retry-After + X-RateLimit headers
+  - [x] Integrated with chat endpoints; available for broader API usage
 
 #### 2. **Content Security Policy**
 - **Description:** Enhanced security headers
@@ -3000,6 +3020,10 @@ content/
   - Content filtering
 - **Tech:** DOMPurify, Zod validation
 - **Priority:** 🟡 Medium
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Created sanitization utilities for HTML, text, URL, email, and files
+  - [x] Added recursive object sanitizer + helpers for API routes
+  - [x] Wired into chat endpoints; ready for forms/uploads
 
 ### 📈 SEO Enhancements
 

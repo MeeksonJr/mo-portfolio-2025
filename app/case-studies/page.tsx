@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import CaseStudiesListing from '@/components/case-studies-listing'
@@ -14,7 +14,7 @@ export const metadata: Metadata = genMeta({
 })
 
 export default async function CaseStudiesPage() {
-  const supabase = await createServerClient()
+  const supabase = createAdminClient()
 
   // Fetch published case studies
   let caseStudies = []

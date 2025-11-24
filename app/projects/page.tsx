@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import ProjectsListing from '@/components/projects-listing'
@@ -14,7 +14,7 @@ export const metadata: Metadata = genMeta({
 })
 
 export default async function ProjectsPage() {
-  const supabase = await createServerClient()
+  const supabase = createAdminClient()
 
   // Fetch published projects
   let projects = []
