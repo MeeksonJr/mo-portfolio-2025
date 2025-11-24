@@ -33,6 +33,7 @@ import {
   Calculator,
   Play,
   Bot,
+  CreditCard,
 } from 'lucide-react'
 
 export default function CommandPalette() {
@@ -181,6 +182,12 @@ export default function CommandPalette() {
           >
             <Bot className="mr-2 h-4 w-4" />
             <span>AI Portfolio Assistant</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/card'))}
+          >
+            <CreditCard className="mr-2 h-4 w-4" />
+            <span>Virtual Business Card</span>
           </CommandItem>
         </CommandGroup>
 

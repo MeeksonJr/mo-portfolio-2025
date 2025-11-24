@@ -148,33 +148,50 @@ Try asking me something like "Show me projects using React" or "What's your expe
       setMessages(prev => [...prev, assistantMessage])
 
       if (reader) {
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
 
-          const chunk = decoder.decode(value)
-          const lines = chunk.split('\n')
-
-          for (const line of lines) {
-            if (line.startsWith('0:')) {
-              try {
-                const data = JSON.parse(line.slice(2))
-                if (data.type === 'text-delta' && data.textDelta) {
-                  assistantContent += data.textDelta
-                  setMessages(prev => {
-                    const updated = [...prev]
-                    const lastMsg = updated[updated.length - 1]
-                    if (lastMsg && lastMsg.role === 'assistant') {
-                      lastMsg.content = assistantContent
-                    }
-                    return updated
-                  })
-                }
-              } catch (e) {
-                // Skip invalid JSON
+            const chunk = decoder.decode(value, { stream: true })
+            
+            // toTextStreamResponse returns plain text chunks
+            // Each chunk may contain partial text, so we accumulate it
+            assistantContent += chunk
+            
+            // Update the message content in real-time
+            setMessages(prev => {
+              const updated = [...prev]
+              const lastMsg = updated[updated.length - 1]
+              if (lastMsg && lastMsg.role === 'assistant') {
+                lastMsg.content = assistantContent
               }
-            }
+              return updated
+            })
           }
+          
+          // Ensure final content is set
+          if (assistantContent) {
+            setMessages(prev => {
+              const updated = [...prev]
+              const lastMsg = updated[updated.length - 1]
+              if (lastMsg && lastMsg.role === 'assistant') {
+                lastMsg.content = assistantContent
+              }
+              return updated
+            })
+          }
+        } catch (streamError) {
+          console.error('Error reading stream:', streamError)
+          // If streaming fails, try to show error message
+          setMessages(prev => {
+            const updated = [...prev]
+            const lastMsg = updated[updated.length - 1]
+            if (lastMsg && lastMsg.role === 'assistant') {
+              lastMsg.content = lastMsg.content || 'Sorry, I encountered an error while generating the response. Please try again.'
+            }
+            return updated
+          })
         }
       }
     } catch (error) {

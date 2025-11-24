@@ -47,6 +47,7 @@ export default function Navigation() {
     { name: "Live Demos", href: "/demos" },
     { name: "Contact Hub", href: "/contact-hub" },
     { name: "AI Assistant", href: "/portfolio-assistant" },
+    { name: "Business Card", href: "/card" },
   ]
 
   const allLinks = [...mainLinks, ...contentLinks]
