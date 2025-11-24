@@ -68,8 +68,10 @@ const interests = [
   { name: 'Coffee & Coding', icon: Coffee },
 ]
 
+import { ImageLightbox, useImageLightbox } from '@/components/image-lightbox/image-lightbox'
+
 export default function AboutPageContent() {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const { isOpen, images, initialIndex, openLightbox, closeLightbox } = useImageLightbox()
 
   // Fallback images - used when CMS has no active images
   const fallbackPhotos = [
@@ -262,7 +264,15 @@ export default function AboutPageContent() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group"
-              onClick={() => setSelectedImage(photo.src)}
+              onClick={() => {
+                const imageList = photos.map(p => ({
+                  src: p.src,
+                  alt: p.caption || '',
+                  title: p.caption || '',
+                  description: p.caption || '',
+                }))
+                openLightbox(imageList, index)
+              }}
             >
               <div className="w-full h-full bg-muted flex items-center justify-center">
                 <Camera className="text-muted-foreground" size={32} />
@@ -275,7 +285,7 @@ export default function AboutPageContent() {
           ))}
         </div>
         <p className="text-center text-sm text-muted-foreground mt-4">
-          Click on any photo to view full size (coming soon)
+          Click on any photo to view full size
         </p>
       </motion.section>
 
@@ -307,25 +317,13 @@ export default function AboutPageContent() {
         </div>
       </motion.section>
 
-      {/* Image Modal */}
-      {selectedImage && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-          onClick={() => setSelectedImage(null)}
-        >
-          <div className="relative max-w-4xl max-h-[90vh]">
-            <button
-              className="absolute top-4 right-4 text-white bg-black/50 rounded-full p-2 hover:bg-black/70"
-              onClick={() => setSelectedImage(null)}
-            >
-              ✕
-            </button>
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <Camera className="text-muted-foreground" size={64} />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Image Lightbox */}
+      <ImageLightbox
+        images={images}
+        initialIndex={initialIndex}
+        isOpen={isOpen}
+        onClose={closeLightbox}
+      />
     </div>
   )
 }
