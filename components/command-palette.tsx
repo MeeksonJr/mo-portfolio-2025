@@ -28,6 +28,7 @@ import {
   User,
   Search,
   ArrowRight,
+  BarChart3,
 } from 'lucide-react'
 
 export default function CommandPalette() {
@@ -141,6 +142,12 @@ export default function CommandPalette() {
             <BookOpen className="mr-2 h-4 w-4" />
             <span>Resources</span>
           </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/assessment'))}
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            <span>Quick Assessment</span>
+          </CommandItem>
         </CommandGroup>
 
         <CommandSeparator />
@@ -148,15 +155,10 @@ export default function CommandPalette() {
         {/* Actions */}
         <CommandGroup heading="Actions">
           <CommandItem
-            onSelect={() => runCommand(() => {
-              const link = document.createElement('a')
-              link.href = '/resume-Mohamed-Datt-Full Stack Developer-2025.pdf'
-              link.download = 'Mohamed-Datt-Resume-2025.pdf'
-              link.click()
-            })}
+            onSelect={() => runCommand(() => router.push('/resume'))}
           >
             <Download className="mr-2 h-4 w-4" />
-            <span>Download Resume</span>
+            <span>View Resume</span>
             <CommandShortcut>⌘R</CommandShortcut>
           </CommandItem>
           <CommandItem

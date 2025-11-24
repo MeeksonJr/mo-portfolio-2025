@@ -30,6 +30,7 @@ export default function Navigation() {
     { name: "Work", href: "#projects" },
     { name: "Services", href: "#services" },
     { name: "Contact", href: "#contact" },
+    { name: "Assessment", href: "/assessment" },
   ]
 
   const contentLinks = [
@@ -100,7 +101,7 @@ export default function Navigation() {
           <div className="hidden lg:flex items-center gap-3">
             <ThemeToggle />
             <a
-              href="/resume-Mohamed-Datt-Full Stack Developer-2025.pdf"
+              href="/resume"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground/70 hover:text-primary transition-colors"
@@ -155,7 +156,7 @@ export default function Navigation() {
                   <ThemeToggle />
                 </div>
                 <a
-                  href="/resume-Mohamed-Datt-Full Stack Developer-2025.pdf"
+                  href="/resume"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2"
