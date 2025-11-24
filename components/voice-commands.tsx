@@ -87,6 +87,7 @@ export default function VoiceCommands() {
   }, [])
 
   const commands: VoiceCommand[] = [
+    // Navigation
     {
       command: 'go home',
       action: () => router.push('/'),
@@ -96,16 +97,6 @@ export default function VoiceCommands() {
       command: 'go to about',
       action: () => router.push('/about'),
       description: 'Navigate to about page',
-    },
-    {
-      command: 'go to blog',
-      action: () => router.push('/blog'),
-      description: 'Navigate to blog',
-    },
-    {
-      command: 'go to projects',
-      action: () => router.push('/projects'),
-      description: 'Navigate to projects',
     },
     {
       command: 'go to contact',
@@ -119,6 +110,126 @@ export default function VoiceCommands() {
       },
       description: 'Scroll to contact section',
     },
+    // Content Pages
+    {
+      command: 'go to projects',
+      action: () => router.push('/projects'),
+      description: 'Navigate to projects',
+    },
+    {
+      command: 'go to blog',
+      action: () => router.push('/blog'),
+      description: 'Navigate to blog',
+    },
+    {
+      command: 'go to case studies',
+      action: () => router.push('/case-studies'),
+      description: 'Navigate to case studies',
+    },
+    {
+      command: 'go to resources',
+      action: () => router.push('/resources'),
+      description: 'Navigate to resources',
+    },
+    {
+      command: 'go to testimonials',
+      action: () => router.push('/testimonials'),
+      description: 'Navigate to testimonials',
+    },
+    {
+      command: 'go to timeline',
+      action: () => router.push('/timeline'),
+      description: 'Navigate to timeline',
+    },
+    {
+      command: 'go to music',
+      action: () => router.push('/music'),
+      description: 'Navigate to music player',
+    },
+    {
+      command: 'go to achievements',
+      action: () => router.push('/achievements'),
+      description: 'Navigate to achievements',
+    },
+    // Tools
+    {
+      command: 'open ai assistant',
+      action: () => router.push('/portfolio-assistant'),
+      description: 'Open AI portfolio assistant',
+    },
+    {
+      command: 'go to skills match',
+      action: () => router.push('/skills-match'),
+      description: 'Navigate to skills matching tool',
+    },
+    {
+      command: 'go to roi calculator',
+      action: () => router.push('/roi-calculator'),
+      description: 'Navigate to ROI calculator',
+    },
+    {
+      command: 'go to assessment',
+      action: () => router.push('/assessment'),
+      description: 'Navigate to assessment dashboard',
+    },
+    {
+      command: 'go to resume',
+      action: () => router.push('/resume'),
+      description: 'Navigate to resume generator',
+    },
+    {
+      command: 'go to contact hub',
+      action: () => router.push('/contact-hub'),
+      description: 'Navigate to contact hub',
+    },
+    {
+      command: 'go to business card',
+      action: () => router.push('/card'),
+      description: 'Navigate to virtual business card',
+    },
+    {
+      command: 'go to live demos',
+      action: () => router.push('/demos'),
+      description: 'Navigate to live project demos',
+    },
+    // Analytics & Data
+    {
+      command: 'go to analytics',
+      action: () => router.push('/analytics'),
+      description: 'Navigate to analytics dashboard',
+    },
+    {
+      command: 'go to activity',
+      action: () => router.push('/activity'),
+      description: 'Navigate to activity feed',
+    },
+    {
+      command: 'go to recommendations',
+      action: () => router.push('/recommendations'),
+      description: 'Navigate to content recommendations',
+    },
+    {
+      command: 'go to project timeline',
+      action: () => router.push('/projects-timeline'),
+      description: 'Navigate to project timeline',
+    },
+    {
+      command: 'go to skill tree',
+      action: () => router.push('/skills-tree'),
+      description: 'Navigate to skill tree',
+    },
+    // Developer Tools
+    {
+      command: 'go to code snippets',
+      action: () => router.push('/code'),
+      description: 'Navigate to code snippet library',
+    },
+    {
+      command: 'go to calendar',
+      action: () => router.push('/calendar'),
+      description: 'Navigate to availability calendar',
+    },
+    // Utilities
     {
       command: 'open command palette',
       action: () => {
