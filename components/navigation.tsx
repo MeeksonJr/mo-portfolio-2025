@@ -30,7 +30,6 @@ export default function Navigation() {
     { name: "Work", href: "#projects" },
     { name: "Services", href: "#services" },
     { name: "Contact", href: "#contact" },
-    { name: "Assessment", href: "/assessment" },
   ]
 
   const contentLinks = [
@@ -42,6 +41,9 @@ export default function Navigation() {
     { name: "Timeline", href: "/timeline" },
     { name: "Music", href: "/music" },
     { name: "Achievements", href: "/achievements" },
+    { name: "Assessment", href: "/assessment" },
+    { name: "Skills Match", href: "/skills-match" },
+    { name: "ROI Calculator", href: "/roi-calculator" },
   ]
 
   const allLinks = [...mainLinks, ...contentLinks]

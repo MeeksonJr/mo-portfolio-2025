@@ -29,6 +29,8 @@ import {
   Search,
   ArrowRight,
   BarChart3,
+  Target,
+  Calculator,
 } from 'lucide-react'
 
 export default function CommandPalette() {
@@ -147,6 +149,18 @@ export default function CommandPalette() {
           >
             <BarChart3 className="mr-2 h-4 w-4" />
             <span>Quick Assessment</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/skills-match'))}
+          >
+            <Target className="mr-2 h-4 w-4" />
+            <span>Skills Matching Tool</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/roi-calculator'))}
+          >
+            <Calculator className="mr-2 h-4 w-4" />
+            <span>ROI Calculator</span>
           </CommandItem>
         </CommandGroup>
 
