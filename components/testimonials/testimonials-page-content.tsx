@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { Star, Filter, Search, Quote, Video, ExternalLink, Linkedin, Twitter, Globe } from 'lucide-react'
+import { Star, Filter, Search, Quote, Video, Linkedin, Twitter, Globe, BarChart3, SlidersHorizontal } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Image from 'next/image'
 import { createClient } from '@supabase/supabase-js'
 import { TestimonialGridSkeleton } from '@/components/loading/content-skeletons'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Progress } from '@/components/ui/progress'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -41,6 +49,10 @@ export default function TestimonialsPageContent() {
   const [ratingFilter, setRatingFilter] = useState<string>('all')
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [featuredOnly, setFeaturedOnly] = useState(false)
+  const [projectFilter, setProjectFilter] = useState<string>('all')
+  const [sortOption, setSortOption] = useState<'recent' | 'rating' | 'featured'>('recent')
+  const [isVideoOpen, setIsVideoOpen] = useState(false)
+  const [selectedVideo, setSelectedVideo] = useState<{ url: string; client: string } | null>(null)
 
   useEffect(() => {
     loadTestimonials()
@@ -76,6 +88,16 @@ export default function TestimonialsPageContent() {
     }
   }
 
+  const projectOptions = useMemo(() => {
+    const projects = new Set<string>()
+    testimonials.forEach((t) => {
+      if (t.project_name) {
+        projects.add(t.project_name)
+      }
+    })
+    return Array.from(projects).sort()
+  }, [testimonials])
+
   const filterTestimonials = () => {
     let filtered = [...testimonials]
 
@@ -102,9 +124,25 @@ export default function TestimonialsPageContent() {
       filtered = filtered.filter((t) => t.testimonial_type === typeFilter)
     }
 
+    // Project filter
+    if (projectFilter !== 'all') {
+      filtered = filtered.filter((t) => t.project_name === projectFilter)
+    }
+
     // Featured filter
     if (featuredOnly) {
       filtered = filtered.filter((t) => t.is_featured)
+    }
+
+    // Sorting
+    if (sortOption === 'rating') {
+      filtered = filtered.sort((a, b) => b.rating - a.rating)
+    } else if (sortOption === 'featured') {
+      filtered = filtered.sort((a, b) => Number(b.is_featured) - Number(a.is_featured))
+    } else {
+      filtered = filtered.sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      )
     }
 
     setFilteredTestimonials(filtered)
@@ -150,6 +188,49 @@ export default function TestimonialsPageContent() {
       ? (testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length).toFixed(1)
       : '0.0',
     featured: testimonials.filter((t) => t.is_featured).length,
+  }
+
+  const ratingDistribution = useMemo(() => {
+    const counts: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+    testimonials.forEach((t) => {
+      counts[t.rating] = (counts[t.rating] || 0) + 1
+    })
+    return counts
+  }, [testimonials])
+
+  const typeDistribution = useMemo(() => {
+    const types: Record<string, number> = {}
+    testimonials.forEach((t) => {
+      types[t.testimonial_type] = (types[t.testimonial_type] || 0) + 1
+    })
+    return types
+  }, [testimonials])
+
+  const openVideoModal = (url: string, client: string) => {
+    setSelectedVideo({ url, client })
+    setIsVideoOpen(true)
+  }
+
+  const renderVideoEmbed = (url: string) => {
+    const youtubeMatch = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&]+)/)
+    if (youtubeMatch) {
+      const embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`
+      return (
+        <iframe
+          className="w-full aspect-video rounded-lg"
+          src={embedUrl}
+          title="Video testimonial"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      )
+    }
+
+    return (
+      <video controls className="w-full rounded-lg" src={url}>
+        Your browser does not support the video tag.
+      </video>
+    )
   }
 
   return (
@@ -204,6 +285,74 @@ export default function TestimonialsPageContent() {
         </Card>
       </motion.div>
 
+      {/* Distribution Insights */}
+      {!isLoading && testimonials.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Rating Distribution
+              </CardTitle>
+              <CardDescription>
+                Breakdown of testimonial ratings
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {[5, 4, 3, 2, 1].map((rating) => {
+                const count = ratingDistribution[rating] || 0
+                const percentage = testimonials.length
+                  ? Math.round((count / testimonials.length) * 100)
+                  : 0
+                return (
+                  <div key={rating} className="space-y-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">{rating} Stars</span>
+                        <div className="flex">
+                          {renderStars(rating)}
+                        </div>
+                      </div>
+                      <span className="text-muted-foreground">{percentage}%</span>
+                    </div>
+                    <Progress value={percentage} className="h-2" />
+                  </div>
+                )
+              })}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <SlidersHorizontal className="h-5 w-5" />
+                Testimonial Types
+              </CardTitle>
+              <CardDescription>
+                Diversity of testimonial sources
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {Object.entries(typeDistribution).map(([type, count]) => (
+                <div key={type} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className={getTypeColor(type)}>
+                      {getTypeLabel(type)}
+                    </Badge>
+                  </div>
+                  <span className="font-semibold">{count}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
       {/* Filters */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -254,13 +403,38 @@ export default function TestimonialsPageContent() {
                   <SelectItem value="student">Student</SelectItem>
                 </SelectContent>
               </Select>
-              <Button
-                variant={featuredOnly ? 'default' : 'outline'}
-                onClick={() => setFeaturedOnly(!featuredOnly)}
-                className="w-full"
-              >
-                {featuredOnly ? 'Show All' : 'Featured Only'}
-              </Button>
+              <Select value={projectFilter} onValueChange={setProjectFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Project" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Projects</SelectItem>
+                  {projectOptions.map((project) => (
+                    <SelectItem key={project} value={project}>
+                      {project}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="flex gap-2">
+                <Select value={sortOption} onValueChange={(value: 'recent' | 'rating' | 'featured') => setSortOption(value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="recent">Most Recent</SelectItem>
+                    <SelectItem value="rating">Highest Rated</SelectItem>
+                    <SelectItem value="featured">Featured First</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant={featuredOnly ? 'default' : 'outline'}
+                  onClick={() => setFeaturedOnly(!featuredOnly)}
+                  className="w-full"
+                >
+                  {featuredOnly ? 'Show All' : 'Featured Only'}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -339,15 +513,13 @@ export default function TestimonialsPageContent() {
                   {(testimonial.linkedin_url || testimonial.twitter_url || testimonial.website_url || testimonial.video_url) && (
                     <div className="flex items-center gap-2 pt-4 border-t">
                       {testimonial.video_url && (
-                        <a
-                          href={testimonial.video_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={() => openVideoModal(testimonial.video_url!, testimonial.client_name)}
                           className="text-muted-foreground hover:text-primary transition-colors"
                           aria-label="Watch video testimonial"
                         >
                           <Video className="h-4 w-4" />
-                        </a>
+                        </button>
                       )}
                       {testimonial.linkedin_url && (
                         <a
@@ -390,6 +562,17 @@ export default function TestimonialsPageContent() {
           ))}
         </div>
       )}
+
+      <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
+        {selectedVideo && (
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>{selectedVideo.client}'s Testimonial</DialogTitle>
+            </DialogHeader>
+            {renderVideoEmbed(selectedVideo.url)}
+          </DialogContent>
+        )}
+      </Dialog>
     </div>
   )
 }

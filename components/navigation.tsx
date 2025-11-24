@@ -45,6 +45,7 @@ export default function Navigation() {
     { name: "Architecture", href: "/architecture" },
     { name: "Collaboration", href: "/collaboration" },
     { name: "Resources", href: "/resources" },
+    { name: "Learning Paths", href: "/learning-paths" },
     { name: "Testimonials", href: "/testimonials" },
     { name: "Timeline", href: "/timeline" },
     { name: "Music", href: "/music" },

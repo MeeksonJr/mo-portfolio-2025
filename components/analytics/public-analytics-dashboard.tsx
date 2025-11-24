@@ -29,6 +29,12 @@ interface PublicAnalyticsData {
   topContent: Array<{ type: string; id: string; views: number; title: string; slug: string | null }>
   dailyViews: Array<{ date: string; views: number }>
   period: number
+  eventBreakdown: Record<string, number>
+  referrers: Array<{ source: string; count: number; percentage: number }>
+  devices: Array<{ type: string; count: number; percentage: number }>
+  avgViewsPerDay: number
+  uniqueVisitors: number
+  engagementRate: number
 }
 
 const contentTypeIcons = {
@@ -180,7 +186,7 @@ export default function PublicAnalyticsDashboard() {
           </motion.div>
 
           {/* Main Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -229,17 +235,15 @@ export default function PublicAnalyticsDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
-                    <Activity className="h-5 w-5 text-primary" />
-                    Content Types
+                    <Users className="h-5 w-5 text-primary" />
+                    Unique Visitors
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-4xl font-bold mb-2">
-                    {Object.keys(data.viewsByType).length}
+                    {formatNumber(data.uniqueVisitors)}
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Different content types viewed
-                  </p>
+                  <p className="text-sm text-muted-foreground">Visitors in the last {data.period} days</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -252,16 +256,39 @@ export default function PublicAnalyticsDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
-                    <TrendingUp className="h-5 w-5 text-primary" />
-                    Top Content
+                    <Clock className="h-5 w-5 text-primary" />
+                    Avg Views / Day
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-4xl font-bold mb-2">
-                    {data.topContent.length}
+                    {formatNumber(data.avgViewsPerDay)}
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Most viewed pieces
+                    Average over the last {data.period} days
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Activity className="h-5 w-5 text-primary" />
+                    Engagement Rate
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold mb-2">
+                    {data.engagementRate}%
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Clicks & interactions vs views
                   </p>
                 </CardContent>
               </Card>
@@ -333,29 +360,22 @@ export default function PublicAnalyticsDashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {data.dailyViews.slice(-14).map((day, idx) => {
                       const date = new Date(day.date)
                       const dayName = date.toLocaleDateString('en-US', { weekday: 'short' })
                       const dayNumber = date.getDate()
-                      const height = (day.views / maxDailyViews) * 100
-                      
+                      const value = (day.views / maxDailyViews) * 100
+
                       return (
-                        <div key={idx} className="flex items-end gap-2">
-                          <div className="flex-1 text-xs text-muted-foreground min-w-[60px]">
-                            {dayName} {dayNumber}
+                        <div key={idx} className="space-y-1">
+                          <div className="flex items-center justify-between text-sm text-muted-foreground">
+                            <span>
+                              {dayName} {dayNumber}
+                            </span>
+                            <span className="font-semibold text-foreground">{day.views}</span>
                           </div>
-                          <div className="flex-1 flex items-end gap-1">
-                            <div
-                              className="bg-primary rounded-t transition-all"
-                              // eslint-disable-next-line react/forbid-dom-props
-                              style={{ height: `${Math.max(height, 5)}%`, minHeight: '4px', width: '100%' }}
-                              title={`${day.views} views`}
-                            />
-                          </div>
-                          <div className="text-xs font-medium min-w-[40px] text-right">
-                            {day.views}
-                          </div>
+                          <Progress value={value} className="h-2" />
                         </div>
                       )
                     })}
@@ -365,13 +385,14 @@ export default function PublicAnalyticsDashboard() {
             </motion.div>
           </div>
 
-          {/* Top Content */}
+          {/* Top Content & Event Breakdown */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
+            className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8"
           >
-            <Card>
+            <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
@@ -436,6 +457,88 @@ export default function PublicAnalyticsDashboard() {
                     <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p>No content views recorded yet</p>
                   </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Event Breakdown
+                </CardTitle>
+                <CardDescription>
+                  Interaction types captured
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {Object.entries(data.eventBreakdown).map(([event, count]) => (
+                  <div key={event} className="flex items-center justify-between text-sm">
+                    <span className="capitalize">{event.replace('_', ' ')}</span>
+                    <span className="font-semibold">{formatNumber(count)}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Referrers & Device Breakdown */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5" />
+                  Top Referrers
+                </CardTitle>
+                <CardDescription>
+                  Where visitors are coming from
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {data.referrers.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Not enough referral data yet.</p>
+                ) : (
+                  data.referrers.map((referrer) => (
+                    <div key={referrer.source} className="space-y-1">
+                      <div className="flex items-center justify-between text-sm">
+                        <span>{referrer.source}</span>
+                        <span className="font-semibold">{referrer.percentage}%</span>
+                      </div>
+                      <Progress value={referrer.percentage} className="h-2" />
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Device Breakdown
+                </CardTitle>
+                <CardDescription>
+                  Devices used to access the site
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {data.devices.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No device data yet.</p>
+                ) : (
+                  data.devices.map((device) => (
+                    <div key={device.type} className="space-y-1">
+                      <div className="flex items-center justify-between text-sm">
+                        <span>{device.type}</span>
+                        <span className="font-semibold">{device.percentage}%</span>
+                      </div>
+                      <Progress value={device.percentage} className="h-2" />
+                    </div>
+                  ))
                 )}
               </CardContent>
             </Card>

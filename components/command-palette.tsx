@@ -195,6 +195,12 @@ export default function CommandPalette() {
             <span>Resources</span>
           </CommandItem>
           <CommandItem
+            onSelect={() => runCommand(() => router.push('/learning-paths'))}
+          >
+            <Target className="mr-2 h-4 w-4" />
+            <span>Learning Paths</span>
+          </CommandItem>
+          <CommandItem
             onSelect={() => runCommand(() => router.push('/assessment'))}
           >
             <BarChart3 className="mr-2 h-4 w-4" />

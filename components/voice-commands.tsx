@@ -132,6 +132,11 @@ export default function VoiceCommands() {
       description: 'Navigate to resources',
     },
     {
+      command: 'go to learning paths',
+      action: () => router.push('/learning-paths'),
+      description: 'Navigate to learning paths',
+    },
+    {
       command: 'go to testimonials',
       action: () => router.push('/testimonials'),
       description: 'Navigate to testimonials',
