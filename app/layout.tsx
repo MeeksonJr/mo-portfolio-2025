@@ -6,7 +6,7 @@ import CommandPalette from "@/components/command-palette"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import Terminal3DBackground from "@/components/3d-terminal-background"
+import TerminalBackground from "@/components/terminal-background"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -74,7 +74,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={inter.className}>
-        <Terminal3DBackground />
+        <TerminalBackground />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
