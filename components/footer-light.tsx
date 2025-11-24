@@ -1,7 +1,8 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Heart, Coffee, Github, Linkedin, Mail, ArrowUp } from "lucide-react"
+import { Heart, Coffee, Github, Linkedin, Mail, ArrowUp, Trophy } from "lucide-react"
+import Link from "next/link"
 
 export default function FooterLight() {
   return (
@@ -42,12 +43,21 @@ export default function FooterLight() {
               </motion.a>
             </div>
 
-            <div className="flex items-center justify-center gap-2 text-foreground/70">
-              <span>Crafted with</span>
-              <Heart className="text-red-500" size={16} fill="currentColor" />
-              <span>and lots of</span>
-              <Coffee className="text-yellow-700" size={16} />
-              <span>by Mohamed Datt</span>
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center justify-center gap-2 text-foreground/70">
+                <span>Crafted with</span>
+                <Heart className="text-red-500" size={16} fill="currentColor" />
+                <span>and lots of</span>
+                <Coffee className="text-yellow-700" size={16} />
+                <span>by Mohamed Datt</span>
+              </div>
+              <Link
+                href="/achievements"
+                className="flex items-center gap-2 text-sm text-foreground/70 hover:text-primary transition-colors"
+              >
+                <Trophy className="h-4 w-4" />
+                <span>View Achievements</span>
+              </Link>
             </div>
 
             <div className="text-sm text-muted-foreground">

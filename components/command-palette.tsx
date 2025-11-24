@@ -38,7 +38,14 @@ export default function CommandPalette() {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
-        setOpen((open) => !open)
+        setOpen((open) => {
+          const newOpen = !open
+          // Track achievement when command palette is opened (only on open, not close)
+          if (newOpen && typeof window !== 'undefined' && (window as any).unlockAchievement) {
+            ;(window as any).unlockAchievement('command-palette')
+          }
+          return newOpen
+        })
       }
       // Close with Escape
       if (e.key === 'Escape' && open) {

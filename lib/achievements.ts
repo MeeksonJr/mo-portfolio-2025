@@ -287,12 +287,20 @@ export function trackPageVisit(page: string): void {
   const allVisited = mainPages.every((p) => visitedPages.has(p))
 
   if (allVisited && !state.unlocked.includes('explore-all-pages')) {
-    unlockAchievement('explore-all-pages')
+    const wasUnlocked = unlockAchievement('explore-all-pages')
+    if (wasUnlocked && typeof window !== 'undefined' && (window as any).unlockAchievement) {
+      // Trigger notification via global function
+      ;(window as any).unlockAchievement('explore-all-pages')
+    }
   }
 
   // Check return visitor achievement
   if (state.visitCount >= 3 && !state.unlocked.includes('return-visitor')) {
-    unlockAchievement('return-visitor')
+    const wasUnlocked = unlockAchievement('return-visitor')
+    if (wasUnlocked && typeof window !== 'undefined' && (window as any).unlockAchievement) {
+      // Trigger notification via global function
+      ;(window as any).unlockAchievement('return-visitor')
+    }
   }
 
   saveAchievementState(state)
@@ -306,7 +314,11 @@ export function trackTimeOnSite(): void {
   const timeSpent = (Date.now() - state.sessionStartTime) / 1000 / 60 // minutes
 
   if (timeSpent >= 10 && !state.unlocked.includes('deep-dive')) {
-    unlockAchievement('deep-dive')
+    const wasUnlocked = unlockAchievement('deep-dive')
+    if (wasUnlocked && typeof window !== 'undefined' && (window as any).unlockAchievement) {
+      // Trigger notification via global function
+      ;(window as any).unlockAchievement('deep-dive')
+    }
   }
 }
 

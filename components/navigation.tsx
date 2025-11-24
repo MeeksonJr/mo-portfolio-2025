@@ -38,6 +38,7 @@ export default function Navigation() {
     { name: "Case Studies", href: "/case-studies" },
     { name: "Resources", href: "/resources" },
     { name: "Music", href: "/music" },
+    { name: "Achievements", href: "/achievements" },
   ]
 
   const allLinks = [...mainLinks, ...contentLinks]

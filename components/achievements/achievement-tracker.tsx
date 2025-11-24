@@ -18,11 +18,24 @@ export default function AchievementTracker() {
   const [newAchievement, setNewAchievement] = useState<Achievement | null>(null)
 
   const checkAndUnlock = useCallback((achievementId: string): boolean => {
+    console.log('🔍 Checking achievement:', achievementId)
+    const state = getAchievementState()
+    
+    // Check if already unlocked
+    if (state.unlocked.includes(achievementId)) {
+      console.log('✅ Achievement already unlocked:', achievementId)
+      return false
+    }
+    
     const wasUnlocked = unlockAchievement(achievementId)
     if (wasUnlocked) {
       const achievement = ACHIEVEMENTS.find((a) => a.id === achievementId)
       if (achievement) {
-        setNewAchievement(achievement)
+        console.log('🎉 Achievement unlocked:', achievement.title)
+        // Use setTimeout to ensure state update happens
+        setTimeout(() => {
+          setNewAchievement(achievement)
+        }, 100)
       }
       return true
     }
@@ -49,23 +62,33 @@ export default function AchievementTracker() {
   useEffect(() => {
     if (!pathname) return
 
-    const state = getAchievementState()
+    // Use a small delay to ensure page is fully loaded
+    const timer = setTimeout(() => {
+      const state = getAchievementState()
 
-    // Track About page visit
-    if (pathname === '/about' && !state.unlocked.includes('read-bio')) {
-      checkAndUnlock('read-bio')
-    }
+      // Track About page visit
+      if (pathname === '/about' && !state.unlocked.includes('read-bio')) {
+        console.log('📖 Tracking About page visit for achievement')
+        checkAndUnlock('read-bio')
+      }
 
-    // Track Resources page visit
-    if (pathname === '/resources' && !state.unlocked.includes('view-resources')) {
-      checkAndUnlock('view-resources')
-    }
+      // Track Resources page visit
+      if (pathname === '/resources' && !state.unlocked.includes('view-resources')) {
+        console.log('📚 Tracking Resources page visit for achievement')
+        checkAndUnlock('view-resources')
+      }
+    }, 500) // Wait 500ms for page to load
+
+    return () => clearTimeout(timer)
   }, [pathname, checkAndUnlock])
 
   // Expose functions for other components to use
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      ;(window as any).unlockAchievement = checkAndUnlock
+      ;(window as any).unlockAchievement = (achievementId: string) => {
+        console.log('🔓 Attempting to unlock achievement:', achievementId)
+        return checkAndUnlock(achievementId)
+      }
       ;(window as any).updateAchievementProgress = updateProgress
     }
   }, [checkAndUnlock])

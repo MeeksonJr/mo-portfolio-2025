@@ -20,6 +20,7 @@ export default function AchievementNotification({
 
   useEffect(() => {
     if (achievement) {
+      console.log('🔔 Showing achievement notification:', achievement.title)
       setIsVisible(true)
       // Auto-close after 5 seconds
       const timer = setTimeout(() => {
@@ -28,6 +29,8 @@ export default function AchievementNotification({
       }, 5000)
 
       return () => clearTimeout(timer)
+    } else {
+      setIsVisible(false)
     }
   }, [achievement, onClose])
 

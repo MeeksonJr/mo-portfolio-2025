@@ -9,6 +9,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import TerminalBackground from "@/components/terminal-background"
 import { Toaster } from "@/components/ui/sonner"
 import AchievementTracker from "@/components/achievements/achievement-tracker"
+import KeyboardShortcutHint from "@/components/keyboard-shortcut-hint"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -86,6 +87,7 @@ export default function RootLayout({
           {children}
           <CommandPalette />
           <AchievementTracker />
+          <KeyboardShortcutHint />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
