@@ -189,6 +189,12 @@ export default function CommandPalette() {
             <CreditCard className="mr-2 h-4 w-4" />
             <span>Virtual Business Card</span>
           </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/analytics'))}
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            <span>Portfolio Analytics</span>
+          </CommandItem>
         </CommandGroup>
 
         <CommandSeparator />
