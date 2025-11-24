@@ -20,6 +20,7 @@ import { ErrorBoundary } from "@/components/error-boundary"
 import { ErrorHandler } from "@/components/error-handler"
 import FloatingActionMenu from "@/components/floating-action-menu"
 import VisitorProfileProvider from "@/components/personalization/visitor-profile-provider"
+import MobileBottomNav from "@/components/mobile/mobile-bottom-nav"
 
 const inter = Inter({ subsets: ["latin"] })
 

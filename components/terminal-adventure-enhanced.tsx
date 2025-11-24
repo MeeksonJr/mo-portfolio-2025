@@ -4,8 +4,9 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Terminal, RotateCcw, Code, Trophy, Zap } from "lucide-react"
+import { Terminal, RotateCcw, Code, Trophy, Zap, Save, Download, Upload } from "lucide-react"
 import Inspectable from "./inspectable"
+import { unlockAchievement } from "@/lib/achievements"
 
 interface GameState {
   currentScene: string
@@ -1041,9 +1042,32 @@ export default function TerminalAdventureEnhanced() {
   const [showChoices, setShowChoices] = useState(false)
   const [commandInput, setCommandInput] = useState("")
   const [showCommandLine, setShowCommandLine] = useState(false)
+  const [saveMessage, setSaveMessage] = useState("")
   const terminalRef = useRef<HTMLDivElement>(null)
 
   const currentScene = SCENES.find((scene) => scene.id === gameState.currentScene)
+
+  // Load saved game on mount
+  useEffect(() => {
+    const savedGame = localStorage.getItem('terminal_adventure_save')
+    if (savedGame) {
+      try {
+        const parsed = JSON.parse(savedGame)
+        setGameState(parsed)
+        setSaveMessage("💾 Loaded saved game!")
+        setTimeout(() => setSaveMessage(""), 3000)
+      } catch (e) {
+        console.error('Failed to load saved game:', e)
+      }
+    }
+  }, [])
+
+  // Auto-save game state
+  useEffect(() => {
+    if (gameState.currentScene !== 'start') {
+      localStorage.setItem('terminal_adventure_save', JSON.stringify(gameState))
+    }
+  }, [gameState])
 
   // Handle secret commands
   const handleSecretCommand = (command: string) => {
@@ -1150,9 +1174,37 @@ export default function TerminalAdventureEnhanced() {
         newState.unlockedProjects.push(choice.unlockProject)
       }
 
-      // Add achievements
+      // Add achievements and unlock in achievement system
       if (choice.addAchievement) {
         newState.achievements.push(choice.addAchievement)
+        // Unlock achievement in the global achievement system
+        if (typeof window !== 'undefined') {
+          unlockAchievement(choice.addAchievement)
+          if ((window as any).unlockAchievement) {
+            ;(window as any).unlockAchievement(choice.addAchievement)
+          }
+        }
+      }
+
+      // Unlock achievements for game milestones
+      if (newState.visitedScenes.length === 5 && !newState.achievements.includes('terminal-explorer')) {
+        newState.achievements.push('terminal-explorer')
+        if (typeof window !== 'undefined') {
+          unlockAchievement('terminal-explorer')
+          if ((window as any).unlockAchievement) {
+            ;(window as any).unlockAchievement('terminal-explorer')
+          }
+        }
+      }
+
+      if (newState.gameComplete && !newState.achievements.includes('terminal-complete')) {
+        newState.achievements.push('terminal-complete')
+        if (typeof window !== 'undefined') {
+          unlockAchievement('terminal-complete')
+          if ((window as any).unlockAchievement) {
+            ;(window as any).unlockAchievement('terminal-complete')
+          }
+        }
       }
 
       // Update visited scenes
@@ -1174,6 +1226,71 @@ export default function TerminalAdventureEnhanced() {
 
       return newState
     })
+  }
+
+  const handleSaveGame = () => {
+    const saveData = JSON.stringify(gameState)
+    localStorage.setItem('terminal_adventure_save', saveData)
+    setSaveMessage("💾 Game saved successfully!")
+    setTimeout(() => setSaveMessage(""), 3000)
+    
+    // Unlock save achievement
+    if (typeof window !== 'undefined') {
+      unlockAchievement('terminal-save')
+      if ((window as any).unlockAchievement) {
+        ;(window as any).unlockAchievement('terminal-save')
+      }
+    }
+  }
+
+  const handleLoadGame = () => {
+    const savedGame = localStorage.getItem('terminal_adventure_save')
+    if (savedGame) {
+      try {
+        const parsed = JSON.parse(savedGame)
+        setGameState(parsed)
+        setSaveMessage("📂 Game loaded successfully!")
+        setTimeout(() => setSaveMessage(""), 3000)
+      } catch (e) {
+        setSaveMessage("❌ Failed to load saved game")
+        setTimeout(() => setSaveMessage(""), 3000)
+      }
+    } else {
+      setSaveMessage("❌ No saved game found")
+      setTimeout(() => setSaveMessage(""), 3000)
+    }
+  }
+
+  const handleExportSave = () => {
+    const saveData = JSON.stringify(gameState)
+    const blob = new Blob([saveData], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `terminal-adventure-save-${Date.now()}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+    setSaveMessage("📥 Save exported!")
+    setTimeout(() => setSaveMessage(""), 3000)
+  }
+
+  const handleImportSave = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const parsed = JSON.parse(e.target?.result as string)
+        setGameState(parsed)
+        setSaveMessage("📤 Save imported successfully!")
+        setTimeout(() => setSaveMessage(""), 3000)
+      } catch (err) {
+        setSaveMessage("❌ Invalid save file")
+        setTimeout(() => setSaveMessage(""), 3000)
+      }
+    }
+    reader.readAsText(file)
   }
 
   const handleSpecialAction = (action: string) => {
@@ -1198,6 +1315,7 @@ export default function TerminalAdventureEnhanced() {
         break
       case "restart":
         setGameState(INITIAL_STATE)
+        localStorage.removeItem('terminal_adventure_save')
         break
     }
   }
@@ -1392,9 +1510,58 @@ export default function TerminalAdventureEnhanced() {
                       Command Line
                     </button>
 
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={handleSaveGame}
+                        className="flex items-center gap-2 text-gray-400 hover:text-blue-400 transition-colors text-sm"
+                        title="Save game"
+                      >
+                        <Save size={14} />
+                        Save
+                      </button>
+                      <button
+                        onClick={handleLoadGame}
+                        className="flex items-center gap-2 text-gray-400 hover:text-blue-400 transition-colors text-sm"
+                        title="Load game"
+                      >
+                        <Upload size={14} />
+                        Load
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={handleExportSave}
+                        className="flex items-center gap-2 text-gray-400 hover:text-purple-400 transition-colors text-sm"
+                        title="Export save file"
+                      >
+                        <Download size={14} />
+                        Export
+                      </button>
+                      <label className="flex items-center gap-2 text-gray-400 hover:text-purple-400 transition-colors text-sm cursor-pointer">
+                        <Upload size={14} />
+                        Import
+                        <input
+                          type="file"
+                          accept=".json"
+                          onChange={handleImportSave}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+
+                    {saveMessage && (
+                      <div className="text-xs text-green-400 text-center py-1">
+                        {saveMessage}
+                      </div>
+                    )}
+
                     <button
-                      onClick={resetGame}
-                      className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm w-full"
+                      onClick={() => {
+                        setGameState(INITIAL_STATE)
+                        localStorage.removeItem('terminal_adventure_save')
+                      }}
+                      className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors text-sm w-full"
                     >
                       <RotateCcw size={14} />
                       Restart Journey
