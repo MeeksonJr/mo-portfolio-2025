@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { BarChart3, Eye, TrendingUp, Users, ExternalLink, Calendar } from 'lucide-react'
+import { BarChart3, Eye, TrendingUp, Users, ExternalLink, Calendar, ArrowUp, ArrowDown, Clock, FileText, Activity } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -14,10 +15,14 @@ import { supabase } from '@/lib/supabase/client'
 
 interface AnalyticsData {
   totalViews: number
+  previousTotalViews: number
+  growthPercentage: number
   viewsByType: Record<string, number>
-  topContent: Array<{ type: string; id: string; views: number }>
+  topContent: Array<{ type: string; id: string; views: number; title: string; slug: string | null; status: string | null }>
   topReferrers: Array<{ domain: string; count: number }>
   dailyViews: Array<{ date: string; views: number }>
+  hourlyViews: Array<{ hour: number; views: number }>
+  statusBreakdown: Record<string, { published: number; draft: number; other: number }>
   period: number
 }
 
@@ -124,42 +129,60 @@ export default function AnalyticsDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.totalViews.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Last {period} days</p>
+            <div className="flex items-center gap-2 mt-1">
+              {data.growthPercentage !== 0 && (
+                <div className={`flex items-center gap-1 text-xs ${data.growthPercentage > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {data.growthPercentage > 0 ? (
+                    <ArrowUp className="h-3 w-3" />
+                  ) : (
+                    <ArrowDown className="h-3 w-3" />
+                  )}
+                  {Math.abs(data.growthPercentage).toFixed(1)}%
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground">vs previous period</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg Daily Views</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {data.period > 0 ? Math.round(data.totalViews / data.period).toLocaleString() : 0}
+            </div>
+            <p className="text-xs text-muted-foreground">Per day average</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Peak Hour</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {data.hourlyViews && data.hourlyViews.length > 0
+                ? `${data.hourlyViews.reduce((max, h) => h.views > max.views ? h : max, data.hourlyViews[0]).hour}:00`
+                : '—'}
+            </div>
+            <p className="text-xs text-muted-foreground">Most active today</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Content Types</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {Object.keys(data.viewsByType).length}
             </div>
             <p className="text-xs text-muted-foreground">Active content types</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Top Content</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.topContent.length}</div>
-            <p className="text-xs text-muted-foreground">Tracked items</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Referrers</CardTitle>
-            <ExternalLink className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.topReferrers.length}</div>
-            <p className="text-xs text-muted-foreground">Traffic sources</p>
           </CardContent>
         </Card>
       </div>
@@ -212,18 +235,25 @@ export default function AnalyticsDashboard() {
                   key={`${item.type}-${item.id}`}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-muted-foreground w-6">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span className="text-sm font-medium text-muted-foreground w-6 flex-shrink-0">
                       #{index + 1}
                     </span>
-                    <div>
-                      <span className="text-sm font-medium capitalize">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium truncate">{item.title}</span>
+                        {item.status && (
+                          <Badge variant={item.status === 'published' ? 'default' : 'secondary'} className="text-xs">
+                            {item.status}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground capitalize">
                         {item.type.replace('_', ' ')}
-                      </span>
-                      <p className="text-xs text-muted-foreground">{item.id.slice(0, 8)}...</p>
+                      </p>
                     </div>
                   </div>
-                  <span className="text-sm font-semibold">{item.views} views</span>
+                  <span className="text-sm font-semibold flex-shrink-0 ml-2">{item.views.toLocaleString()} views</span>
                 </div>
               ))}
             </div>
@@ -257,44 +287,148 @@ export default function AnalyticsDashboard() {
         </Card>
       </div>
 
-      {/* Daily Views Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Daily Views</CardTitle>
-          <CardDescription>Views over the last {period} days</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {data.dailyViews.length > 0 ? (
-              <div className="flex items-end gap-1 h-64">
-                {data.dailyViews.map((day) => {
-                  const maxViews = Math.max(...data.dailyViews.map((d) => d.views))
-                  const height = maxViews > 0 ? (day.views / maxViews) * 100 : 0
-                  return (
-                    <div
-                      key={day.date}
-                      className="flex-1 flex flex-col items-center gap-1 group"
-                    >
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Daily Views Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Daily Views</CardTitle>
+            <CardDescription>Views over the last {period} days</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {data.dailyViews.length > 0 ? (
+                <div className="flex items-end gap-1 h-64">
+                  {data.dailyViews.map((day) => {
+                    const maxViews = Math.max(...data.dailyViews.map((d) => d.views), 1)
+                    const height = maxViews > 0 ? (day.views / maxViews) * 100 : 0
+                    return (
                       <div
-                        className="w-full bg-primary rounded-t transition-all hover:bg-primary/80 min-h-[4px]"
-                        style={{ height: `${Math.max(height, 2)}%` }}
-                        title={`${day.date}: ${day.views} views`}
-                      />
-                      <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                        {new Date(day.date).getDate()}
+                        key={day.date}
+                        className="flex-1 flex flex-col items-center gap-1 group"
+                      >
+                        <div
+                          className="w-full bg-primary rounded-t transition-all hover:bg-primary/80 min-h-[4px]"
+                          style={{ height: `${Math.max(height, 2)}%` }}
+                          title={`${new Date(day.date).toLocaleDateString()}: ${day.views} views`}
+                        />
+                        <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                          {new Date(day.date).getDate()}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground py-8">
+                  No data available for this period
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Hourly Views Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Hourly Views (Today)</CardTitle>
+            <CardDescription>Views distribution throughout the day</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {data.hourlyViews && data.hourlyViews.length > 0 ? (
+                <div className="flex items-end gap-1 h-64">
+                  {data.hourlyViews.map((hour) => {
+                    const maxViews = Math.max(...data.hourlyViews.map((h) => h.views), 1)
+                    const height = maxViews > 0 ? (hour.views / maxViews) * 100 : 0
+                    return (
+                      <div
+                        key={hour.hour}
+                        className="flex-1 flex flex-col items-center gap-1 group"
+                      >
+                        <div
+                          className="w-full bg-primary rounded-t transition-all hover:bg-primary/80 min-h-[4px]"
+                          style={{ height: `${Math.max(height, 2)}%` }}
+                          title={`${hour.hour}:00 - ${hour.views} views`}
+                        />
+                        <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                          {hour.hour}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground py-8">
+                  No data available for today
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Content Status Breakdown */}
+      {Object.keys(data.statusBreakdown || {}).length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Content Status Breakdown</CardTitle>
+            <CardDescription>Views by content status</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {Object.entries(data.statusBreakdown).map(([type, breakdown]) => (
+                <div key={type} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium capitalize">
+                      {type.replace('_', ' ')}
+                    </span>
+                    <div className="flex items-center gap-4 text-xs">
+                      <span className="text-green-600">
+                        Published: {breakdown.published}
                       </span>
+                      <span className="text-yellow-600">
+                        Draft: {breakdown.draft}
+                      </span>
+                      {breakdown.other > 0 && (
+                        <span className="text-muted-foreground">
+                          Other: {breakdown.other}
+                        </span>
+                      )}
                     </div>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="text-center text-muted-foreground py-8">
-                No data available for this period
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2 flex overflow-hidden">
+                    {breakdown.published > 0 && (
+                      <div
+                        className="bg-green-600 h-full"
+                        style={{
+                          width: `${(breakdown.published / (breakdown.published + breakdown.draft + breakdown.other)) * 100}%`,
+                        }}
+                      />
+                    )}
+                    {breakdown.draft > 0 && (
+                      <div
+                        className="bg-yellow-600 h-full"
+                        style={{
+                          width: `${(breakdown.draft / (breakdown.published + breakdown.draft + breakdown.other)) * 100}%`,
+                        }}
+                      />
+                    )}
+                    {breakdown.other > 0 && (
+                      <div
+                        className="bg-muted-foreground h-full"
+                        style={{
+                          width: `${(breakdown.other / (breakdown.published + breakdown.draft + breakdown.other)) * 100}%`,
+                        }}
+                      />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

@@ -43,6 +43,7 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import ContentCreationModal from '@/components/admin/content-creation-modal'
+import ContentPreviewModal from '@/components/admin/content-preview-modal'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -86,6 +87,8 @@ export default function ResourcesTable({ initialResources }: ResourcesTableProps
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [resourceToEdit, setResourceToEdit] = useState<Resource | null>(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [previewModalOpen, setPreviewModalOpen] = useState(false)
+  const [resourceToPreview, setResourceToPreview] = useState<Resource | null>(null)
   const [selectedResources, setSelectedResources] = useState<Set<string>>(new Set())
   const [isBulkOperating, setIsBulkOperating] = useState(false)
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
@@ -511,6 +514,17 @@ export default function ResourcesTable({ initialResources }: ResourcesTableProps
                         variant="ghost"
                         size="sm"
                         onClick={() => {
+                          setResourceToPreview(resource)
+                          setPreviewModalOpen(true)
+                        }}
+                        title="Preview"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
                           setResourceToEdit(resource)
                           setEditModalOpen(true)
                         }}
@@ -639,6 +653,19 @@ export default function ResourcesTable({ initialResources }: ResourcesTableProps
           }}
           contentType="resource"
           initialData={resourceToEdit}
+        />
+      )}
+
+      {/* Preview Modal */}
+      {resourceToPreview && (
+        <ContentPreviewModal
+          open={previewModalOpen}
+          onOpenChange={(open) => {
+            setPreviewModalOpen(open)
+            if (!open) setResourceToPreview(null)
+          }}
+          contentType="resource"
+          content={resourceToPreview}
         />
       )}
     </div>

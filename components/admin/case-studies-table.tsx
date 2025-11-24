@@ -43,6 +43,7 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import ContentCreationModal from '@/components/admin/content-creation-modal'
+import ContentPreviewModal from '@/components/admin/content-preview-modal'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -83,6 +84,8 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [caseStudyToEdit, setCaseStudyToEdit] = useState<CaseStudy | null>(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [previewModalOpen, setPreviewModalOpen] = useState(false)
+  const [caseStudyToPreview, setCaseStudyToPreview] = useState<CaseStudy | null>(null)
   const [selectedCaseStudies, setSelectedCaseStudies] = useState<Set<string>>(new Set())
   const [isBulkOperating, setIsBulkOperating] = useState(false)
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
@@ -494,6 +497,17 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
                         variant="ghost"
                         size="sm"
                         onClick={() => {
+                          setCaseStudyToPreview(cs)
+                          setPreviewModalOpen(true)
+                        }}
+                        title="Preview"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
                           setCaseStudyToEdit(cs)
                           setEditModalOpen(true)
                         }}
@@ -622,6 +636,19 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
           }}
           contentType="case-study"
           initialData={caseStudyToEdit}
+        />
+      )}
+
+      {/* Preview Modal */}
+      {caseStudyToPreview && (
+        <ContentPreviewModal
+          open={previewModalOpen}
+          onOpenChange={(open) => {
+            setPreviewModalOpen(open)
+            if (!open) setCaseStudyToPreview(null)
+          }}
+          contentType="case-study"
+          content={caseStudyToPreview}
         />
       )}
     </div>

@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
       return acc
     }, {} as Record<string, number>) || {}
 
-    // Get top content
+    // Get top content with actual content details
     const { data: topContent } = await adminClient
       .from('analytics')
       .select('content_type, content_id')
@@ -162,13 +162,55 @@ export async function GET(request: NextRequest) {
       return acc
     }, {} as Record<string, number>) || {}
 
-    const topContentList = Object.entries(contentViews)
+    const topContentEntries = Object.entries(contentViews)
       .sort(([, a], [, b]) => b - a)
-      .slice(0, 10)
+      .slice(0, 20)
       .map(([key, views]) => {
         const [type, id] = key.split(':')
         return { type, id, views }
       })
+
+    // Fetch actual content details for top content
+    const topContentList = await Promise.all(
+      topContentEntries.map(async (item) => {
+        let title = item.id.slice(0, 8) + '...'
+        let slug = null
+        let status = null
+
+        try {
+          const tableName = 
+            item.type === 'blog_post' ? 'blog_posts' :
+            item.type === 'case_study' ? 'case_studies' :
+            item.type === 'project' ? 'projects' :
+            item.type === 'resource' ? 'resources' : null
+
+          if (tableName) {
+            const { data: content } = await adminClient
+              .from(tableName)
+              .select('title, name, slug, status')
+              .eq('id', item.id)
+              .single()
+
+            if (content) {
+              title = content.title || content.name || title
+              slug = content.slug || null
+              status = content.status || null
+            }
+          }
+        } catch (error) {
+          // Content might not exist, use default
+        }
+
+        return {
+          type: item.type,
+          id: item.id,
+          views: item.views,
+          title,
+          slug,
+          status,
+        }
+      })
+    )
 
     // Get referrers
     const { data: referrers } = await adminClient
@@ -196,7 +238,7 @@ export async function GET(request: NextRequest) {
       .slice(0, 10)
       .map(([domain, count]) => ({ domain, count }))
 
-    // Get daily views for the last 30 days
+    // Get daily views for the period
     const { data: dailyViews } = await adminClient
       .from('analytics')
       .select('created_at')
@@ -210,16 +252,116 @@ export async function GET(request: NextRequest) {
       dailyViewsMap[date] = (dailyViewsMap[date] || 0) + 1
     })
 
-    const dailyViewsList = Object.entries(dailyViewsMap)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, views]) => ({ date, views }))
+    // Fill in missing dates with 0
+    const dailyViewsList: Array<{ date: string; views: number }> = []
+    const currentDate = new Date(startDate)
+    const endDate = new Date()
+    
+    while (currentDate <= endDate) {
+      const dateStr = currentDate.toISOString().split('T')[0]
+      dailyViewsList.push({
+        date: dateStr,
+        views: dailyViewsMap[dateStr] || 0,
+      })
+      currentDate.setDate(currentDate.getDate() + 1)
+    }
+
+    // Get previous period for comparison
+    const previousStartDate = new Date(startDate)
+    previousStartDate.setDate(previousStartDate.getDate() - days)
+    
+    const { count: previousTotalViews } = await adminClient
+      .from('analytics')
+      .select('*', { count: 'exact', head: true })
+      .eq('event_type', 'view')
+      .gte('created_at', previousStartDate.toISOString())
+      .lt('created_at', startDate.toISOString())
+
+    // Get content status breakdown
+    const { data: contentStatusData } = await adminClient
+      .from('analytics')
+      .select('content_type, content_id')
+      .eq('event_type', 'view')
+      .gte('created_at', startDate.toISOString())
+      .not('content_id', 'is', null)
+
+    const statusBreakdown: Record<string, { published: number; draft: number; other: number }> = {}
+    
+    // Get status for each content item
+    for (const item of contentStatusData || []) {
+      if (!item.content_id || !item.content_type) continue
+      
+      const tableName = 
+        item.content_type === 'blog_post' ? 'blog_posts' :
+        item.content_type === 'case_study' ? 'case_studies' :
+        item.content_type === 'project' ? 'projects' :
+        item.content_type === 'resource' ? 'resources' : null
+
+      if (!tableName) continue
+
+      if (!statusBreakdown[item.content_type]) {
+        statusBreakdown[item.content_type] = { published: 0, draft: 0, other: 0 }
+      }
+
+      try {
+        const { data: content } = await adminClient
+          .from(tableName)
+          .select('status')
+          .eq('id', item.content_id)
+          .single()
+
+        if (content?.status === 'published') {
+          statusBreakdown[item.content_type].published++
+        } else if (content?.status === 'draft') {
+          statusBreakdown[item.content_type].draft++
+        } else {
+          statusBreakdown[item.content_type].other++
+        }
+      } catch {
+        statusBreakdown[item.content_type].other++
+      }
+    }
+
+    // Calculate growth percentage
+    const previousViews = previousTotalViews || 0
+    const currentViews = totalViews || 0
+    const growthPercentage = previousViews > 0 
+      ? ((currentViews - previousViews) / previousViews) * 100 
+      : 0
+
+    // Get hourly distribution for today
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const { data: todayViews } = await adminClient
+      .from('analytics')
+      .select('created_at')
+      .eq('event_type', 'view')
+      .gte('created_at', today.toISOString())
+
+    const hourlyViews: Record<number, number> = {}
+    for (let i = 0; i < 24; i++) {
+      hourlyViews[i] = 0
+    }
+
+    todayViews?.forEach((item) => {
+      const hour = new Date(item.created_at).getHours()
+      hourlyViews[hour] = (hourlyViews[hour] || 0) + 1
+    })
+
+    const hourlyViewsList = Object.entries(hourlyViews)
+      .map(([hour, views]) => ({ hour: parseInt(hour), views }))
+      .sort((a, b) => a.hour - b.hour)
 
     return NextResponse.json({
       totalViews: totalViews || 0,
+      previousTotalViews: previousViews,
+      growthPercentage,
       viewsByType: viewsByTypeCount,
-      topContent: topContentList,
+      topContent: topContentList.slice(0, 10),
       topReferrers,
       dailyViews: dailyViewsList,
+      hourlyViews: hourlyViewsList,
+      statusBreakdown,
       period: days,
     })
   } catch (error) {

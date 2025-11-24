@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Search, Plus, Edit, Trash2, Eye, Calendar, FileText, CheckSquare, Square, Download } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Eye, Calendar, FileText, CheckSquare, Square, Download, ExternalLink } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -49,6 +49,7 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import ContentCreationModal from '@/components/admin/content-creation-modal'
+import ContentPreviewModal from '@/components/admin/content-preview-modal'
 import { format } from 'date-fns'
 
 interface BlogPost {
@@ -85,6 +86,8 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [postToEdit, setPostToEdit] = useState<BlogPost | null>(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [previewModalOpen, setPreviewModalOpen] = useState(false)
+  const [postToPreview, setPostToPreview] = useState<BlogPost | null>(null)
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set())
   const [isBulkOperating, setIsBulkOperating] = useState(false)
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
@@ -549,6 +552,17 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
                       <Button
                         variant="ghost"
                         size="sm"
+                        onClick={() => {
+                          setPostToPreview(post)
+                          setPreviewModalOpen(true)
+                        }}
+                        title="Preview"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleEdit(post)}
                       >
                         <Edit className="h-4 w-4" />
@@ -679,6 +693,19 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
           }}
           contentType="blog"
           initialData={postToEdit}
+        />
+      )}
+
+      {/* Preview Modal */}
+      {postToPreview && (
+        <ContentPreviewModal
+          open={previewModalOpen}
+          onOpenChange={(open) => {
+            setPreviewModalOpen(open)
+            if (!open) setPostToPreview(null)
+          }}
+          contentType="blog"
+          content={postToPreview}
         />
       )}
     </div>

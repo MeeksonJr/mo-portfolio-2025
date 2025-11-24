@@ -49,6 +49,7 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination'
 import ContentCreationModal from '@/components/admin/content-creation-modal'
+import ContentPreviewModal from '@/components/admin/content-preview-modal'
 import { format } from 'date-fns'
 
 interface Project {
@@ -87,6 +88,8 @@ export default function ProjectsTable({ initialProjects }: ProjectsTableProps) {
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [projectToEdit, setProjectToEdit] = useState<Project | null>(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [previewModalOpen, setPreviewModalOpen] = useState(false)
+  const [projectToPreview, setProjectToPreview] = useState<Project | null>(null)
   const [selectedProjects, setSelectedProjects] = useState<Set<string>>(new Set())
   const [isBulkOperating, setIsBulkOperating] = useState(false)
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
@@ -577,6 +580,17 @@ export default function ProjectsTable({ initialProjects }: ProjectsTableProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => {
+                          setProjectToPreview(project)
+                          setPreviewModalOpen(true)
+                        }}
+                        title="Preview"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
                           setProjectToEdit(project)
                           setEditModalOpen(true)
                         }}
@@ -705,6 +719,19 @@ export default function ProjectsTable({ initialProjects }: ProjectsTableProps) {
           }}
           contentType="project"
           initialData={projectToEdit}
+        />
+      )}
+
+      {/* Preview Modal */}
+      {projectToPreview && (
+        <ContentPreviewModal
+          open={previewModalOpen}
+          onOpenChange={(open) => {
+            setPreviewModalOpen(open)
+            if (!open) setProjectToPreview(null)
+          }}
+          contentType="project"
+          content={projectToPreview}
         />
       )}
     </div>
