@@ -85,6 +85,8 @@ export default function ProjectContent({ project, relatedProjects }: ProjectCont
               description={project.description || ''}
               variant="ghost"
               size="sm"
+              contentType="project"
+              contentId={project.id}
             />
           </div>
         </div>

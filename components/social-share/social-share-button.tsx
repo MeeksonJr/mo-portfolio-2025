@@ -18,6 +18,9 @@ interface SocialShareButtonProps {
   className?: string
   variant?: 'default' | 'outline' | 'ghost'
   size?: 'default' | 'sm' | 'lg' | 'icon'
+  contentType?: 'blog' | 'project' | 'case-study' | 'page'
+  contentId?: string
+  onShare?: (platform: string) => void
 }
 
 export default function SocialShareButton({
@@ -27,6 +30,9 @@ export default function SocialShareButton({
   className,
   variant = 'outline',
   size = 'default',
+  contentType,
+  contentId,
+  onShare,
 }: SocialShareButtonProps) {
   const [copied, setCopied] = useState(false)
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '')
@@ -57,6 +63,29 @@ export default function SocialShareButton({
     }
 
     if (shareLink) {
+      // Track share event
+      if (contentType && contentId) {
+        try {
+          await fetch('/api/analytics/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              content_type: contentType,
+              content_id: contentId,
+              event_type: 'share',
+              metadata: { platform, url: shareUrl, title },
+            }),
+          })
+        } catch (error) {
+          console.error('Failed to track share:', error)
+        }
+      }
+
+      // Call custom onShare callback
+      if (onShare) {
+        onShare(platform)
+      }
+
       window.open(shareLink, '_blank', 'width=600,height=400')
       toast.success(`Opening ${platform}...`)
     }
@@ -66,6 +95,29 @@ export default function SocialShareButton({
     try {
       await navigator.clipboard.writeText(shareUrl)
       setCopied(true)
+      
+      // Track copy link as share
+      if (contentType && contentId) {
+        try {
+          await fetch('/api/analytics/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              content_type: contentType,
+              content_id: contentId,
+              event_type: 'share',
+              metadata: { platform: 'copy', url: shareUrl, title },
+            }),
+          })
+        } catch (error) {
+          console.error('Failed to track share:', error)
+        }
+      }
+
+      if (onShare) {
+        onShare('copy')
+      }
+
       toast.success('Link copied to clipboard!')
       setTimeout(() => setCopied(false), 2000)
     } catch (error) {
@@ -81,6 +133,29 @@ export default function SocialShareButton({
           text: description,
           url: shareUrl,
         })
+
+        // Track native share
+        if (contentType && contentId) {
+          try {
+            await fetch('/api/analytics/track', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                content_type: contentType,
+                content_id: contentId,
+                event_type: 'share',
+                metadata: { platform: 'native', url: shareUrl, title },
+              }),
+            })
+          } catch (error) {
+            console.error('Failed to track share:', error)
+          }
+        }
+
+        if (onShare) {
+          onShare('native')
+        }
+
         toast.success('Shared successfully!')
       } catch (error: any) {
         if (error.name !== 'AbortError') {

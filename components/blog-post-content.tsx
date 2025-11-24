@@ -95,6 +95,8 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
               description={post.excerpt || ''}
               variant="ghost"
               size="sm"
+              contentType="blog"
+              contentId={post.id}
             />
           </div>
         </div>

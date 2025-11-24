@@ -84,6 +84,8 @@ export default function CaseStudyContent({ caseStudy, relatedCaseStudies }: Case
               description={caseStudy.description || ''}
               variant="ghost"
               size="sm"
+              contentType="case-study"
+              contentId={caseStudy.id}
             />
           </div>
         </div>
