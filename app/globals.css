@@ -421,3 +421,37 @@ html {
 .md-editor-wrapper .w-md-editor-toolbar button.active {
   @apply bg-primary text-primary-foreground;
 }
+
+/* Mobile Bottom Navigation Safe Area */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Touch-optimized interactions */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase tap target sizes on mobile */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better touch feedback */
+  button:active,
+  a:active,
+  [role="button"]:active {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+}
+
+/* Pull-to-refresh indicator (for future use) */
+@keyframes pull-to-refresh {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

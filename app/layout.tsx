@@ -92,6 +92,8 @@ export default function RootLayout({
             <AchievementTracker />
             <KeyboardShortcutHint />
             <InteractiveOnboarding />
+            <BottomNavigation />
+            <SwipeNavigation />
           </PreferencesProvider>
         </ThemeProvider>
         <Analytics />

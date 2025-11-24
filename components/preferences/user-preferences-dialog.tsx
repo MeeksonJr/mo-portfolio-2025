@@ -21,7 +21,11 @@ import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
 import type { UserPreferences } from '@/lib/user-preferences'
 
-export function UserPreferencesDialog() {
+interface UserPreferencesDialogProps {
+  children?: React.ReactNode
+}
+
+export function UserPreferencesDialog({ children }: UserPreferencesDialogProps) {
   const { preferences, updatePreferences, reset } = useUserPreferences()
   const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
