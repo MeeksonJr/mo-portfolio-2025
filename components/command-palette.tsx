@@ -35,6 +35,7 @@ import {
   Bot,
   CreditCard,
   Calendar,
+  Code2,
 } from 'lucide-react'
 
 export default function CommandPalette() {
@@ -201,6 +202,12 @@ export default function CommandPalette() {
           >
             <Calendar className="mr-2 h-4 w-4" />
             <span>Book a Meeting</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/code'))}
+          >
+            <Code2 className="mr-2 h-4 w-4" />
+            <span>Code Snippets Library</span>
           </CommandItem>
         </CommandGroup>
 

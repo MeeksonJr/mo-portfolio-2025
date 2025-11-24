@@ -50,6 +50,7 @@ export default function Navigation() {
     { name: "Business Card", href: "/card" },
     { name: "Analytics", href: "/analytics" },
     { name: "Calendar", href: "/calendar" },
+    { name: "Code Snippets", href: "/code" },
   ]
 
   const allLinks = [...mainLinks, ...contentLinks]
