@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthenticatedUser } from '@/lib/supabase/api-helpers'
-
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY
-
-if (!OPENAI_API_KEY) {
-  console.warn('OPENAI_API_KEY not set - AI content improvement will not work')
-}
+import { callAI } from '@/lib/ai-providers'
 
 type ImprovementType = 'improve' | 'shorten' | 'lengthen' | 'rewrite' | 'fix-grammar' | 'enhance'
 
@@ -16,9 +11,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (!OPENAI_API_KEY) {
+    // Check if at least one AI provider is configured
+    const hasGroq = !!process.env.GROQ_API_KEY
+    const hasHuggingFace = !!(process.env.HUGGINGFACE_API_KEY || process.env.HUGGINGFACE_API_TOKEN)
+    const hasGemini = !!(process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY)
+
+    if (!hasGroq && !hasHuggingFace && !hasGemini) {
       return NextResponse.json(
-        { error: 'AI service not configured' },
+        { error: 'AI service not configured. Please set GROQ_API_KEY, HUGGINGFACE_API_KEY, or GEMINI_API_KEY' },
         { status: 503 }
       )
     }
@@ -69,42 +69,31 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid improvement type' }, { status: 400 })
     }
 
-    // Call OpenAI API
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
+    // Call AI provider (Groq -> HuggingFace -> Gemini)
+    try {
+      const aiResponse = await callAI({
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
         temperature: 0.7,
-        max_tokens: 2000,
-      }),
-    })
+        maxTokens: 2000,
+      })
 
-    if (!response.ok) {
-      const error = await response.json()
-      console.error('OpenAI API error:', error)
+      return NextResponse.json({
+        original: content,
+        improved: aiResponse.content,
+        type,
+        provider: aiResponse.provider,
+        model: aiResponse.model,
+      })
+    } catch (error: any) {
+      console.error('AI provider error:', error)
       return NextResponse.json(
-        { error: 'Failed to improve content' },
-        { status: response.status }
+        { error: error.message || 'Failed to improve content' },
+        { status: 500 }
       )
     }
-
-    const data = await response.json()
-    const improvedContent = data.choices[0]?.message?.content || content
-
-    return NextResponse.json({
-      original: content,
-      improved: improvedContent,
-      type,
-      model: 'gpt-4o-mini',
-    })
   } catch (error: any) {
     console.error('Error in POST /api/admin/ai/improve-content:', error)
     return NextResponse.json(

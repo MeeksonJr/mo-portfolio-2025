@@ -143,36 +143,41 @@ export async function POST(req: Request) {
           break
 
         default:
-          console.log("🌟 Chat API: Initializing Gemini model")
-          const profileData = await getMohamedProfileData()
-
-          // Try different Gemini models in order (updated to current models)
-          const geminiModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.5-pro"]
-          let geminiSuccess = false
-
-          for (const geminiModel of geminiModels) {
-            try {
-              console.log(`🔄 Trying Gemini model: ${geminiModel}`)
-              result = await streamText({
-                model: google(geminiModel),
-                system: profileData,
-                messages,
-                temperature: 0.7,
-              })
-              console.log(`✅ Gemini model ${geminiModel} succeeded!`)
-              geminiSuccess = true
-              break
-            } catch (geminiError: unknown) {
-              const errorMessage = geminiError instanceof Error ? geminiError.message : 'Unknown error'
-              console.error(`❌ Gemini model ${geminiModel} failed:`, errorMessage)
-              continue
-            }
-          }
-
-          if (!geminiSuccess) {
-            console.log("🔄 All Gemini models failed, falling back to Groq...")
+          // Priority: Groq first, then Gemini, then HuggingFace
+          console.log("🦙 Chat API: Trying Groq first (primary)")
+          try {
             result = await tryGroqModels(messages)
-            console.log("✅ Groq fallback succeeded!")
+            console.log("✅ Chat API: Groq response generated")
+          } catch (groqError) {
+            console.log("🔄 Groq failed, trying Gemini...")
+            const profileData = await getMohamedProfileData()
+
+            // Try different Gemini models in order
+            const geminiModels = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"]
+            let geminiSuccess = false
+
+            for (const geminiModel of geminiModels) {
+              try {
+                console.log(`🔄 Trying Gemini model: ${geminiModel}`)
+                result = await streamText({
+                  model: google(geminiModel),
+                  system: profileData,
+                  messages,
+                  temperature: 0.7,
+                })
+                console.log(`✅ Gemini model ${geminiModel} succeeded!`)
+                geminiSuccess = true
+                break
+              } catch (geminiError: unknown) {
+                const errorMessage = geminiError instanceof Error ? geminiError.message : 'Unknown error'
+                console.error(`❌ Gemini model ${geminiModel} failed:`, errorMessage)
+                continue
+              }
+            }
+
+            if (!geminiSuccess) {
+              throw new Error("All AI providers failed")
+            }
           }
       }
 

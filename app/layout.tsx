@@ -12,6 +12,8 @@ import { Toaster } from "@/components/ui/sonner"
 import AchievementTracker from "@/components/achievements/achievement-tracker"
 import KeyboardShortcutHint from "@/components/keyboard-shortcut-hint"
 import InteractiveOnboarding from "@/components/onboarding/interactive-onboarding"
+import { BottomNavigation } from "@/components/mobile/bottom-navigation"
+import { SwipeNavigation } from "@/components/mobile/swipe-navigation"
 
 const inter = Inter({ subsets: ["latin"] })
 
