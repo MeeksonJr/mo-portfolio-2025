@@ -2551,17 +2551,28 @@ content/
 - **Tech:** Supabase, Giscus (GitHub-based), or custom
 - **Priority:** 🟢 Low
 
-#### 3. **Newsletter Integration**
+#### 3. **Newsletter Integration** ✅
 - **Description:** Newsletter signup and management
 - **Features:**
-  - Email capture
-  - Double opt-in
-  - Welcome email
-  - Unsubscribe management
-  - Integration with Resend
-  - Subscriber analytics
-- **Tech:** Resend, Supabase
+  - [x] Email capture (with name optional)
+  - [x] Double opt-in (confirmation email required)
+  - [x] Welcome email (sent after confirmation)
+  - [x] Unsubscribe management (token-based and email-based)
+  - [x] Integration with Resend (confirmation and welcome emails)
+  - [x] Subscriber analytics (track subscribe, confirm, unsubscribe events)
+  - [x] Database schema (subscribers and analytics tables)
+  - [x] Newsletter signup component (default, compact, inline variants)
+  - [x] Confirmation page (`/newsletter/confirm`)
+  - [x] Unsubscribe page (`/newsletter/unsubscribe`)
+  - [x] Email templates (confirmation and welcome)
+  - [x] Footer integration (compact signup form)
+  - [x] Source tracking (homepage, blog, footer, etc.)
+  - [ ] Admin dashboard for subscriber management - Future enhancement
+  - [ ] Newsletter sending functionality - Future enhancement
+  - [ ] Email open/click tracking - Future enhancement
+- **Tech:** Resend, Supabase, React Email
 - **Priority:** 🟡 Medium
+- **Status:** ✅ Completed
 
 #### 4. **Guestbook**
 - **Description:** Visitor guestbook page

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { Heart, Coffee, Github, Linkedin, Mail, ArrowUp, Trophy } from "lucide-react"
 import Link from "next/link"
+import { NewsletterSignup } from "@/components/newsletter/newsletter-signup"
 
 export default function FooterLight() {
   return (
@@ -58,6 +59,10 @@ export default function FooterLight() {
                 <Trophy className="h-4 w-4" />
                 <span>View Achievements</span>
               </Link>
+            </div>
+
+            <div className="max-w-md mx-auto">
+              <NewsletterSignup variant="compact" source="footer" />
             </div>
 
             <div className="text-sm text-muted-foreground">
