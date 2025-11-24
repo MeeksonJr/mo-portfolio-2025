@@ -245,6 +245,11 @@ export default function VoiceCommands() {
       description: 'Navigate to code snippet library',
     },
     {
+      command: 'go to uses',
+      action: () => router.push('/uses'),
+      description: 'Navigate to uses page',
+    },
+    {
       command: 'go to calendar',
       action: () => router.push('/calendar'),
       description: 'Navigate to availability calendar',
@@ -302,6 +307,11 @@ export default function VoiceCommands() {
       command: 'go to project analyzer',
       action: () => router.push('/project-analyzer'),
       description: 'Navigate to project analyzer',
+    },
+    {
+      command: 'go to code playground',
+      action: () => router.push('/code-playground'),
+      description: 'Navigate to code playground',
     },
     {
       command: 'analyze project',
