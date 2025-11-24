@@ -79,13 +79,16 @@ export function ContentPerformanceInsights({
       )
 
       if (!response.ok) {
-        throw new Error('Failed to fetch performance data')
+        // Don't throw error, just set data to null to show empty state
+        setData(null)
+        return
       }
 
       const performanceData = await response.json()
       setData(performanceData)
     } catch (error) {
       console.error('Error fetching performance data:', error)
+      // Silently fail - don't break the page if analytics fail
       setData(null)
     } finally {
       setLoading(false)
@@ -122,14 +125,8 @@ export function ContentPerformanceInsights({
   }
 
   if (!data) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Content Performance</CardTitle>
-          <CardDescription>No performance data available</CardDescription>
-        </CardHeader>
-      </Card>
-    )
+    // Don't render anything if there's no data - fail silently
+    return null
   }
 
   return (
