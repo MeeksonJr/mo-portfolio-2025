@@ -2,6 +2,7 @@
 
 import { Calendar, Eye, ArrowLeft, CheckCircle2, Lightbulb, Target } from 'lucide-react'
 import SocialShareButton from '@/components/social-share/social-share-button'
+import { ContentPerformanceInsights } from '@/components/analytics/content-performance-insights'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -273,6 +274,15 @@ export default function CaseStudyContent({ caseStudy, relatedCaseStudies }: Case
           </div>
         </section>
       )}
+
+      {/* Content Performance Insights */}
+      <div className="mt-16 pt-8 border-t">
+        <ContentPerformanceInsights
+          contentId={caseStudy.id}
+          contentType="case_study"
+          contentTitle={caseStudy.title}
+        />
+      </div>
     </article>
   )
 }

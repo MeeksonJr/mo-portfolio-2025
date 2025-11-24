@@ -226,6 +226,15 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
           </div>
         </section>
       )}
+
+      {/* Content Performance Insights */}
+      <div className="mt-16 pt-8 border-t">
+        <ContentPerformanceInsights
+          contentId={post.id}
+          contentType="blog_post"
+          contentTitle={post.title}
+        />
+      </div>
     </article>
   )
 }

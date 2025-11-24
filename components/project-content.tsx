@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import SocialShareButton from '@/components/social-share/social-share-button'
+import { ContentPerformanceInsights } from '@/components/analytics/content-performance-insights'
 
 interface Project {
   id: string
@@ -189,6 +190,15 @@ export default function ProjectContent({ project, relatedProjects }: ProjectCont
           </div>
         </section>
       )}
+
+      {/* Content Performance Insights */}
+      <div className="mt-16 pt-8 border-t">
+        <ContentPerformanceInsights
+          contentId={project.id}
+          contentType="project"
+          contentTitle={project.name}
+        />
+      </div>
     </article>
   )
 }
