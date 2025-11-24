@@ -18,6 +18,7 @@ import { InstallPrompt } from "@/components/pwa/install-prompt"
 import { OfflineIndicator } from "@/components/pwa/offline-indicator"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { ErrorHandler } from "@/components/error-handler"
+import FloatingActionMenu from "@/components/floating-action-menu"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -104,6 +105,7 @@ export default function RootLayout({
               <SwipeNavigation />
               <InstallPrompt />
               <OfflineIndicator />
+              <FloatingActionMenu />
             </ErrorBoundary>
           </PreferencesProvider>
         </ThemeProvider>

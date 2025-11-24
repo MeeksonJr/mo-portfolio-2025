@@ -41,7 +41,6 @@ export default function Home() {
 
       <FooterLight />
       <AIChatbotVoice />
-      <FloatingActionMenu />
     </div>
     </>
   )

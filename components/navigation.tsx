@@ -42,6 +42,8 @@ export default function Navigation() {
     { name: "Projects", href: "/projects" },
     { name: "Blog", href: "/blog" },
     { name: "Case Studies", href: "/case-studies" },
+    { name: "Architecture", href: "/architecture" },
+    { name: "Collaboration", href: "/collaboration" },
     { name: "Resources", href: "/resources" },
     { name: "Testimonials", href: "/testimonials" },
     { name: "Timeline", href: "/timeline" },

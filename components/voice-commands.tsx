@@ -192,6 +192,21 @@ export default function VoiceCommands() {
       action: () => router.push('/demos'),
       description: 'Navigate to live project demos',
     },
+    {
+      command: 'go to demos',
+      action: () => router.push('/demos'),
+      description: 'Navigate to project demos',
+    },
+    {
+      command: 'go to architecture',
+      action: () => router.push('/architecture'),
+      description: 'Navigate to technical architecture showcase',
+    },
+    {
+      command: 'go to collaboration',
+      action: () => router.push('/collaboration'),
+      description: 'Navigate to team collaboration proof',
+    },
     // Analytics & Data
     {
       command: 'go to analytics',

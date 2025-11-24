@@ -38,6 +38,8 @@ import {
   Code2,
   Activity,
   Sparkles,
+  Layers,
+  Users,
 } from 'lucide-react'
 import { GlobalSearch } from '@/components/search/global-search'
 
@@ -173,6 +175,18 @@ export default function CommandPalette() {
           >
             <Briefcase className="mr-2 h-4 w-4" />
             <span>Case Studies</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/architecture'))}
+          >
+            <Layers className="mr-2 h-4 w-4" />
+            <span>Technical Architecture</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/collaboration'))}
+          >
+            <Users className="mr-2 h-4 w-4" />
+            <span>Team Collaboration</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/resources'))}
