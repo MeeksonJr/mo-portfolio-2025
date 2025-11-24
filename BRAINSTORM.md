@@ -727,6 +727,13 @@ CREATE TABLE settings (
   - Visual feedback
 - **Tech:** Web Speech API, SpeechRecognition
 - **Priority:** 🟡 Medium
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Enhanced voice commands with natural language support
+  - [x] Added fuzzy matching for conversational commands
+  - [x] Integrated with AI assistant for "tell me about" queries
+  - [x] Added commands for project analyzer, resume download, and more
+  - [x] Improved error handling with helpful suggestions
+  - [x] Voice commands component already supports 40+ commands
 
 #### 5. **Interactive Timeline**
 - **Description:** Animated timeline of journey (Guinea → NYC → Norfolk)
@@ -1173,6 +1180,14 @@ Comprehensive AI integration using free APIs (Gemini, Groq, Hugging Face) for co
   - Interactive prototypes
   - Before/After sliders
 - **Priority:** 🟡 Medium
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Live project showcase with embedded iframe demos
+  - [x] Video walkthrough component with fullscreen support
+  - [x] Before/After slider component for visual comparisons
+  - [x] Interactive project cards with hover effects
+  - [x] Full-screen modal with browser-style UI
+  - [x] Tabbed interface for demo, comparison, and video views
+  - [x] Integrated into /demos page with project filtering
 
 ### 📱 Mobile Enhancements
 

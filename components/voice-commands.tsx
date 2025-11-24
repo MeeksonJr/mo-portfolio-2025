@@ -263,17 +263,87 @@ export default function VoiceCommands() {
       },
       description: 'Open command palette',
     },
+    // Natural language commands
+    {
+      command: 'tell me about',
+      action: () => {
+        // Open AI assistant with context
+        router.push('/portfolio-assistant')
+      },
+      description: 'Ask about Mohamed (opens AI assistant)',
+    },
+    {
+      command: 'what can you do',
+      action: () => {
+        router.push('/portfolio-assistant')
+      },
+      description: 'Learn about capabilities',
+    },
+    {
+      command: 'show me projects',
+      action: () => router.push('/projects'),
+      description: 'Navigate to projects',
+    },
+    {
+      command: 'show me blog',
+      action: () => router.push('/blog'),
+      description: 'Navigate to blog',
+    },
+    {
+      command: 'download resume',
+      action: () => {
+        const link = document.createElement('a')
+        link.href = '/resume'
+        link.click()
+      },
+      description: 'Download resume',
+    },
+    {
+      command: 'go to project analyzer',
+      action: () => router.push('/project-analyzer'),
+      description: 'Navigate to project analyzer',
+    },
+    {
+      command: 'analyze project',
+      action: () => router.push('/project-analyzer'),
+      description: 'Open project analyzer',
+    },
   ]
 
   const handleCommand = (text: string) => {
-    const matchedCommand = commands.find((cmd) => text.includes(cmd.command))
+    // Try exact match first
+    let matchedCommand = commands.find((cmd) => text === cmd.command)
+    
+    // If no exact match, try partial match
+    if (!matchedCommand) {
+      matchedCommand = commands.find((cmd) => text.includes(cmd.command))
+    }
+    
+    // If still no match, try fuzzy matching for natural language
+    if (!matchedCommand) {
+      const lowerText = text.toLowerCase()
+      
+      // Natural language patterns
+      if (lowerText.includes('tell me about') || lowerText.includes('who are you') || lowerText.includes('about you')) {
+        matchedCommand = commands.find((cmd) => cmd.command === 'tell me about')
+      } else if (lowerText.includes('projects') || lowerText.includes('show projects') || lowerText.includes('my work')) {
+        matchedCommand = commands.find((cmd) => cmd.command === 'show me projects')
+      } else if (lowerText.includes('blog') || lowerText.includes('articles') || lowerText.includes('posts')) {
+        matchedCommand = commands.find((cmd) => cmd.command === 'show me blog')
+      } else if (lowerText.includes('resume') || lowerText.includes('cv') || lowerText.includes('download resume')) {
+        matchedCommand = commands.find((cmd) => cmd.command === 'download resume')
+      } else if (lowerText.includes('analyze') && lowerText.includes('project')) {
+        matchedCommand = commands.find((cmd) => cmd.command === 'analyze project')
+      }
+    }
     
     if (matchedCommand) {
       matchedCommand.action()
       setTranscript('')
       setIsOpen(false)
     } else {
-      setError(`Command not recognized: "${text}". Try: ${commands.map(c => c.command).join(', ')}`)
+      // If command not recognized, offer to send to AI assistant
+      setError(`Command not recognized: "${text}". Say "tell me about" to ask questions, or try: ${commands.slice(0, 5).map(c => c.command).join(', ')}`)
     }
   }
 
