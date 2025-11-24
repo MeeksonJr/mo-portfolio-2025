@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Mic, Music, MessageCircle, X, Plus } from 'lucide-react'
 import VoiceCommands from './voice-commands'
 import MusicPlayerContent from './music-player-content'
-import AIChatbotContent from './ai-chatbot-content'
+import { AIChatbotContent } from './chatbot/chatbot-wrappers'
 
 export default function FloatingActionMenu() {
   const [isOpen, setIsOpen] = useState(false)
