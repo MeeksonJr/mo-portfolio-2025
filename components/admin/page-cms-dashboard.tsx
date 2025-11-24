@@ -16,8 +16,21 @@ import { supabase } from '@/lib/supabase/client'
 import MDXEditor from '@/components/admin/mdx-editor'
 
 const PAGES = [
-  { value: 'timeline', label: 'Timeline', sections: ['milestone-1', 'milestone-2', 'milestone-3', 'milestone-4', 'milestone-5', 'milestone-6', 'milestone-7', 'milestone-8'] },
-  { value: 'about', label: 'About', sections: ['hero', 'bio', 'skills', 'values'] },
+  { 
+    value: 'timeline', 
+    label: 'Timeline', 
+    sections: [
+      'born-guinea', 
+      'moved-nyc', 
+      'learned-english', 
+      'discovered-coding', 
+      'started-college', 
+      'competition-win', 
+      'building-saas', 
+      'current'
+    ] 
+  },
+  { value: 'about', label: 'About', sections: ['hero', 'bio', 'skills', 'values', 'gallery'] },
   { value: 'work', label: 'Work', sections: ['hero', 'description'] },
   { value: 'services', label: 'Services', sections: ['hero', 'description', 'service-1', 'service-2', 'service-3'] },
   { value: 'home', label: 'Home', sections: ['hero', 'intro', 'cta'] },

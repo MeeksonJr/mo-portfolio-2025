@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
+import { usePageImages } from '@/hooks/use-page-cms'
 
 export interface TimelineMilestone {
   id: string
@@ -128,6 +129,27 @@ export default function InteractiveTimeline() {
   // Calculate progress along timeline
   const timelineProgress = useTransform(scrollYProgress, [0, 1], [0, 100])
 
+  // Fetch images for each milestone from CMS
+  const milestoneImageHooks = milestones.reduce((acc, milestone) => {
+    acc[milestone.id] = usePageImages('timeline', milestone.id, [])
+    return acc
+  }, {} as Record<string, ReturnType<typeof usePageImages>>)
+
+  // Enhance milestones with CMS images
+  const enhancedMilestones = milestones.map((milestone) => {
+    const imageHook = milestoneImageHooks[milestone.id]
+    const cmsImages = imageHook.images.map(img => ({
+      url: img.src,
+      alt: img.alt,
+      caption: img.caption,
+    }))
+    
+    return {
+      ...milestone,
+      photos: cmsImages.length > 0 ? cmsImages : milestone.photos,
+    }
+  })
+
   return (
     <div ref={containerRef} className="relative py-20 px-4">
       <div className="max-w-6xl mx-auto">
@@ -158,7 +180,7 @@ export default function InteractiveTimeline() {
 
           {/* Milestones */}
           <div className="space-y-24 md:space-y-32">
-            {milestones.map((milestone, index) => {
+            {enhancedMilestones.map((milestone, index) => {
               const Icon = milestone.icon
               const isEven = index % 2 === 0
               const ref = useRef<HTMLDivElement>(null)

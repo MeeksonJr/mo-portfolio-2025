@@ -5,6 +5,7 @@ import { Heart, MapPin, GraduationCap, Code, Rocket, Sparkles, Camera, Award, Co
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePageImages } from '@/hooks/use-page-cms'
 
 const timeline = [
   {
@@ -70,13 +71,16 @@ const interests = [
 export default function AboutPageContent() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
-  // Placeholder images - replace with actual photos
-  const photos = [
+  // Fallback images - used when CMS has no active images
+  const fallbackPhotos = [
     { src: '/images/about/guinea.jpg', alt: 'Guinea, West Africa', caption: 'Guinea, West Africa' },
     { src: '/images/about/nyc.jpg', alt: 'New York City', caption: 'New York City' },
     { src: '/images/about/norfolk.jpg', alt: 'Norfolk, Virginia', caption: 'Norfolk, Virginia' },
     { src: '/images/about/coding.jpg', alt: 'Coding', caption: 'Building Applications' },
   ]
+
+  // Fetch gallery images from CMS with fallback
+  const { images: photos, isLoading: imagesLoading } = usePageImages('about', 'gallery', fallbackPhotos)
 
   return (
     <div className="max-w-6xl mx-auto px-4">
