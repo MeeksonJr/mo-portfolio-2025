@@ -9,6 +9,7 @@ import ReactMarkdown from 'react-markdown'
 import { useEffect } from 'react'
 import SocialShareButton from '@/components/social-share/social-share-button'
 import ReadingMode from '@/components/reading-mode/reading-mode'
+import { ContentPerformanceInsights } from '@/components/analytics/content-performance-insights'
 
 interface BlogPost {
   id: string

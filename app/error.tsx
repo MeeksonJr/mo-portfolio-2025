@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { Home, RefreshCw, Terminal, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { errorTracker } from '@/lib/error-tracking'
 
 export default function Error({
   error,
@@ -15,6 +16,12 @@ export default function Error({
   useEffect(() => {
     // Log error to console for debugging
     console.error('Application error:', error)
+    
+    // Track error
+    errorTracker.trackError(error, {
+      type: 'page-error',
+      digest: error.digest,
+    })
   }, [error])
 
   return (

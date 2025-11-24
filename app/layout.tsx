@@ -16,6 +16,8 @@ import { BottomNavigation } from "@/components/mobile/bottom-navigation"
 import { SwipeNavigation } from "@/components/mobile/swipe-navigation"
 import { InstallPrompt } from "@/components/pwa/install-prompt"
 import { OfflineIndicator } from "@/components/pwa/offline-indicator"
+import { ErrorBoundary } from "@/components/error-boundary"
+import { ErrorHandler } from "@/components/error-handler"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -91,15 +93,18 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <PreferencesProvider>
-            {children}
-            <CommandPalette />
-            <AchievementTracker />
-            <KeyboardShortcutHint />
-            <InteractiveOnboarding />
-            <BottomNavigation />
-            <SwipeNavigation />
-            <InstallPrompt />
-            <OfflineIndicator />
+            <ErrorHandler />
+            <ErrorBoundary>
+              {children}
+              <CommandPalette />
+              <AchievementTracker />
+              <KeyboardShortcutHint />
+              <InteractiveOnboarding />
+              <BottomNavigation />
+              <SwipeNavigation />
+              <InstallPrompt />
+              <OfflineIndicator />
+            </ErrorBoundary>
           </PreferencesProvider>
         </ThemeProvider>
         <Analytics />

@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { Home, RefreshCw, Terminal, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { errorTracker } from '@/lib/error-tracking'
 
 export default function GlobalError({
   error,
@@ -15,6 +16,12 @@ export default function GlobalError({
   useEffect(() => {
     // Log error to console for debugging
     console.error('Global application error:', error)
+    
+    // Track error
+    errorTracker.trackError(error, {
+      type: 'global-error',
+      digest: error.digest,
+    })
   }, [error])
 
   return (
