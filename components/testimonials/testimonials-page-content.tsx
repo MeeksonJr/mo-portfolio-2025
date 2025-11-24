@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Image from 'next/image'
 import { createClient } from '@supabase/supabase-js'
+import { TestimonialGridSkeleton } from '@/components/loading/content-skeletons'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -267,19 +268,7 @@ export default function TestimonialsPageContent() {
 
       {/* Testimonials Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="h-4 bg-muted rounded w-3/4"></div>
-                <div className="h-3 bg-muted rounded w-1/2 mt-2"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-20 bg-muted rounded"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <TestimonialGridSkeleton count={6} />
       ) : filteredTestimonials.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
