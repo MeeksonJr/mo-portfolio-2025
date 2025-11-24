@@ -36,8 +36,32 @@
       "short_name": "Projects",
       "description": "View projects",
       "url": "/projects",
-      "icons": [{ "src": "/placeholder-logo.png", "sizes": "512x512" }]
+      "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Contact",
+      "short_name": "Contact",
+      "description": "Get in touch",
+      "url": "/#contact",
+      "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Resume",
+      "short_name": "Resume",
+      "description": "Download resume",
+      "url": "/resume",
+      "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
     }
-  ]
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }
 

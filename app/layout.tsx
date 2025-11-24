@@ -14,6 +14,8 @@ import KeyboardShortcutHint from "@/components/keyboard-shortcut-hint"
 import InteractiveOnboarding from "@/components/onboarding/interactive-onboarding"
 import { BottomNavigation } from "@/components/mobile/bottom-navigation"
 import { SwipeNavigation } from "@/components/mobile/swipe-navigation"
+import { InstallPrompt } from "@/components/pwa/install-prompt"
+import { OfflineIndicator } from "@/components/pwa/offline-indicator"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -96,6 +98,8 @@ export default function RootLayout({
             <InteractiveOnboarding />
             <BottomNavigation />
             <SwipeNavigation />
+            <InstallPrompt />
+            <OfflineIndicator />
           </PreferencesProvider>
         </ThemeProvider>
         <Analytics />
