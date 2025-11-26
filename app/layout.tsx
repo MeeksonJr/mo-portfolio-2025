@@ -24,6 +24,8 @@ import MobileBottomNav from "@/components/mobile/mobile-bottom-nav"
 import SkipToContent from "@/components/accessibility/skip-to-content"
 import CustomCursor from "@/components/ui/custom-cursor"
 import { TranslationProvider } from "@/components/i18n/translation-provider"
+import KeyboardShortcutsHandler from "@/components/keyboard-shortcuts-handler"
+import KeyboardShortcutsModal from "@/components/keyboard-shortcuts-modal"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -105,8 +107,10 @@ export default function RootLayout({
               <VisitorProfileProvider>
                 <ErrorHandler />
                 <ErrorBoundary>
+                  <KeyboardShortcutsHandler />
                   {children}
               <CommandPalette />
+              <KeyboardShortcutsModal />
               <AchievementTracker />
               <KeyboardShortcutHint />
               <InteractiveOnboarding />
