@@ -51,6 +51,7 @@ export default function Navigation() {
     { name: "Timeline", href: "/timeline" },
     { name: "Music", href: "/music" },
     { name: "Achievements", href: "/achievements" },
+    { name: "Dashboard", href: "/dashboard" },
   ]
 
   // Tools dropdown - Interactive tools and utilities

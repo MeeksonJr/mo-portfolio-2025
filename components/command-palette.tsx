@@ -40,6 +40,7 @@ import {
   Sparkles,
   Layers,
   Users,
+  TrendingUp,
 } from 'lucide-react'
 import { GlobalSearch } from '@/components/search/global-search'
 
@@ -193,6 +194,12 @@ export default function CommandPalette() {
           >
             <BookOpen className="mr-2 h-4 w-4" />
             <span>Resources</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/dashboard'))}
+          >
+            <TrendingUp className="mr-2 h-4 w-4" />
+            <span>Personal Dashboard</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/learning-paths'))}
