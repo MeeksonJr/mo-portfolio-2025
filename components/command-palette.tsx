@@ -261,6 +261,12 @@ export default function CommandPalette() {
             <span>Code Snippets Library</span>
           </CommandItem>
           <CommandItem
+            onSelect={() => runCommand(() => router.push('/code-review'))}
+          >
+            <Code2 className="mr-2 h-4 w-4" />
+            <span>Code Review Simulator</span>
+          </CommandItem>
+          <CommandItem
             onSelect={() => runCommand(() => router.push('/projects-timeline'))}
           >
             <Calendar className="mr-2 h-4 w-4" />

@@ -335,6 +335,11 @@ export default function VoiceCommands() {
       description: 'Navigate to code playground',
     },
     {
+      command: 'go to code review',
+      action: () => router.push('/code-review'),
+      description: 'Navigate to code review simulator',
+    },
+    {
       command: 'analyze project',
       action: () => router.push('/project-analyzer'),
       description: 'Open project analyzer',
