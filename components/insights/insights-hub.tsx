@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, lazy } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -17,12 +17,16 @@ import {
   Users,
   Zap,
   CheckCircle2,
+  Loader2,
 } from 'lucide-react'
-import PublicAnalyticsDashboard from '@/components/analytics/public-analytics-dashboard'
-import LiveActivityFeed from '@/components/activity/live-activity-feed'
-import ContentRecommendations from '@/components/recommendations/content-recommendations'
-import InteractiveProjectTimeline from '@/components/projects/project-timeline'
-import InteractiveSkillTree from '@/components/skills/skill-tree'
+
+// Lazy load tab components for better performance
+const PublicAnalyticsDashboard = lazy(() => import('@/components/analytics/public-analytics-dashboard'))
+const LiveActivityFeed = lazy(() => import('@/components/activity/live-activity-feed'))
+const ContentRecommendations = lazy(() => import('@/components/recommendations/content-recommendations'))
+const InteractiveProjectTimeline = lazy(() => import('@/components/projects/project-timeline'))
+const InteractiveSkillTree = lazy(() => import('@/components/skills/skill-tree'))
+import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
 
 const TAB_OPTIONS = [
   { value: 'analytics', label: 'Analytics', icon: BarChart3, description: 'Portfolio statistics and metrics' },
@@ -173,7 +177,14 @@ function InsightsHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <PublicAnalyticsDashboard />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading analytics dashboard...</span>
+                      </div>
+                    }>
+                      <PublicAnalyticsDashboard />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -203,7 +214,14 @@ function InsightsHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <LiveActivityFeed />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading activity feed...</span>
+                      </div>
+                    }>
+                      <LiveActivityFeed />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -233,7 +251,14 @@ function InsightsHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <ContentRecommendations />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading recommendations...</span>
+                      </div>
+                    }>
+                      <ContentRecommendations />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -263,7 +288,14 @@ function InsightsHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <InteractiveProjectTimeline />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading project timeline...</span>
+                      </div>
+                    }>
+                      <InteractiveProjectTimeline />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -293,7 +325,14 @@ function InsightsHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <InteractiveSkillTree />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading skill tree...</span>
+                      </div>
+                    }>
+                      <InteractiveSkillTree />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>

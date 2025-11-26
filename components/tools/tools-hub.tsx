@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, lazy } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -18,13 +18,17 @@ import {
   TrendingUp,
   Users,
   CheckCircle2,
+  Loader2,
 } from 'lucide-react'
-import ProjectAnalyzer from '@/components/project-analyzer/project-analyzer'
-import SkillsMatchingTool from '@/components/skills-match/skills-matching-tool'
-import ROICalculator from '@/components/roi/roi-calculator'
-import QuickAssessmentDashboard from '@/components/assessment/quick-assessment-dashboard'
-import UniversalContactHub from '@/components/contact-hub/universal-contact-hub'
-import VirtualBusinessCard from '@/components/business-card/virtual-business-card'
+import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
+
+// Lazy load tab components for better performance
+const ProjectAnalyzer = lazy(() => import('@/components/project-analyzer/project-analyzer'))
+const SkillsMatchingTool = lazy(() => import('@/components/skills-match/skills-matching-tool'))
+const ROICalculator = lazy(() => import('@/components/roi/roi-calculator'))
+const QuickAssessmentDashboard = lazy(() => import('@/components/assessment/quick-assessment-dashboard'))
+const UniversalContactHub = lazy(() => import('@/components/contact-hub/universal-contact-hub'))
+const VirtualBusinessCard = lazy(() => import('@/components/business-card/virtual-business-card'))
 
 const TAB_OPTIONS = [
   { value: 'analyzer', label: 'Project Analyzer', icon: Sparkles, description: 'AI-powered GitHub repository analysis' },
@@ -179,7 +183,14 @@ function ToolsHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <ProjectAnalyzer />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading project analyzer...</span>
+                      </div>
+                    }>
+                      <ProjectAnalyzer />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -209,7 +220,14 @@ function ToolsHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <SkillsMatchingTool />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading skills matching tool...</span>
+                      </div>
+                    }>
+                      <SkillsMatchingTool />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -239,7 +257,14 @@ function ToolsHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <ROICalculator />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading ROI calculator...</span>
+                      </div>
+                    }>
+                      <ROICalculator />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -269,7 +294,14 @@ function ToolsHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <QuickAssessmentDashboard />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading assessment dashboard...</span>
+                      </div>
+                    }>
+                      <QuickAssessmentDashboard />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -299,7 +331,14 @@ function ToolsHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <UniversalContactHub />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading contact hub...</span>
+                      </div>
+                    }>
+                      <UniversalContactHub />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -329,7 +368,14 @@ function ToolsHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <VirtualBusinessCard />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading business card...</span>
+                      </div>
+                    }>
+                      <VirtualBusinessCard />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>

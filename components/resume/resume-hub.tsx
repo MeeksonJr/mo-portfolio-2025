@@ -18,6 +18,7 @@ import {
   Eye,
   Zap,
   CheckCircle2,
+  Loader2,
 } from 'lucide-react'
 import { showSuccessToast, showErrorToast } from '@/lib/toast-helpers'
 import ResumeViewer from '@/components/resume/resume-viewer'
@@ -306,7 +307,14 @@ function ResumeHubContent() {
 
                       {/* Resume Viewer */}
                       <div className="border rounded-lg overflow-hidden">
-                        <ResumeViewer data={resumeData} format={selectedFormat} />
+                        <Suspense fallback={
+                          <div className="flex items-center justify-center py-12">
+                            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                            <span className="ml-2 text-muted-foreground">Loading resume viewer...</span>
+                          </div>
+                        }>
+                          <ResumeViewer data={resumeData} format={selectedFormat} />
+                        </Suspense>
                       </div>
                     </div>
                   </CardContent>
@@ -331,7 +339,14 @@ function ResumeHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <ResumeGenerator />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading resume generator...</span>
+                      </div>
+                    }>
+                      <ResumeGenerator />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -361,7 +376,14 @@ function ResumeHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <CandidateSummaryContent />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading candidate summary...</span>
+                      </div>
+                    }>
+                      <CandidateSummaryContent />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>

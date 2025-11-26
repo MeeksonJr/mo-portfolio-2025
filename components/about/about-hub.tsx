@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, lazy } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -18,14 +18,18 @@ import {
   MapPin,
   Code,
   Rocket,
+  Loader2,
 } from 'lucide-react'
-import AboutPageContent from '@/components/about-page-content'
-import UsesPageContent from '@/components/uses/uses-page-content'
-import VirtualOfficeTour from '@/components/office/virtual-office-tour'
-import ActivityStatusIndicator from '@/components/activity/activity-status-indicator'
-import ProgressIndicators from '@/components/progress/progress-indicators'
-import LearningPathGenerator from '@/components/learning/learning-path-generator'
-import PersonalDashboard from '@/components/dashboard/personal-dashboard'
+
+// Lazy load tab components for better performance
+const AboutPageContent = lazy(() => import('@/components/about-page-content'))
+const UsesPageContent = lazy(() => import('@/components/uses/uses-page-content'))
+const VirtualOfficeTour = lazy(() => import('@/components/office/virtual-office-tour'))
+const ActivityStatusIndicator = lazy(() => import('@/components/activity/activity-status-indicator'))
+const ProgressIndicators = lazy(() => import('@/components/progress/progress-indicators'))
+const LearningPathGenerator = lazy(() => import('@/components/learning/learning-path-generator'))
+const PersonalDashboard = lazy(() => import('@/components/dashboard/personal-dashboard'))
+import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
 
 const TAB_OPTIONS = [
   { value: 'bio', label: 'Bio', icon: User, description: 'About me and my journey' },
@@ -188,7 +192,14 @@ function AboutHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <AboutPageContent />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading about content...</span>
+                      </div>
+                    }>
+                      <AboutPageContent />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -218,7 +229,14 @@ function AboutHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <UsesPageContent />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading uses page...</span>
+                      </div>
+                    }>
+                      <UsesPageContent />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -248,7 +266,14 @@ function AboutHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <VirtualOfficeTour />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading office tour...</span>
+                      </div>
+                    }>
+                      <VirtualOfficeTour />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -278,7 +303,14 @@ function AboutHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <ActivityStatusIndicator />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading activity status...</span>
+                      </div>
+                    }>
+                      <ActivityStatusIndicator />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -308,7 +340,14 @@ function AboutHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <ProgressIndicators />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading progress indicators...</span>
+                      </div>
+                    }>
+                      <ProgressIndicators />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -338,7 +377,14 @@ function AboutHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <LearningPathGenerator />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading learning paths...</span>
+                      </div>
+                    }>
+                      <LearningPathGenerator />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -368,7 +414,14 @@ function AboutHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <PersonalDashboard />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading dashboard...</span>
+                      </div>
+                    }>
+                      <PersonalDashboard />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense, lazy } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -23,16 +23,19 @@ import {
   Zap,
   BookOpen,
   GitBranch,
+  Loader2,
 } from 'lucide-react'
 import { showSuccessToast, showErrorToast } from '@/lib/toast-helpers'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import CodePlayground from '@/components/code-playground/code-playground'
-import CodeReviewSimulator from '@/components/code-review/code-review-simulator'
-import PortfolioCodeViewer from '@/components/portfolio-code-viewer/portfolio-code-viewer'
-import LiveCodingTerminal from '@/components/terminal/live-coding-terminal'
-import CodeSnippetLibrary from '@/components/code/code-snippet-library'
 import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
+
+// Lazy load tab components for better performance
+const CodePlayground = lazy(() => import('@/components/code-playground/code-playground'))
+const CodeReviewSimulator = lazy(() => import('@/components/code-review/code-review-simulator'))
+const PortfolioCodeViewer = lazy(() => import('@/components/portfolio-code-viewer/portfolio-code-viewer'))
+const LiveCodingTerminal = lazy(() => import('@/components/terminal/live-coding-terminal'))
+const CodeSnippetLibrary = lazy(() => import('@/components/code/code-snippet-library'))
 
 const TAB_OPTIONS = [
   { value: 'playground', label: 'Playground', icon: Play, description: 'Interactive code editor' },
@@ -196,7 +199,14 @@ function CodeHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <CodePlayground />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading playground...</span>
+                      </div>
+                    }>
+                      <CodePlayground />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -254,7 +264,14 @@ function CodeHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <PortfolioCodeViewer />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading portfolio code viewer...</span>
+                      </div>
+                    }>
+                      <PortfolioCodeViewer />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -286,7 +303,14 @@ function CodeHubContent() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <LiveCodingTerminal />
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2 text-muted-foreground">Loading terminal...</span>
+                      </div>
+                    }>
+                      <LiveCodingTerminal />
+                    </Suspense>
                   </CardContent>
                 </Card>
               </TabsContent>

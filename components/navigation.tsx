@@ -138,7 +138,7 @@ export default function Navigation() {
               <DropdownMenuContent align="end" className="w-56">
                 {contentLinks.map((link) => (
                   <DropdownMenuItem key={link.name} asChild>
-                    <Link href={link.href} className="cursor-pointer">
+                    <Link href={link.href} className="cursor-pointer" prefetch={true}>
                       {link.name}
                     </Link>
                   </DropdownMenuItem>
@@ -155,7 +155,7 @@ export default function Navigation() {
               <DropdownMenuContent align="end" className="w-56">
                 {toolsLinks.map((link) => (
                   <DropdownMenuItem key={link.name} asChild>
-                    <Link href={link.href} className="cursor-pointer">
+                    <Link href={link.href} className="cursor-pointer" prefetch={true}>
                       {link.name}
                     </Link>
                   </DropdownMenuItem>
@@ -172,7 +172,7 @@ export default function Navigation() {
               <DropdownMenuContent align="end" className="w-56">
                 {analyticsLinks.map((link) => (
                   <DropdownMenuItem key={link.name} asChild>
-                    <Link href={link.href} className="cursor-pointer">
+                    <Link href={link.href} className="cursor-pointer" prefetch={true}>
                       {link.name}
                     </Link>
                   </DropdownMenuItem>
@@ -189,7 +189,7 @@ export default function Navigation() {
               <DropdownMenuContent align="end" className="w-56">
                 {developerLinks.map((link) => (
                   <DropdownMenuItem key={link.name} asChild>
-                    <Link href={link.href} className="cursor-pointer">
+                    <Link href={link.href} className="cursor-pointer" prefetch={true}>
                       {link.name}
                     </Link>
                   </DropdownMenuItem>
@@ -206,7 +206,7 @@ export default function Navigation() {
               <DropdownMenuContent align="end" className="w-56">
                 {agentLinks.map((link) => (
                   <DropdownMenuItem key={link.name} asChild>
-                    <Link href={link.href} className="cursor-pointer">
+                    <Link href={link.href} className="cursor-pointer" prefetch={true}>
                       {link.name}
                     </Link>
                   </DropdownMenuItem>
@@ -297,6 +297,7 @@ export default function Navigation() {
                   <Link
                     key={link.name}
                     href={link.href}
+                    prefetch={true}
                     className="block text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
