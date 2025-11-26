@@ -126,16 +126,26 @@ function InsightsHubContent() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tab Navigation */}
           <div className="sticky top-20 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1 bg-muted/50 overflow-x-auto">
+            <TabsList 
+              className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1 bg-muted/50 overflow-x-auto"
+              aria-label="Insights Hub navigation tabs"
+            >
               {TAB_OPTIONS.map((tab) => {
                 const Icon = tab.icon
+                const isActive = activeTab === tab.value
                 return (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
                     className="flex flex-col md:flex-row items-center gap-2 py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm min-w-[100px]"
+                    aria-label={`${tab.label} tab, ${tab.description}. ${isActive ? 'Currently active' : ''} Press Enter or Space to activate.`}
+                    aria-selected={isActive}
+                    aria-controls={`insights-tabpanel-${tab.value}`}
+                    id={`insights-tab-${tab.value}`}
+                    role="tab"
+                    tabIndex={isActive ? 0 : -1}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4" aria-hidden="true" />
                     <span className="text-xs md:text-sm font-medium text-center">{tab.label}</span>
                   </TabsTrigger>
                 )
