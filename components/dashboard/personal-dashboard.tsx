@@ -30,20 +30,43 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 export default function PersonalDashboard() {
-  const [bookmarks, setBookmarks] = useState(getBookmarks())
-  const [readingList, setReadingList] = useState(getReadingList())
-  const [achievementState, setAchievementState] = useState(getAchievementState())
-  const [explorationProgress, setExplorationProgress] = useState(getExplorationProgress())
+  const [bookmarks, setBookmarks] = useState<ReturnType<typeof getBookmarks>>([])
+  const [readingList, setReadingList] = useState<ReturnType<typeof getReadingList>>([])
+  const [achievementState, setAchievementState] = useState<ReturnType<typeof getAchievementState>>({
+    unlocked: [],
+    progress: {},
+    visitCount: 0,
+    lastVisit: null,
+    sessionStartTime: null,
+  })
+  const [explorationProgress, setExplorationProgress] = useState<ReturnType<typeof getExplorationProgress>>({
+    pagesVisited: 0,
+    featuresUsed: 0,
+    contentViewed: 0,
+    milestonesCompleted: 0,
+  })
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
 
-  const categories = getCategories()
-  const unreadItems = getUnreadItems()
-  const readItems = getReadItems()
+  useEffect(() => {
+    // Only access localStorage on client side
+    setMounted(true)
+    setBookmarks(getBookmarks())
+    setReadingList(getReadingList())
+    setAchievementState(getAchievementState())
+    setExplorationProgress(getExplorationProgress())
+  }, [])
+
+  const categories = mounted ? getCategories() : []
+  const unreadItems = mounted ? getUnreadItems() : []
+  const readItems = mounted ? getReadItems() : []
   const filteredReadingList = selectedCategory
     ? readingList.filter((item) => item.category === selectedCategory)
     : readingList
 
   useEffect(() => {
+    if (!mounted) return
+
     // Refresh data periodically
     const interval = setInterval(() => {
       setBookmarks(getBookmarks())
@@ -53,14 +76,14 @@ export default function PersonalDashboard() {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [mounted])
 
   const bookmarkStats = {
     total: bookmarks.length,
-    projects: getBookmarksByType('project').length,
-    blog: getBookmarksByType('blog').length,
-    resources: getBookmarksByType('resource').length,
-    caseStudies: getBookmarksByType('case-study').length,
+    projects: mounted ? getBookmarksByType('project').length : 0,
+    blog: mounted ? getBookmarksByType('blog').length : 0,
+    resources: mounted ? getBookmarksByType('resource').length : 0,
+    caseStudies: mounted ? getBookmarksByType('case-study').length : 0,
   }
 
   const readingStats = {

@@ -26,8 +26,11 @@ const SECTION_COMPONENTS: Record<string, React.ComponentType> = {
 
 export default function CustomizableHomepage() {
   const [sections, setSections] = useState<HomepageSection[]>([])
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    // Only access localStorage on client side
+    setMounted(true)
     setSections(getHomepageSections())
 
     const handleUpdate = (event: CustomEvent<HomepageSection[]>) => {
@@ -41,7 +44,16 @@ export default function CustomizableHomepage() {
   }, [])
 
   // Render sections based on customization
-  const visibleSections = sections.filter((s) => s.visible).sort((a, b) => a.order - b.order)
+  // If not mounted yet, show default sections
+  const visibleSections = mounted
+    ? sections.filter((s) => s.visible).sort((a, b) => a.order - b.order)
+    : Object.keys(SECTION_COMPONENTS).map((key, index) => ({
+        id: key.toLowerCase().replace(/([A-Z])/g, '-$1').toLowerCase(),
+        name: key,
+        component: key,
+        visible: true,
+        order: index,
+      }))
 
   return (
     <>

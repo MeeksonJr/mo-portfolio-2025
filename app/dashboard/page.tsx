@@ -11,6 +11,9 @@ export const metadata: Metadata = genMeta({
   tags: ['dashboard', 'bookmarks', 'reading list', 'achievements'],
 })
 
+// Force dynamic rendering to avoid static generation issues with localStorage
+export const dynamic = 'force-dynamic'
+
 export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">

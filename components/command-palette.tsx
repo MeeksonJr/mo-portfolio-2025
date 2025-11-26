@@ -41,6 +41,8 @@ import {
   Layers,
   Users,
   TrendingUp,
+  Monitor,
+  Terminal,
 } from 'lucide-react'
 import { GlobalSearch } from '@/components/search/global-search'
 
@@ -206,6 +208,18 @@ export default function CommandPalette() {
           >
             <FileText className="mr-2 h-4 w-4" />
             <span>Resume Generator</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/office-tour'))}
+          >
+            <Monitor className="mr-2 h-4 w-4" />
+            <span>Virtual Office Tour</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/live-coding'))}
+          >
+            <Terminal className="mr-2 h-4 w-4" />
+            <span>Live Coding Terminal</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/learning-paths'))}

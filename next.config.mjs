@@ -110,8 +110,6 @@ const nextConfig = {
   },
   // Enable compression
   compress: true,
-  // Optimize production builds
-  swcMinify: true,
   // Reduce bundle size by excluding unnecessary modules
   experimental: {
     optimizePackageImports: [

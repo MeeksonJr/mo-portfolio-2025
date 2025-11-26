@@ -142,6 +142,16 @@ export default function VoiceCommands() {
       description: 'Navigate to resume generator',
     },
     {
+      command: 'go to office tour',
+      action: () => router.push('/office-tour'),
+      description: 'Navigate to virtual office tour',
+    },
+    {
+      command: 'go to live coding',
+      action: () => router.push('/live-coding'),
+      description: 'Navigate to live coding terminal',
+    },
+    {
       command: 'go to learning paths',
       action: () => router.push('/learning-paths'),
       description: 'Navigate to learning paths',
