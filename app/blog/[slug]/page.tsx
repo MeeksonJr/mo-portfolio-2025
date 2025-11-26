@@ -130,7 +130,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <div className="min-h-screen bg-background">
         <PageViewTracker contentType="blog_post" contentId={post.id} />
         <Navigation />
-        <main className="pt-20 pb-16">
+        <main id="main-content" role="main" className="pt-20 pb-16" tabIndex={-1}>
           <BlogPostContent post={post} relatedPosts={relatedPosts} />
           <AchievementTrackerClient achievementId="read-blog-post" />
         </main>

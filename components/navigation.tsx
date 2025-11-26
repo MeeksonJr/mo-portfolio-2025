@@ -103,6 +103,8 @@ export default function Navigation() {
 
   return (
     <motion.nav
+      role="navigation"
+      aria-label="Main navigation"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? "glass shadow-lg py-3" : "bg-transparent py-5"
       }`}
@@ -113,7 +115,11 @@ export default function Navigation() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="text-xl font-bold text-primary">
+          <Link 
+            href="/" 
+            className="text-xl font-bold text-primary"
+            aria-label="Mohamed Datt - Home"
+          >
             Mohamed Datt
           </Link>
 

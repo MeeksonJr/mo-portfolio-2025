@@ -2,6 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Screen Reader Only - Hide visually but keep accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip to Content Link */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 0 0 4px 0;
+  font-weight: 600;
+  transition: top 0.2s;
+}
+
+.skip-to-content:focus {
+  top: 0;
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.skip-to-content.visible {
+  top: 0;
+}
+
 /* Animation preferences */
 .no-animations *,
 .no-animations *::before,

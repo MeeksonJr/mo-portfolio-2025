@@ -45,7 +45,7 @@ export default async function BlogPage() {
       />
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main className="pt-20 pb-16">
+        <main id="main-content" role="main" className="pt-20 pb-16" tabIndex={-1}>
           <BlogListing posts={blogPosts} />
         </main>
         <FooterLight />

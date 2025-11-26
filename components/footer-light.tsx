@@ -7,7 +7,11 @@ import { NewsletterSignup } from "@/components/newsletter/newsletter-signup"
 
 export default function FooterLight() {
   return (
-    <footer className="py-12 px-4 border-t border-border bg-muted/30">
+    <footer 
+      role="contentinfo" 
+      aria-label="Site footer"
+      className="py-12 px-4 border-t border-border bg-muted/30"
+    >
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -21,26 +25,29 @@ export default function FooterLight() {
                 href="https://github.com/MeeksonJr"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit Mohamed Datt's GitHub profile"
                 className="w-10 h-10 glass rounded-full flex items-center justify-center hover:shadow-lg transition-all"
                 whileHover={{ scale: 1.1, y: -2 }}
               >
-                <Github size={20} />
+                <Github size={20} aria-hidden="true" />
               </motion.a>
               <motion.a
                 href="https://www.linkedin.com/in/mohamed-datt-b60907296"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit Mohamed Datt's LinkedIn profile"
                 className="w-10 h-10 glass rounded-full flex items-center justify-center hover:shadow-lg transition-all"
                 whileHover={{ scale: 1.1, y: -2 }}
               >
-                <Linkedin size={20} />
+                <Linkedin size={20} aria-hidden="true" />
               </motion.a>
               <motion.a
                 href="mailto:d.mohamed1504@gmail.com"
+                aria-label="Send email to Mohamed Datt"
                 className="w-10 h-10 glass rounded-full flex items-center justify-center hover:shadow-lg transition-all"
                 whileHover={{ scale: 1.1, y: -2 }}
               >
-                <Mail size={20} />
+                <Mail size={20} aria-hidden="true" />
               </motion.a>
             </div>
 

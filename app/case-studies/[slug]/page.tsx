@@ -122,7 +122,7 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
           <PageViewTracker contentType="case_study" contentId={caseStudy.id} />
           <AchievementTrackerClient achievementId="read-case-study" />
         <Navigation />
-        <main className="pt-20 pb-16">
+        <main id="main-content" role="main" className="pt-20 pb-16" tabIndex={-1}>
           <CaseStudyContent caseStudy={caseStudy} relatedCaseStudies={relatedCaseStudies} />
         </main>
         <FooterLight />

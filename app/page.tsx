@@ -27,7 +27,7 @@ export default function Home() {
         <ScrollProgress />
         <Navigation />
 
-      <main className="relative z-10">
+      <main id="main-content" className="relative z-10" role="main" tabIndex={-1}>
         <HeroLight />
         <QuickStats />
         <TechSnapshot />
