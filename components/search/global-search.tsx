@@ -272,30 +272,75 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
                   const hub = HUB_SEARCH_DATA.find(h => h.id === hubId)
                   if (!hub) return null
 
+                  // Get all tabs for this hub
+                  const allTabs = hub.tabs
+                  const matchedTabIds = new Set(
+                    items
+                      .filter(item => item.type === 'hub-tab' && item.tabValue)
+                      .map(item => item.tabValue!)
+                  )
+                  const hasHubMatch = items.some(item => item.type === 'hub')
+
                   return (
                     <CommandGroup key={type} heading={hub.name}>
-                      {items.map(result => {
-                        const Icon = result.type === 'hub-tab' ? Code2 : Layers
+                      {/* Hub main result (if matched) */}
+                      {hasHubMatch && (
+                        <CommandItem
+                          key={`hub-${hub.id}`}
+                          onSelect={() => handleSelect({
+                            id: `hub-${hub.id}`,
+                            type: 'hub',
+                            title: hub.name,
+                            description: hub.description,
+                            url: hub.url,
+                            hubId: hub.id,
+                          })}
+                          className="flex items-start gap-3 py-3"
+                        >
+                          <Layers className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium truncate">{hub.name}</div>
+                            {hub.description && (
+                              <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                                {hub.description}
+                              </div>
+                            )}
+                          </div>
+                        </CommandItem>
+                      )}
+                      
+                      {/* All tabs for quick navigation */}
+                      {allTabs.map(tab => {
+                        const isMatched = matchedTabIds.has(tab.value)
+                        const TabIcon = tab.icon
                         return (
                           <CommandItem
-                            key={result.id}
-                            onSelect={() => handleSelect(result)}
-                            className="flex items-start gap-3 py-3"
+                            key={`hub-${hub.id}-${tab.value}`}
+                            onSelect={() => handleSelect({
+                              id: `hub-${hub.id}-${tab.value}`,
+                              type: 'hub-tab',
+                              title: `${hub.name} - ${tab.label}`,
+                              description: tab.description,
+                              url: `${hub.url}?tab=${tab.value}`,
+                              hubId: hub.id,
+                              tabValue: tab.value,
+                            })}
+                            className={`flex items-start gap-3 py-3 ${!isMatched ? 'opacity-75' : ''}`}
                           >
-                            <Icon className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                            <TabIcon className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium truncate">
-                                {result.type === 'hub-tab' ? result.title.replace(`${hub.name} - `, '') : result.title}
+                              <div className="font-medium truncate flex items-center gap-2">
+                                {tab.label}
+                                {isMatched && (
+                                  <Badge variant="secondary" className="text-xs h-4">
+                                    Match
+                                  </Badge>
+                                )}
                               </div>
-                              {result.description && (
+                              {tab.description && (
                                 <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
-                                  {result.description}
+                                  {tab.description}
                                 </div>
-                              )}
-                              {result.type === 'hub-tab' && (
-                                <Badge variant="outline" className="text-xs h-4 mt-1">
-                                  {hub.name}
-                                </Badge>
                               )}
                             </div>
                           </CommandItem>
