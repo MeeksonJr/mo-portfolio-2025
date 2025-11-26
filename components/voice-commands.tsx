@@ -193,19 +193,14 @@ export default function VoiceCommands() {
       description: 'Open AI portfolio assistant',
     },
     {
-      command: 'go to skills match',
-      action: () => router.push('/skills-match'),
-      description: 'Navigate to skills matching tool',
+      command: 'go to tools',
+      action: () => router.push('/tools'),
+      description: 'Navigate to tools hub',
     },
     {
-      command: 'go to roi calculator',
-      action: () => router.push('/roi-calculator'),
-      description: 'Navigate to ROI calculator',
-    },
-    {
-      command: 'go to assessment',
-      action: () => router.push('/assessment'),
-      description: 'Navigate to assessment dashboard',
+      command: 'go to tools hub',
+      action: () => router.push('/tools'),
+      description: 'Navigate to tools hub',
     },
     {
       command: 'go to resume',
@@ -216,16 +211,6 @@ export default function VoiceCommands() {
       command: 'go to resume hub',
       action: () => router.push('/resume'),
       description: 'Navigate to resume hub',
-    },
-    {
-      command: 'go to contact hub',
-      action: () => router.push('/contact-hub'),
-      description: 'Navigate to contact hub',
-    },
-    {
-      command: 'go to business card',
-      action: () => router.push('/card'),
-      description: 'Navigate to virtual business card',
     },
     {
       command: 'go to live demos',
@@ -350,13 +335,8 @@ export default function VoiceCommands() {
       description: 'Download resume',
     },
     {
-      command: 'go to project analyzer',
-      action: () => router.push('/project-analyzer'),
-      description: 'Navigate to project analyzer',
-    },
-    {
       command: 'analyze project',
-      action: () => router.push('/project-analyzer'),
+      action: () => router.push('/tools?tab=analyzer'),
       description: 'Open project analyzer',
     },
   ]

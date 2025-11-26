@@ -241,22 +241,10 @@ export default function CommandPalette() {
             <span>Learning Paths</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => router.push('/assessment'))}
+            onSelect={() => runCommand(() => router.push('/tools'))}
           >
-            <BarChart3 className="mr-2 h-4 w-4" />
-            <span>Quick Assessment</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/skills-match'))}
-          >
-            <Target className="mr-2 h-4 w-4" />
-            <span>Skills Matching Tool</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/roi-calculator'))}
-          >
-            <Calculator className="mr-2 h-4 w-4" />
-            <span>ROI Calculator</span>
+            <Wrench className="mr-2 h-4 w-4" />
+            <span>Tools Hub</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/demos'))}
@@ -265,22 +253,10 @@ export default function CommandPalette() {
             <span>Live Project Demos</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => router.push('/contact-hub'))}
-          >
-            <MessageCircle className="mr-2 h-4 w-4" />
-            <span>Universal Contact Hub</span>
-          </CommandItem>
-          <CommandItem
             onSelect={() => runCommand(() => router.push('/portfolio-assistant'))}
           >
             <Bot className="mr-2 h-4 w-4" />
             <span>AI Portfolio Assistant</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/card'))}
-          >
-            <CreditCard className="mr-2 h-4 w-4" />
-            <span>Virtual Business Card</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/analytics'))}

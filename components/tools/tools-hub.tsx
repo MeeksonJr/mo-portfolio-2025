@@ -1,51 +1,44 @@
 'use client'
 
-import { useState, useEffect, useRef, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import {
-  Code2,
-  Play,
-  Copy,
-  Download,
-  RefreshCw,
-  Terminal,
-  FileCode,
-  FileText,
-  Search,
+  Wrench,
   Sparkles,
-  Check,
+  Target,
+  Calculator,
+  FileCheck,
+  MessageCircle,
+  CreditCard,
   Zap,
-  BookOpen,
-  GitBranch,
+  TrendingUp,
+  Users,
+  CheckCircle2,
 } from 'lucide-react'
-import { showSuccessToast, showErrorToast } from '@/lib/toast-helpers'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import CodePlayground from '@/components/code-playground/code-playground'
-import CodeReviewSimulator from '@/components/code-review/code-review-simulator'
-import PortfolioCodeViewer from '@/components/portfolio-code-viewer/portfolio-code-viewer'
-import LiveCodingTerminal from '@/components/terminal/live-coding-terminal'
-import CodeSnippetLibrary from '@/components/code/code-snippet-library'
+import ProjectAnalyzer from '@/components/project-analyzer/project-analyzer'
+import SkillsMatchingTool from '@/components/skills-match/skills-matching-tool'
+import ROICalculator from '@/components/roi/roi-calculator'
+import QuickAssessmentDashboard from '@/components/assessment/quick-assessment-dashboard'
+import UniversalContactHub from '@/components/contact-hub/universal-contact-hub'
+import VirtualBusinessCard from '@/components/business-card/virtual-business-card'
 
 const TAB_OPTIONS = [
-  { value: 'playground', label: 'Playground', icon: Play, description: 'Interactive code editor' },
-  { value: 'review', label: 'Review', icon: Code2, description: 'Code review simulator' },
-  { value: 'portfolio', label: 'Portfolio Code', icon: FileCode, description: 'View portfolio source' },
-  { value: 'terminal', label: 'Terminal', icon: Terminal, description: 'Live coding terminal' },
-  { value: 'library', label: 'Library', icon: BookOpen, description: 'Code snippets library' },
+  { value: 'analyzer', label: 'Project Analyzer', icon: Sparkles, description: 'AI-powered GitHub repository analysis' },
+  { value: 'skills', label: 'Skills Match', icon: Target, description: 'Match skills to job requirements' },
+  { value: 'roi', label: 'ROI Calculator', icon: Calculator, description: 'Calculate business impact and ROI' },
+  { value: 'assessment', label: 'Assessment', icon: FileCheck, description: 'Quick candidate assessment' },
+  { value: 'contact', label: 'Contact Hub', icon: MessageCircle, description: 'Universal contact options' },
+  { value: 'card', label: 'Business Card', icon: CreditCard, description: 'Digital business card with QR code' },
 ] as const
 
-function CodeHubContent() {
+function ToolsHubContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<string>('playground')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [activeTab, setActiveTab] = useState<string>('analyzer')
 
   // Sync tab with URL query parameter
   useEffect(() => {
@@ -58,7 +51,7 @@ function CodeHubContent() {
   // Update URL when tab changes
   const handleTabChange = (value: string) => {
     setActiveTab(value)
-    router.push(`/code?tab=${value}`, { scroll: false })
+    router.push(`/tools?tab=${value}`, { scroll: false })
   }
 
   return (
@@ -78,13 +71,13 @@ function CodeHubContent() {
               transition={{ delay: 0.2, type: 'spring' }}
               className="inline-flex items-center gap-2 mb-4"
             >
-              <Code2 className="h-8 w-8 text-primary" />
+              <Wrench className="h-8 w-8 text-primary" />
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Code Hub
+                Tools Hub
               </h1>
             </motion.div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Explore, learn, and interact with real production code. From interactive playgrounds to code reviews and portfolio source code.
+              Interactive tools and utilities to analyze projects, match skills, calculate ROI, and connect with me.
             </p>
           </div>
 
@@ -96,10 +89,10 @@ function CodeHubContent() {
             className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto"
           >
             {[
-              { label: 'Code Examples', value: '50+', icon: FileCode },
-              { label: 'Languages', value: '10+', icon: Code2 },
-              { label: 'Projects', value: '20+', icon: GitBranch },
-              { label: 'Snippets', value: '100+', icon: Sparkles },
+              { label: 'Tools', value: '6', icon: Wrench },
+              { label: 'AI-Powered', value: '2', icon: Sparkles },
+              { label: 'For Recruiters', value: '4', icon: Users },
+              { label: 'Free to Use', value: '100%', icon: CheckCircle2 },
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -125,17 +118,17 @@ function CodeHubContent() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tab Navigation */}
           <div className="sticky top-20 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1 bg-muted/50">
+            <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 h-auto p-1 bg-muted/50 overflow-x-auto">
               {TAB_OPTIONS.map((tab) => {
                 const Icon = tab.icon
                 return (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="flex flex-col md:flex-row items-center gap-2 py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                    className="flex flex-col md:flex-row items-center gap-2 py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm min-w-[100px]"
                   >
                     <Icon className="h-4 w-4" />
-                    <span className="text-xs md:text-sm font-medium">{tab.label}</span>
+                    <span className="text-xs md:text-sm font-medium text-center">{tab.label}</span>
                   </TabsTrigger>
                 )
               })}
@@ -151,130 +144,140 @@ function CodeHubContent() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <TabsContent value="playground" className="mt-0">
+              {/* Project Analyzer Tab */}
+              <TabsContent value="analyzer" className="mt-0">
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle className="flex items-center gap-2">
-                          <Play className="h-5 w-5 text-primary" />
-                          Interactive Code Playground
+                          <Sparkles className="h-5 w-5 text-primary" />
+                          AI Project Analyzer
                         </CardTitle>
                         <CardDescription>
-                          Write, run, and experiment with code in real-time
+                          Analyze any GitHub repository with AI-powered insights
                         </CardDescription>
                       </div>
-                      <Badge variant="secondary" className="gap-1">
-                        <Zap className="h-3 w-3" />
-                        Live
-                      </Badge>
+                      <Badge variant="secondary">AI-Powered</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <CodePlayground />
+                    <ProjectAnalyzer />
                   </CardContent>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="review" className="mt-0">
+              {/* Skills Match Tab */}
+              <TabsContent value="skills" className="mt-0">
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle className="flex items-center gap-2">
-                          <Code2 className="h-5 w-5 text-primary" />
-                          Code Review Simulator
+                          <Target className="h-5 w-5 text-primary" />
+                          Skills Matching Tool
                         </CardTitle>
                         <CardDescription>
-                          Practice code reviews with interactive commenting and feedback
+                          Input job requirements and see how my skills match
                         </CardDescription>
                       </div>
-                      <Badge variant="secondary">Educational</Badge>
+                      <Badge variant="secondary">For Recruiters</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <CodeReviewSimulator />
+                    <SkillsMatchingTool />
                   </CardContent>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="portfolio" className="mt-0">
+              {/* ROI Calculator Tab */}
+              <TabsContent value="roi" className="mt-0">
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle className="flex items-center gap-2">
-                          <FileCode className="h-5 w-5 text-primary" />
-                          Portfolio Source Code
+                          <Calculator className="h-5 w-5 text-primary" />
+                          ROI & Impact Calculator
                         </CardTitle>
                         <CardDescription>
-                          Browse the actual source code of this portfolio
+                          Calculate the potential business impact and ROI of hiring me
                         </CardDescription>
                       </div>
-                      <Badge variant="secondary">Open Source</Badge>
+                      <Badge variant="secondary">For Recruiters</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <PortfolioCodeViewer />
+                    <ROICalculator />
                   </CardContent>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="terminal" className="mt-0">
+              {/* Assessment Tab */}
+              <TabsContent value="assessment" className="mt-0">
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle className="flex items-center gap-2">
-                          <Terminal className="h-5 w-5 text-primary" />
-                          Live Coding Terminal
+                          <FileCheck className="h-5 w-5 text-primary" />
+                          Quick Assessment Dashboard
                         </CardTitle>
                         <CardDescription>
-                          Execute code snippets from the portfolio with terminal output
+                          Quick assessment dashboard for recruiters
                         </CardDescription>
                       </div>
-                      <Badge variant="secondary" className="gap-1">
-                        <Zap className="h-3 w-3" />
-                        Interactive
-                      </Badge>
+                      <Badge variant="secondary">For Recruiters</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <LiveCodingTerminal />
+                    <QuickAssessmentDashboard />
                   </CardContent>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="library" className="mt-0">
+              {/* Contact Hub Tab */}
+              <TabsContent value="contact" className="mt-0">
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
                         <CardTitle className="flex items-center gap-2">
-                          <BookOpen className="h-5 w-5 text-primary" />
-                          Code Snippets Library
+                          <MessageCircle className="h-5 w-5 text-primary" />
+                          Universal Contact Hub
                         </CardTitle>
                         <CardDescription>
-                          Searchable collection of production code examples
+                          Get in touch through any channel you prefer
                         </CardDescription>
                       </div>
-                      <Badge variant="secondary">{searchQuery ? 'Filtered' : 'All'}</Badge>
+                      <Badge variant="secondary">Contact</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    {/* Search Bar */}
-                    <div className="mb-6">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Search code snippets..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-10"
-                        />
+                    <UniversalContactHub />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Business Card Tab */}
+              <TabsContent value="card" className="mt-0">
+                <Card className="border-2">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <CreditCard className="h-5 w-5 text-primary" />
+                          Virtual Business Card
+                        </CardTitle>
+                        <CardDescription>
+                          Digital business card with QR code for easy sharing
+                        </CardDescription>
                       </div>
+                      <Badge variant="secondary">Contact</Badge>
                     </div>
-                    <CodeSnippetLibrary />
+                  </CardHeader>
+                  <CardContent>
+                    <VirtualBusinessCard />
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -286,17 +289,17 @@ function CodeHubContent() {
   )
 }
 
-export default function CodeHub() {
+export default function ToolsHub() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading Code Hub...</p>
+          <p className="text-muted-foreground">Loading Tools Hub...</p>
         </div>
       </div>
     }>
-      <CodeHubContent />
+      <ToolsHubContent />
     </Suspense>
   )
 }
