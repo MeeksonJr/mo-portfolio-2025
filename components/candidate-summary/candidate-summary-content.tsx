@@ -22,43 +22,72 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
-const candidateData = {
-  name: 'Mohamed Datt',
-  title: 'Full Stack Developer',
-  location: 'Norfolk, Virginia, USA',
-  timezone: 'EST (UTC-5)',
-  availability: 'Available for opportunities',
-  workType: ['Remote', 'Hybrid', 'On-site'],
-  preferredWorkType: 'Remote',
-  email: 'd.mohamed1504@gmail.com',
-  linkedin: 'https://linkedin.com/in/mohamed-datt',
-  github: 'https://github.com/MeeksonJr',
-  portfolio: 'https://mohameddatt.com',
-  keySkills: [
-    { name: 'Next.js', level: 'Expert' },
-    { name: 'React', level: 'Expert' },
-    { name: 'TypeScript', level: 'Expert' },
-    { name: 'Node.js', level: 'Advanced' },
-    { name: 'PostgreSQL', level: 'Advanced' },
-    { name: 'AI Integration', level: 'Advanced' },
-    { name: 'Supabase', level: 'Advanced' },
-    { name: 'TailwindCSS', level: 'Expert' },
-  ],
-  experience: '3+ years',
-  education: 'Computer Science (ODU)',
-  languages: ['English (Native)', 'French (Conversational)'],
-  certifications: [],
-  notableProjects: [
-    'EduSphere AI - AI-powered learning platform',
-    'InterviewPrep AI - Interview preparation tool',
-    'Portfolio 2025 - This portfolio site',
-  ],
-  achievements: [
-    '1st Place Winner - Fall 2024 Internship Competition',
-    'Built 6+ production SaaS applications',
-    'Open source contributor',
-  ],
+import { resumeData } from '@/lib/resume-data'
+
+// Transform resume data to candidate summary format
+const getCandidateData = () => {
+  const allSkills = [
+    ...resumeData.skills.frontend,
+    ...resumeData.skills.backend,
+    ...resumeData.skills.ai,
+    ...resumeData.skills.tools,
+  ]
+
+  // Get top skills (first 8)
+  const keySkills = allSkills.slice(0, 8).map((skill) => ({
+    name: skill,
+    level: 'Expert' as const, // You can enhance this with actual skill levels if available
+  }))
+
+  // Calculate experience years
+  const firstJob = resumeData.experience[0]
+  const startYear = firstJob ? new Date(firstJob.startDate).getFullYear() : new Date().getFullYear() - 3
+  const years = new Date().getFullYear() - startYear
+  const experience = `${years}+ years`
+
+  // Get education
+  const eduItem = resumeData.education[0]
+  const educationText = eduItem
+    ? `${eduItem.degree} (${eduItem.school})`
+    : 'Computer Science (ODU)'
+
+  // Get languages
+  const languages = resumeData.languages?.map((lang) => `${lang.name} (${lang.proficiency})`) || [
+    'English (Native)',
+    'French (Conversational)',
+  ]
+
+  // Get notable projects
+  const notableProjects = resumeData.projects.slice(0, 3).map((proj) => `${proj.name} - ${proj.description}`)
+
+  // Get achievements from experience
+  const achievements = resumeData.experience
+    .flatMap((exp) => exp.achievements || [])
+    .slice(0, 3)
+
+  return {
+    name: resumeData.personal.name,
+    title: resumeData.personal.title,
+    location: resumeData.personal.location,
+    timezone: 'EST (UTC-5)', // You can calculate this dynamically
+    availability: 'Available for opportunities',
+    workType: ['Remote', 'Hybrid', 'On-site'] as const,
+    preferredWorkType: 'Remote' as const,
+    email: resumeData.personal.email,
+    linkedin: resumeData.personal.linkedin,
+    github: resumeData.personal.github,
+    portfolio: resumeData.personal.website || 'https://mohameddatt.com',
+    keySkills,
+    experience,
+    education: educationText as string,
+    languages,
+    certifications: resumeData.certifications || [],
+    notableProjects,
+    achievements,
+  }
 }
+
+const candidateData = getCandidateData()
 
 export default function CandidateSummaryContent() {
   const [copied, setCopied] = useState<string | null>(null)

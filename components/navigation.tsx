@@ -52,7 +52,6 @@ export default function Navigation() {
     { name: "Music", href: "/music" },
     { name: "Achievements", href: "/achievements" },
     { name: "Dashboard", href: "/dashboard" },
-    { name: "Resume Generator", href: "/resume-generator" },
     { name: "Office Tour", href: "/office-tour" },
     { name: "Live Coding", href: "/live-coding" },
     { name: "Activity Status", href: "/activity-status" },
@@ -67,7 +66,7 @@ export default function Navigation() {
     { name: "Skills Match", href: "/skills-match" },
     { name: "ROI Calculator", href: "/roi-calculator" },
     { name: "Assessment", href: "/assessment" },
-    { name: "Resume Generator", href: "/resume" },
+    { name: "Resume Hub", href: "/resume" },
     { name: "Contact Hub", href: "/contact-hub" },
     { name: "Business Card", href: "/card" },
     { name: "Live Demos", href: "/demos" },
@@ -90,7 +89,6 @@ export default function Navigation() {
 
   // For Agents & Recruiters
   const agentLinks = [
-    { name: "Candidate Summary", href: "/candidate-summary" },
     { name: "Portfolio Comparison", href: "/portfolio-comparison" },
     { name: "Agent Dashboard", href: "/agent-dashboard" },
   ]

@@ -137,11 +137,6 @@ export default function VoiceCommands() {
       description: 'Navigate to personal dashboard',
     },
     {
-      command: 'go to resume generator',
-      action: () => router.push('/resume-generator'),
-      description: 'Navigate to resume generator',
-    },
-    {
       command: 'go to office tour',
       action: () => router.push('/office-tour'),
       description: 'Navigate to virtual office tour',
@@ -215,7 +210,12 @@ export default function VoiceCommands() {
     {
       command: 'go to resume',
       action: () => router.push('/resume'),
-      description: 'Navigate to resume generator',
+      description: 'Navigate to resume hub',
+    },
+    {
+      command: 'go to resume hub',
+      action: () => router.push('/resume'),
+      description: 'Navigate to resume hub',
     },
     {
       command: 'go to contact hub',
@@ -290,11 +290,6 @@ export default function VoiceCommands() {
       description: 'Navigate to availability calendar',
     },
     // For Agents & Recruiters
-    {
-      command: 'go to candidate summary',
-      action: () => router.push('/candidate-summary'),
-      description: 'Navigate to candidate summary for recruiters',
-    },
     {
       command: 'go to portfolio comparison',
       action: () => router.push('/portfolio-comparison'),

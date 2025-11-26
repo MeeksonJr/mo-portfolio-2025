@@ -205,10 +205,10 @@ export default function CommandPalette() {
             <span>Personal Dashboard</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => router.push('/resume-generator'))}
+            onSelect={() => runCommand(() => router.push('/resume'))}
           >
             <FileText className="mr-2 h-4 w-4" />
-            <span>Resume Generator</span>
+            <span>Resume Hub</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/office-tour'))}
@@ -327,8 +327,8 @@ export default function CommandPalette() {
           <CommandItem
             onSelect={() => runCommand(() => router.push('/resume'))}
           >
-            <Download className="mr-2 h-4 w-4" />
-            <span>View Resume</span>
+            <FileText className="mr-2 h-4 w-4" />
+            <span>Resume Hub</span>
             <CommandShortcut>⌘R</CommandShortcut>
           </CommandItem>
           <CommandItem
