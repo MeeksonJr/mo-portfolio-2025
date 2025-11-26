@@ -493,3 +493,14 @@ html {
     transform: translateY(0);
   }
 }
+
+/* Custom Cursor Styles */
+.custom-cursor-active * {
+  cursor: none !important;
+}
+
+@media (hover: none) {
+  .custom-cursor-active * {
+    cursor: auto !important;
+  }
+}

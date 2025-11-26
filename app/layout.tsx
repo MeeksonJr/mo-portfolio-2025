@@ -22,6 +22,7 @@ import FloatingActionMenu from "@/components/floating-action-menu"
 import VisitorProfileProvider from "@/components/personalization/visitor-profile-provider"
 import MobileBottomNav from "@/components/mobile/mobile-bottom-nav"
 import SkipToContent from "@/components/accessibility/skip-to-content"
+import CustomCursor from "@/components/ui/custom-cursor"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -90,6 +91,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={inter.className}>
         <SkipToContent />
+        <CustomCursor />
         <TerminalBackground />
         <ThemeProvider
           attribute="class"

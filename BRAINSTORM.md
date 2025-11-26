@@ -903,6 +903,14 @@ CREATE TABLE settings (
   - Free templates
   - Useful links
 - **Priority:** 🟢 Low
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Created ResourcesListing component with search and filters
+  - [x] Added type filtering (tools, courses, books, articles, videos)
+  - [x] Implemented category filtering
+  - [x] Added resource type icons and labels
+  - [x] Created resource detail pages
+  - [x] Integrated into /resources page with ARIA landmarks
+  - [x] Added to navigation under Content dropdown
 
 #### 8. **Uses Page** (`/uses`)
 - **Description:** "What I use" page (popular in dev community)
@@ -2648,6 +2656,14 @@ content/
   - Respects reduced motion
 - **Tech:** CSS, JavaScript
 - **Priority:** 🟢 Low
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Created CustomCursor component with terminal-style blinking cursor
+  - [x] Implemented different cursor types (default, pointer, text)
+  - [x] Added hover effects with scale animations
+  - [x] Respects prefers-reduced-motion and user animation preferences
+  - [x] Smooth following animation with transform
+  - [x] Auto-disabled on mobile devices (touch-only)
+  - [x] Integrated into app layout
 
 #### 3. **Reading Mode** ✅
 - **Description:** Distraction-free reading mode for blog posts
@@ -2723,6 +2739,15 @@ content/
   - Custom animations
 - **Tech:** Sonner (already using)
 - **Priority:** 🟢 Low
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Enhanced Toaster component with rich colors and close buttons
+  - [x] Created toast-helpers.ts with utility functions
+  - [x] Added showSuccessToast, showErrorToast, showInfoToast, showWarningToast
+  - [x] Implemented showLoadingToast and showProgressToast
+  - [x] Added showPromiseToast for async operations
+  - [x] Support for action buttons and cancel buttons
+  - [x] Custom styling with theme-aware colors
+  - [x] Improved stack management and positioning
 
 #### 7. **Contextual Help System**
 - **Description:** Helpful tooltips and guides throughout
