@@ -39,6 +39,7 @@ function ToolsHubContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<string>('analyzer')
+  const { announce } = useScreenReaderAnnouncement()
 
   // Sync tab with URL query parameter
   useEffect(() => {
@@ -50,8 +51,14 @@ function ToolsHubContent() {
 
   // Update URL when tab changes
   const handleTabChange = (value: string) => {
+    const tab = TAB_OPTIONS.find((t) => t.value === value)
     setActiveTab(value)
     router.push(`/tools?tab=${value}`, { scroll: false })
+    
+    // Announce tab change to screen readers
+    if (tab) {
+      announce(`Switched to ${tab.label} tab: ${tab.description}`, 'polite')
+    }
   }
 
   return (
@@ -118,16 +125,26 @@ function ToolsHubContent() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tab Navigation */}
           <div className="sticky top-20 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6">
-            <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 h-auto p-1 bg-muted/50 overflow-x-auto">
+            <TabsList 
+              className="grid w-full grid-cols-3 md:grid-cols-6 h-auto p-1 bg-muted/50 overflow-x-auto"
+              aria-label="Tools Hub navigation tabs"
+            >
               {TAB_OPTIONS.map((tab) => {
                 const Icon = tab.icon
+                const isActive = activeTab === tab.value
                 return (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
                     className="flex flex-col md:flex-row items-center gap-2 py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm min-w-[100px]"
+                    aria-label={`${tab.label} tab, ${tab.description}. ${isActive ? 'Currently active' : ''} Press Enter or Space to activate.`}
+                    aria-selected={isActive}
+                    aria-controls={`tools-tabpanel-${tab.value}`}
+                    id={`tools-tab-${tab.value}`}
+                    role="tab"
+                    tabIndex={isActive ? 0 : -1}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4" aria-hidden="true" />
                     <span className="text-xs md:text-sm font-medium text-center">{tab.label}</span>
                   </TabsTrigger>
                 )
@@ -168,7 +185,14 @@ function ToolsHubContent() {
               </TabsContent>
 
               {/* Skills Match Tab */}
-              <TabsContent value="skills" className="mt-0">
+              <TabsContent 
+                value="skills" 
+                className="mt-0"
+                id="tools-tabpanel-skills"
+                role="tabpanel"
+                aria-labelledby="tools-tab-skills"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -191,7 +215,14 @@ function ToolsHubContent() {
               </TabsContent>
 
               {/* ROI Calculator Tab */}
-              <TabsContent value="roi" className="mt-0">
+              <TabsContent 
+                value="roi" 
+                className="mt-0"
+                id="tools-tabpanel-roi"
+                role="tabpanel"
+                aria-labelledby="tools-tab-roi"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -214,7 +245,14 @@ function ToolsHubContent() {
               </TabsContent>
 
               {/* Assessment Tab */}
-              <TabsContent value="assessment" className="mt-0">
+              <TabsContent 
+                value="assessment" 
+                className="mt-0"
+                id="tools-tabpanel-assessment"
+                role="tabpanel"
+                aria-labelledby="tools-tab-assessment"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -237,7 +275,14 @@ function ToolsHubContent() {
               </TabsContent>
 
               {/* Contact Hub Tab */}
-              <TabsContent value="contact" className="mt-0">
+              <TabsContent 
+                value="contact" 
+                className="mt-0"
+                id="tools-tabpanel-contact"
+                role="tabpanel"
+                aria-labelledby="tools-tab-contact"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -260,7 +305,14 @@ function ToolsHubContent() {
               </TabsContent>
 
               {/* Business Card Tab */}
-              <TabsContent value="card" className="mt-0">
+              <TabsContent 
+                value="card" 
+                className="mt-0"
+                id="tools-tabpanel-card"
+                role="tabpanel"
+                aria-labelledby="tools-tab-card"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">

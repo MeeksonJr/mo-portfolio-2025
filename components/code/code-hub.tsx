@@ -32,6 +32,7 @@ import CodeReviewSimulator from '@/components/code-review/code-review-simulator'
 import PortfolioCodeViewer from '@/components/portfolio-code-viewer/portfolio-code-viewer'
 import LiveCodingTerminal from '@/components/terminal/live-coding-terminal'
 import CodeSnippetLibrary from '@/components/code/code-snippet-library'
+import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
 
 const TAB_OPTIONS = [
   { value: 'playground', label: 'Playground', icon: Play, description: 'Interactive code editor' },
@@ -46,6 +47,7 @@ function CodeHubContent() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<string>('playground')
   const [searchQuery, setSearchQuery] = useState('')
+  const { announce } = useScreenReaderAnnouncement()
 
   // Sync tab with URL query parameter
   useEffect(() => {
@@ -57,8 +59,14 @@ function CodeHubContent() {
 
   // Update URL when tab changes
   const handleTabChange = (value: string) => {
+    const tab = TAB_OPTIONS.find((t) => t.value === value)
     setActiveTab(value)
     router.push(`/code?tab=${value}`, { scroll: false })
+    
+    // Announce tab change to screen readers
+    if (tab) {
+      announce(`Switched to ${tab.label} tab: ${tab.description}`, 'polite')
+    }
   }
 
   return (
@@ -125,16 +133,26 @@ function CodeHubContent() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tab Navigation */}
           <div className="sticky top-20 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1 bg-muted/50">
-              {TAB_OPTIONS.map((tab) => {
+            <TabsList 
+              className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1 bg-muted/50"
+              aria-label="Code Hub navigation tabs"
+            >
+              {TAB_OPTIONS.map((tab, index) => {
                 const Icon = tab.icon
+                const isActive = activeTab === tab.value
                 return (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
                     className="flex flex-col md:flex-row items-center gap-2 py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                    aria-label={`${tab.label} tab, ${tab.description}. ${isActive ? 'Currently active' : ''} Press Enter or Space to activate.`}
+                    aria-selected={isActive}
+                    aria-controls={`code-tabpanel-${tab.value}`}
+                    id={`code-tab-${tab.value}`}
+                    role="tab"
+                    tabIndex={isActive ? 0 : -1}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4" aria-hidden="true" />
                     <span className="text-xs md:text-sm font-medium">{tab.label}</span>
                   </TabsTrigger>
                 )
@@ -151,7 +169,14 @@ function CodeHubContent() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              <TabsContent value="playground" className="mt-0">
+              <TabsContent 
+                value="playground" 
+                className="mt-0"
+                id="code-tabpanel-playground"
+                role="tabpanel"
+                aria-labelledby="code-tab-playground"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -176,7 +201,14 @@ function CodeHubContent() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="review" className="mt-0">
+              <TabsContent 
+                value="review" 
+                className="mt-0"
+                id="code-tabpanel-review"
+                role="tabpanel"
+                aria-labelledby="code-tab-review"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -198,7 +230,14 @@ function CodeHubContent() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="portfolio" className="mt-0">
+              <TabsContent 
+                value="portfolio" 
+                className="mt-0"
+                id="code-tabpanel-portfolio"
+                role="tabpanel"
+                aria-labelledby="code-tab-portfolio"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -220,7 +259,14 @@ function CodeHubContent() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="terminal" className="mt-0">
+              <TabsContent 
+                value="terminal" 
+                className="mt-0"
+                id="code-tabpanel-terminal"
+                role="tabpanel"
+                aria-labelledby="code-tab-terminal"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -245,7 +291,14 @@ function CodeHubContent() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="library" className="mt-0">
+              <TabsContent 
+                value="library" 
+                className="mt-0"
+                id="code-tabpanel-library"
+                role="tabpanel"
+                aria-labelledby="code-tab-library"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">

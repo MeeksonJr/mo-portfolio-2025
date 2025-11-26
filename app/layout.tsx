@@ -94,6 +94,13 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={inter.className}>
         <SkipToContent />
+        <div
+          id="screen-reader-announcements"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+        />
         <CustomCursor />
         <TerminalBackground />
         <ThemeProvider

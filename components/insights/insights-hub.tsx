@@ -36,6 +36,7 @@ function InsightsHubContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<string>('analytics')
+  const { announce } = useScreenReaderAnnouncement()
 
   // Sync tab with URL query parameter
   useEffect(() => {
@@ -47,8 +48,14 @@ function InsightsHubContent() {
 
   // Update URL when tab changes
   const handleTabChange = (value: string) => {
+    const tab = TAB_OPTIONS.find((t) => t.value === value)
     setActiveTab(value)
     router.push(`/insights?tab=${value}`, { scroll: false })
+    
+    // Announce tab change to screen readers
+    if (tab) {
+      announce(`Switched to ${tab.label} tab: ${tab.description}`, 'polite')
+    }
   }
 
   return (
@@ -142,7 +149,14 @@ function InsightsHubContent() {
               transition={{ duration: 0.2 }}
             >
               {/* Analytics Tab */}
-              <TabsContent value="analytics" className="mt-0">
+              <TabsContent 
+                value="analytics" 
+                className="mt-0"
+                id="insights-tabpanel-analytics"
+                role="tabpanel"
+                aria-labelledby="insights-tab-analytics"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -165,7 +179,14 @@ function InsightsHubContent() {
               </TabsContent>
 
               {/* Activity Tab */}
-              <TabsContent value="activity" className="mt-0">
+              <TabsContent 
+                value="activity" 
+                className="mt-0"
+                id="insights-tabpanel-activity"
+                role="tabpanel"
+                aria-labelledby="insights-tab-activity"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -188,7 +209,14 @@ function InsightsHubContent() {
               </TabsContent>
 
               {/* Recommendations Tab */}
-              <TabsContent value="recommendations" className="mt-0">
+              <TabsContent 
+                value="recommendations" 
+                className="mt-0"
+                id="insights-tabpanel-recommendations"
+                role="tabpanel"
+                aria-labelledby="insights-tab-recommendations"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -211,7 +239,14 @@ function InsightsHubContent() {
               </TabsContent>
 
               {/* Project Timeline Tab */}
-              <TabsContent value="timeline" className="mt-0">
+              <TabsContent 
+                value="timeline" 
+                className="mt-0"
+                id="insights-tabpanel-timeline"
+                role="tabpanel"
+                aria-labelledby="insights-tab-timeline"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -234,7 +269,14 @@ function InsightsHubContent() {
               </TabsContent>
 
               {/* Skill Tree Tab */}
-              <TabsContent value="skills" className="mt-0">
+              <TabsContent 
+                value="skills" 
+                className="mt-0"
+                id="insights-tabpanel-skills"
+                role="tabpanel"
+                aria-labelledby="insights-tab-skills"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">

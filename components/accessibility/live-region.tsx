@@ -5,17 +5,21 @@ import { useEffect, useRef } from 'react'
 interface LiveRegionProps {
   message: string
   priority?: 'polite' | 'assertive'
-  id?: string
+  clearOnUnmount?: boolean
 }
 
-export default function LiveRegion({ message, priority = 'polite', id = 'live-region' }: LiveRegionProps) {
+/**
+ * LiveRegion component for screen reader announcements
+ * Announces dynamic content changes to screen readers
+ */
+export default function LiveRegion({ message, priority = 'polite', clearOnUnmount = true }: LiveRegionProps) {
   const regionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (message && regionRef.current) {
       // Clear previous message
       regionRef.current.textContent = ''
-      // Set new message after a brief delay to ensure screen readers pick it up
+      // Small delay to ensure screen reader picks up the change
       setTimeout(() => {
         if (regionRef.current) {
           regionRef.current.textContent = message
@@ -24,19 +28,51 @@ export default function LiveRegion({ message, priority = 'polite', id = 'live-re
     }
   }, [message])
 
-  const ariaProps = priority === 'assertive' 
-    ? { 'aria-live': 'assertive' as const }
-    : { 'aria-live': 'polite' as const }
+  useEffect(() => {
+    return () => {
+      if (clearOnUnmount && regionRef.current) {
+        regionRef.current.textContent = ''
+      }
+    }
+  }, [clearOnUnmount])
 
   return (
     <div
       ref={regionRef}
-      id={id}
       role="status"
-      {...ariaProps}
+      aria-live={priority}
       aria-atomic="true"
       className="sr-only"
-    />
+    >
+      {message}
+    </div>
   )
 }
 
+/**
+ * Hook for announcing messages to screen readers
+ * Uses the global live region in app layout
+ */
+export function useScreenReaderAnnouncement() {
+  const announce = (message: string, priority: 'polite' | 'assertive' = 'polite') => {
+    if (typeof window === 'undefined') return
+    
+    const region = document.getElementById('screen-reader-announcements')
+    if (region) {
+      // Update priority if needed
+      if (region.getAttribute('aria-live') !== priority) {
+        region.setAttribute('aria-live', priority)
+      }
+      
+      // Clear and set new message with small delay for screen reader to pick up
+      region.textContent = ''
+      setTimeout(() => {
+        if (region) {
+          region.textContent = message
+        }
+      }, 100)
+    }
+  }
+
+  return { announce }
+}

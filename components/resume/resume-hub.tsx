@@ -23,6 +23,7 @@ import { showSuccessToast, showErrorToast } from '@/lib/toast-helpers'
 import ResumeViewer from '@/components/resume/resume-viewer'
 import ResumeGenerator from '@/components/resume/resume-generator'
 import CandidateSummaryContent from '@/components/candidate-summary/candidate-summary-content'
+import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
 import { resumeData } from '@/lib/resume-data'
 
 const TAB_OPTIONS = [
@@ -54,6 +55,7 @@ function ResumeHubContent() {
   const [activeTab, setActiveTab] = useState<string>('view')
   const [selectedFormat, setSelectedFormat] = useState<ResumeFormat>('ats')
   const [isDownloading, setIsDownloading] = useState(false)
+  const { announce } = useScreenReaderAnnouncement()
 
   // Sync tab with URL query parameter
   useEffect(() => {
@@ -65,8 +67,14 @@ function ResumeHubContent() {
 
   // Update URL when tab changes
   const handleTabChange = (value: string) => {
+    const tab = TAB_OPTIONS.find((t) => t.value === value)
     setActiveTab(value)
     router.push(`/resume?tab=${value}`, { scroll: false })
+    
+    // Announce tab change to screen readers
+    if (tab) {
+      announce(`Switched to ${tab.label} tab: ${tab.description}`, 'polite')
+    }
   }
 
   const handleDownloadPDF = async (format: ResumeFormat = selectedFormat) => {
@@ -188,16 +196,26 @@ function ResumeHubContent() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tab Navigation */}
           <div className="sticky top-20 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6">
-            <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50">
+            <TabsList 
+              className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50"
+              aria-label="Resume Hub navigation tabs"
+            >
               {TAB_OPTIONS.map((tab) => {
                 const Icon = tab.icon
+                const isActive = activeTab === tab.value
                 return (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
                     className="flex flex-col md:flex-row items-center gap-2 py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                    aria-label={`${tab.label} tab, ${tab.description}. ${isActive ? 'Currently active' : ''} Press Enter or Space to activate.`}
+                    aria-selected={isActive}
+                    aria-controls={`resume-tabpanel-${tab.value}`}
+                    id={`resume-tab-${tab.value}`}
+                    role="tab"
+                    tabIndex={isActive ? 0 : -1}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4" aria-hidden="true" />
                     <span className="text-xs md:text-sm font-medium">{tab.label}</span>
                   </TabsTrigger>
                 )
@@ -215,7 +233,14 @@ function ResumeHubContent() {
               transition={{ duration: 0.2 }}
             >
               {/* My Resume Tab */}
-              <TabsContent value="view" className="mt-0">
+              <TabsContent 
+                value="view" 
+                className="mt-0"
+                id="resume-tabpanel-view"
+                role="tabpanel"
+                aria-labelledby="resume-tab-view"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between flex-wrap gap-4">
@@ -312,7 +337,14 @@ function ResumeHubContent() {
               </TabsContent>
 
               {/* Quick Summary Tab */}
-              <TabsContent value="summary" className="mt-0">
+              <TabsContent 
+                value="summary" 
+                className="mt-0"
+                id="resume-tabpanel-summary"
+                role="tabpanel"
+                aria-labelledby="resume-tab-summary"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">

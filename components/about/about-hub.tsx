@@ -41,6 +41,7 @@ function AboutHubContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<string>('bio')
+  const { announce } = useScreenReaderAnnouncement()
 
   // Sync tab with URL query parameter
   useEffect(() => {
@@ -52,8 +53,14 @@ function AboutHubContent() {
 
   // Update URL when tab changes
   const handleTabChange = (value: string) => {
+    const tab = TAB_OPTIONS.find((t) => t.value === value)
     setActiveTab(value)
     router.push(`/about?tab=${value}`, { scroll: false })
+    
+    // Announce tab change to screen readers
+    if (tab) {
+      announce(`Switched to ${tab.label} tab: ${tab.description}`, 'polite')
+    }
   }
 
   return (
@@ -120,16 +127,26 @@ function AboutHubContent() {
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tab Navigation */}
           <div className="sticky top-20 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6">
-            <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 h-auto p-1 bg-muted/50 overflow-x-auto">
+            <TabsList 
+              className="grid w-full grid-cols-3 md:grid-cols-7 h-auto p-1 bg-muted/50 overflow-x-auto"
+              aria-label="About Hub navigation tabs"
+            >
               {TAB_OPTIONS.map((tab) => {
                 const Icon = tab.icon
+                const isActive = activeTab === tab.value
                 return (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
                     className="flex flex-col md:flex-row items-center gap-2 py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm min-w-[100px]"
+                    aria-label={`${tab.label} tab, ${tab.description}. ${isActive ? 'Currently active' : ''} Press Enter or Space to activate.`}
+                    aria-selected={isActive}
+                    aria-controls={`about-tabpanel-${tab.value}`}
+                    id={`about-tab-${tab.value}`}
+                    role="tab"
+                    tabIndex={isActive ? 0 : -1}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4" aria-hidden="true" />
                     <span className="text-xs md:text-sm font-medium text-center">{tab.label}</span>
                   </TabsTrigger>
                 )
@@ -147,7 +164,14 @@ function AboutHubContent() {
               transition={{ duration: 0.2 }}
             >
               {/* Bio Tab */}
-              <TabsContent value="bio" className="mt-0">
+              <TabsContent 
+                value="bio" 
+                className="mt-0"
+                id="about-tabpanel-bio"
+                role="tabpanel"
+                aria-labelledby="about-tab-bio"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -170,7 +194,14 @@ function AboutHubContent() {
               </TabsContent>
 
               {/* Uses Tab */}
-              <TabsContent value="uses" className="mt-0">
+              <TabsContent 
+                value="uses" 
+                className="mt-0"
+                id="about-tabpanel-uses"
+                role="tabpanel"
+                aria-labelledby="about-tab-uses"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -193,7 +224,14 @@ function AboutHubContent() {
               </TabsContent>
 
               {/* Office Tour Tab */}
-              <TabsContent value="office" className="mt-0">
+              <TabsContent 
+                value="office" 
+                className="mt-0"
+                id="about-tabpanel-office"
+                role="tabpanel"
+                aria-labelledby="about-tab-office"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -216,7 +254,14 @@ function AboutHubContent() {
               </TabsContent>
 
               {/* Activity Status Tab */}
-              <TabsContent value="activity" className="mt-0">
+              <TabsContent 
+                value="activity" 
+                className="mt-0"
+                id="about-tabpanel-activity"
+                role="tabpanel"
+                aria-labelledby="about-tab-activity"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -239,7 +284,14 @@ function AboutHubContent() {
               </TabsContent>
 
               {/* Progress Tab */}
-              <TabsContent value="progress" className="mt-0">
+              <TabsContent 
+                value="progress" 
+                className="mt-0"
+                id="about-tabpanel-progress"
+                role="tabpanel"
+                aria-labelledby="about-tab-progress"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -262,7 +314,14 @@ function AboutHubContent() {
               </TabsContent>
 
               {/* Learning Paths Tab */}
-              <TabsContent value="learning" className="mt-0">
+              <TabsContent 
+                value="learning" 
+                className="mt-0"
+                id="about-tabpanel-learning"
+                role="tabpanel"
+                aria-labelledby="about-tab-learning"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -285,7 +344,14 @@ function AboutHubContent() {
               </TabsContent>
 
               {/* Dashboard Tab */}
-              <TabsContent value="dashboard" className="mt-0">
+              <TabsContent 
+                value="dashboard" 
+                className="mt-0"
+                id="about-tabpanel-dashboard"
+                role="tabpanel"
+                aria-labelledby="about-tab-dashboard"
+                tabIndex={0}
+              >
                 <Card className="border-2">
                   <CardHeader>
                     <div className="flex items-center justify-between">
