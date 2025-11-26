@@ -38,9 +38,6 @@ export default function Navigation() {
     { name: "Contact", href: "#contact" },
   ]
 
-  // About Hub entry (for non-home pages)
-  const aboutLink = { name: "About", href: "/about" }
-
   // Content dropdown - Main content pages
   const contentLinks = [
     { name: "Projects", href: "/projects" },

@@ -19,8 +19,8 @@ export function middleware(request: NextRequest) {
     "connect-src 'self' https://*.vercel-analytics.com https://*.supabase.co https://api.github.com https://*.googleapis.com https://*.groq.com https://api-inference.huggingface.co wss://*.supabase.co",
     // Frames - embedded content (allow all HTTPS for project demos)
     "frame-src 'self' https: http:",
-    // Media
-    "media-src 'self' data: blob:",
+    // Media - allow Supabase storage for music files
+    "media-src 'self' data: blob: https://*.supabase.co",
     // Disallow object/embed
     "object-src 'none'",
     // Base URI
