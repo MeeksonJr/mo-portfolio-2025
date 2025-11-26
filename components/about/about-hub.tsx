@@ -30,6 +30,7 @@ const ProgressIndicators = lazy(() => import('@/components/progress/progress-ind
 const LearningPathGenerator = lazy(() => import('@/components/learning/learning-path-generator'))
 const PersonalDashboard = lazy(() => import('@/components/dashboard/personal-dashboard'))
 import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
+import { useFocusManagement } from '@/hooks/use-focus-management'
 
 const TAB_OPTIONS = [
   { value: 'bio', label: 'Bio', icon: User, description: 'About me and my journey' },
@@ -54,6 +55,9 @@ function AboutHubContent() {
       setActiveTab(tab)
     }
   }, [searchParams])
+
+  // Focus management for tab changes
+  useFocusManagement(activeTab, `about-tabpanel-${activeTab}`)
 
   // Update URL when tab changes
   const handleTabChange = (value: string) => {

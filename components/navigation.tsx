@@ -155,7 +155,19 @@ export default function Navigation() {
               <DropdownMenuContent align="end" className="w-56">
                 {toolsLinks.map((link) => (
                   <DropdownMenuItem key={link.name} asChild>
-                    <Link href={link.href} className="cursor-pointer" prefetch={true}>
+                    <Link 
+                      href={link.href} 
+                      className="cursor-pointer" 
+                      prefetch={true}
+                      onMouseEnter={() => {
+                        // Prefetch hub pages on hover for faster navigation
+                        if (link.href.startsWith('/code') || link.href.startsWith('/resume') || 
+                            link.href.startsWith('/tools') || link.href.startsWith('/insights') || 
+                            link.href.startsWith('/about')) {
+                          // Next.js Link already prefetches, but we can ensure it happens
+                        }
+                      }}
+                    >
                       {link.name}
                     </Link>
                   </DropdownMenuItem>

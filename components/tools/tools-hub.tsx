@@ -21,6 +21,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
+import { useFocusManagement } from '@/hooks/use-focus-management'
 
 // Lazy load tab components for better performance
 const ProjectAnalyzer = lazy(() => import('@/components/project-analyzer/project-analyzer'))
@@ -52,6 +53,9 @@ function ToolsHubContent() {
       setActiveTab(tab)
     }
   }, [searchParams])
+
+  // Focus management for tab changes
+  useFocusManagement(activeTab, `tools-tabpanel-${activeTab}`)
 
   // Update URL when tab changes
   const handleTabChange = (value: string) => {

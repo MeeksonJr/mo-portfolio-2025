@@ -25,6 +25,7 @@ import ResumeViewer from '@/components/resume/resume-viewer'
 import ResumeGenerator from '@/components/resume/resume-generator'
 import CandidateSummaryContent from '@/components/candidate-summary/candidate-summary-content'
 import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
+import { useFocusManagement } from '@/hooks/use-focus-management'
 import { resumeData } from '@/lib/resume-data'
 
 const TAB_OPTIONS = [
@@ -65,6 +66,9 @@ function ResumeHubContent() {
       setActiveTab(tab)
     }
   }, [searchParams])
+
+  // Focus management for tab changes
+  useFocusManagement(activeTab, `resume-tabpanel-${activeTab}`)
 
   // Update URL when tab changes
   const handleTabChange = (value: string) => {

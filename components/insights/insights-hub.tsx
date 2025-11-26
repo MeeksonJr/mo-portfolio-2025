@@ -27,6 +27,7 @@ const ContentRecommendations = lazy(() => import('@/components/recommendations/c
 const InteractiveProjectTimeline = lazy(() => import('@/components/projects/project-timeline'))
 const InteractiveSkillTree = lazy(() => import('@/components/skills/skill-tree'))
 import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
+import { useFocusManagement } from '@/hooks/use-focus-management'
 
 const TAB_OPTIONS = [
   { value: 'analytics', label: 'Analytics', icon: BarChart3, description: 'Portfolio statistics and metrics' },
@@ -49,6 +50,9 @@ function InsightsHubContent() {
       setActiveTab(tab)
     }
   }, [searchParams])
+
+  // Focus management for tab changes
+  useFocusManagement(activeTab, `insights-tabpanel-${activeTab}`)
 
   // Update URL when tab changes
   const handleTabChange = (value: string) => {

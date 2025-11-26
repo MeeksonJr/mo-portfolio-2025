@@ -104,6 +104,40 @@
   --ring: 0 0% 100%;
 }
 
+/* Enhanced Focus Indicators - WCAG AA Compliance */
+*:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Tab focus indicators */
+[role="tab"]:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  z-index: 10;
+}
+
+/* Button focus indicators */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Input focus indicators */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Remove default outline for mouse users, keep for keyboard */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* High Contrast Mode - Enhanced borders and focus indicators */
 .high-contrast * {
   border-color: hsl(var(--border)) !important;

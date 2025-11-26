@@ -29,6 +29,7 @@ import { showSuccessToast, showErrorToast } from '@/lib/toast-helpers'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
+import { useFocusManagement } from '@/hooks/use-focus-management'
 
 // Lazy load tab components for better performance
 const CodePlayground = lazy(() => import('@/components/code-playground/code-playground'))
@@ -59,6 +60,9 @@ function CodeHubContent() {
       setActiveTab(tab)
     }
   }, [searchParams])
+
+  // Focus management for tab changes
+  useFocusManagement(activeTab, `code-tabpanel-${activeTab}`)
 
   // Update URL when tab changes
   const handleTabChange = (value: string) => {
