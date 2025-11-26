@@ -1,295 +1,794 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Download, FileText, Sparkles, Briefcase, Share2, QrCode, Copy, Check, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { toast } from 'sonner'
-import ResumeViewer from './resume-viewer'
-import { useRouter } from 'next/navigation'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
-import { QRCodeSVG } from 'qrcode.react'
+import { Badge } from '@/components/ui/badge'
+import {
+  User,
+  Briefcase,
+  GraduationCap,
+  Award,
+  Download,
+  FileText,
+  Sparkles,
+  Plus,
+  X,
+} from 'lucide-react'
+import { showSuccessToast, showErrorToast, showInfoToast } from '@/lib/toast-helpers'
 
-type ResumeFormat = 'ats' | 'creative' | 'traditional'
-
-interface ResumeData {
-  personal: any
-  experience: any[]
-  education: any[]
-  skills: any
-  projects: any[]
-  certifications?: any[]
-  languages?: any[]
+interface PersonalInfo {
+  fullName: string
+  email: string
+  phone: string
+  location: string
+  website?: string
+  linkedin?: string
+  github?: string
 }
+
+interface Experience {
+  id: string
+  title: string
+  company: string
+  location: string
+  startDate: string
+  endDate: string
+  current: boolean
+  description: string
+  achievements: string[]
+}
+
+interface Education {
+  id: string
+  degree: string
+  institution: string
+  location: string
+  graduationDate: string
+  gpa?: string
+  honors?: string
+}
+
+interface Skill {
+  id: string
+  name: string
+  category: string
+  level: 'beginner' | 'intermediate' | 'advanced' | 'expert'
+}
+
+interface Certification {
+  id: string
+  name: string
+  issuer: string
+  date: string
+  expiryDate?: string
+}
+
+const RESUME_TEMPLATES = [
+  { id: 'modern', name: 'Modern', description: 'Clean and professional' },
+  { id: 'classic', name: 'Classic', description: 'Traditional format' },
+  { id: 'creative', name: 'Creative', description: 'Stand out design' },
+]
 
 export default function ResumeGenerator() {
-  const [resumeData, setResumeData] = useState<ResumeData | null>(null)
-  const [selectedFormat, setSelectedFormat] = useState<ResumeFormat>('ats')
-  const [isLoading, setIsLoading] = useState(true)
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
-  const [showQRCode, setShowQRCode] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const router = useRouter()
+  const [currentStep, setCurrentStep] = useState(1)
+  const [selectedTemplate, setSelectedTemplate] = useState('modern')
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
+    fullName: '',
+    email: '',
+    phone: '',
+    location: '',
+    website: '',
+    linkedin: '',
+    github: '',
+  })
+  const [summary, setSummary] = useState('')
+  const [experiences, setExperiences] = useState<Experience[]>([])
+  const [educations, setEducations] = useState<Education[]>([])
+  const [skills, setSkills] = useState<Skill[]>([])
+  const [certifications, setCertifications] = useState<Certification[]>([])
+  const [isGenerating, setIsGenerating] = useState(false)
 
-  useEffect(() => {
-    fetchResumeData()
-  }, [])
-
-  const fetchResumeData = async () => {
-    try {
-      const response = await fetch('/api/resume')
-      if (!response.ok) throw new Error('Failed to fetch resume data')
-      const data = await response.json()
-      setResumeData(data)
-    } catch (error) {
-      console.error('Error fetching resume data:', error)
-      toast.error('Failed to load resume data')
-    } finally {
-      setIsLoading(false)
-    }
+  const addExperience = () => {
+    setExperiences([
+      ...experiences,
+      {
+        id: `exp-${Date.now()}`,
+        title: '',
+        company: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        current: false,
+        description: '',
+        achievements: [],
+      },
+    ])
   }
 
-  const handleDownloadPDF = async () => {
-    if (!resumeData) return
+  const removeExperience = (id: string) => {
+    setExperiences(experiences.filter((exp) => exp.id !== id))
+  }
 
-    setIsGeneratingPDF(true)
+  const addEducation = () => {
+    setEducations([
+      ...educations,
+      {
+        id: `edu-${Date.now()}`,
+        degree: '',
+        institution: '',
+        location: '',
+        graduationDate: '',
+      },
+    ])
+  }
+
+  const removeEducation = (id: string) => {
+    setEducations(educations.filter((edu) => edu.id !== id))
+  }
+
+  const addSkill = () => {
+    setSkills([
+      ...skills,
+      {
+        id: `skill-${Date.now()}`,
+        name: '',
+        category: 'Technical',
+        level: 'intermediate',
+      },
+    ])
+  }
+
+  const removeSkill = (id: string) => {
+    setSkills(skills.filter((skill) => skill.id !== id))
+  }
+
+  const addCertification = () => {
+    setCertifications([
+      ...certifications,
+      {
+        id: `cert-${Date.now()}`,
+        name: '',
+        issuer: '',
+        date: '',
+      },
+    ])
+  }
+
+  const removeCertification = (id: string) => {
+    setCertifications(certifications.filter((cert) => cert.id !== id))
+  }
+
+  const handleGeneratePDF = async () => {
+    setIsGenerating(true)
     try {
-      const response = await fetch('/api/resume/pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          format: selectedFormat,
-          data: resumeData,
-        }),
-      })
-
-      if (!response.ok) {
-        // Fallback to print if PDF generation fails
-        window.print()
-        toast.info('Using browser print as fallback. Server PDF generation is being optimized.')
-        return
+      // In a real implementation, this would call an API to generate PDF
+      // For now, we'll create a downloadable HTML version
+      const resumeData = {
+        template: selectedTemplate,
+        personalInfo,
+        summary,
+        experiences,
+        educations,
+        skills,
+        certifications,
       }
 
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
+      const blob = new Blob([JSON.stringify(resumeData, null, 2)], {
+        type: 'application/json',
+      })
+      const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `Mohamed-Datt-Resume-${selectedFormat}-${new Date().getFullYear()}.pdf`
+      a.download = `${personalInfo.fullName || 'resume'}-data.json`
       document.body.appendChild(a)
       a.click()
-      window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
+      URL.revokeObjectURL(url)
 
-      toast.success('Resume downloaded successfully!')
+      showSuccessToast('Resume data exported! PDF generation coming soon.')
     } catch (error) {
-      console.error('Error generating PDF:', error)
-      // Fallback to print
-      window.print()
-      toast.info('Using browser print. Server PDF generation will be available soon.')
+      showErrorToast('Failed to generate resume')
+      console.error(error)
     } finally {
-      setIsGeneratingPDF(false)
+      setIsGenerating(false)
     }
   }
 
-  const handleShare = async () => {
-    const url = `${window.location.origin}/resume?format=${selectedFormat}`
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: 'Mohamed Datt - Resume',
-          text: 'Check out Mohamed Datt\'s resume',
-          url,
-        })
-        toast.success('Resume shared!')
-      } else {
-        await navigator.clipboard.writeText(url)
-        setCopied(true)
-        toast.success('Resume link copied to clipboard!')
-        setTimeout(() => setCopied(false), 2000)
-      }
-    } catch (error) {
-      // User cancelled share
-      if (error instanceof Error && error.name !== 'AbortError') {
-        toast.error('Failed to share resume')
-      }
-    }
-  }
-
-  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/resume?format=${selectedFormat}` : ''
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
-  }
-
-  if (!resumeData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Failed to load resume data</p>
-      </div>
-    )
-  }
+  const totalSteps = 6
 
   return (
-    <>
-      <Navigation />
-      <div className="pt-20 pb-16 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Resume</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Download my resume in multiple formats. Choose the format that best fits your needs.
-            </p>
-          </motion.div>
+    <div className="container mx-auto py-12">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold mb-2">Resume Generator</h1>
+        <p className="text-muted-foreground">
+          Create your professional resume using our templates
+        </p>
+      </div>
 
-          {/* Format Selector */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-8"
-          >
-            <Tabs value={selectedFormat} onValueChange={(v) => setSelectedFormat(v as ResumeFormat)}>
-              <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3">
-                <TabsTrigger value="ats" className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  ATS-Friendly
-                </TabsTrigger>
-                <TabsTrigger value="creative" className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4" />
-                  Creative
-                </TabsTrigger>
-                <TabsTrigger value="traditional" className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  Traditional
-                </TabsTrigger>
-              </TabsList>
-
-              <div className="mt-4 text-center">
-                <p className="text-sm text-muted-foreground">
-                  {selectedFormat === 'ats' && 'Optimized for Applicant Tracking Systems. Clean, keyword-rich format.'}
-                  {selectedFormat === 'creative' && 'Modern, visually appealing design with color and graphics.'}
-                  {selectedFormat === 'traditional' && 'Professional, classic format suitable for all industries.'}
-                </p>
+      {/* Progress Steps */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          {Array.from({ length: totalSteps }).map((_, index) => (
+            <div key={index} className="flex items-center flex-1">
+              <div
+                className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                  currentStep > index + 1
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : currentStep === index + 1
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-background border-muted-foreground text-muted-foreground'
+                }`}
+              >
+                {currentStep > index + 1 ? '✓' : index + 1}
               </div>
-            </Tabs>
-          </motion.div>
-
-          {/* Action Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-wrap justify-center gap-4 mb-8"
-          >
-            <Button
-              onClick={handleDownloadPDF}
-              disabled={isGeneratingPDF}
-              size="lg"
-              className="gap-2"
-            >
-              {isGeneratingPDF ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Download className="h-4 w-4" />
-                  Download PDF
-                </>
+              {index < totalSteps - 1 && (
+                <div
+                  className={`flex-1 h-1 mx-2 ${
+                    currentStep > index + 1 ? 'bg-primary' : 'bg-muted'
+                  }`}
+                />
               )}
-            </Button>
-
-            <Button
-              onClick={handleShare}
-              variant="outline"
-              size="lg"
-              className="gap-2"
-            >
-              {copied ? (
-                <>
-                  <Check className="h-4 w-4" />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Share2 className="h-4 w-4" />
-                  Share Link
-                </>
-              )}
-            </Button>
-
-            <Button
-              onClick={() => setShowQRCode(!showQRCode)}
-              variant="outline"
-              size="lg"
-              className="gap-2"
-            >
-              <QrCode className="h-4 w-4" />
-              QR Code
-            </Button>
-          </motion.div>
-
-          {/* QR Code Modal */}
-          {showQRCode && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-              onClick={() => setShowQRCode(false)}
-            >
-              <Card className="max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
-                <CardHeader>
-                  <CardTitle>Scan to View Resume</CardTitle>
-                  <CardDescription>Share this QR code for easy access</CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center gap-4">
-                  <div className="bg-white p-4 rounded-lg">
-                    <QRCodeSVG value={shareUrl} size={200} />
-                  </div>
-                  <p className="text-sm text-muted-foreground text-center break-all">{shareUrl}</p>
-                  <Button
-                    onClick={() => {
-                      navigator.clipboard.writeText(shareUrl)
-                      toast.success('Link copied!')
-                    }}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Copy className="h-3 w-3 mr-2" />
-                    Copy Link
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* Resume Preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <ResumeViewer data={resumeData} format={selectedFormat} />
-          </motion.div>
+            </div>
+          ))}
         </div>
       </div>
-      <FooterLight />
-    </>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Form */}
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {currentStep === 1 && 'Step 1: Personal Information'}
+                {currentStep === 2 && 'Step 2: Professional Summary'}
+                {currentStep === 3 && 'Step 3: Work Experience'}
+                {currentStep === 4 && 'Step 4: Education'}
+                {currentStep === 5 && 'Step 5: Skills & Certifications'}
+                {currentStep === 6 && 'Step 6: Review & Generate'}
+              </CardTitle>
+              <CardDescription>
+                Fill in your information to create a professional resume
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Step 1: Personal Info */}
+              {currentStep === 1 && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="fullName">Full Name *</Label>
+                      <Input
+                        id="fullName"
+                        value={personalInfo.fullName}
+                        onChange={(e) =>
+                          setPersonalInfo({ ...personalInfo, fullName: e.target.value })
+                        }
+                        placeholder="John Doe"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Email *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={personalInfo.email}
+                        onChange={(e) =>
+                          setPersonalInfo({ ...personalInfo, email: e.target.value })
+                        }
+                        placeholder="john@example.com"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="phone">Phone *</Label>
+                      <Input
+                        id="phone"
+                        value={personalInfo.phone}
+                        onChange={(e) =>
+                          setPersonalInfo({ ...personalInfo, phone: e.target.value })
+                        }
+                        placeholder="+1 (555) 123-4567"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="location">Location *</Label>
+                      <Input
+                        id="location"
+                        value={personalInfo.location}
+                        onChange={(e) =>
+                          setPersonalInfo({ ...personalInfo, location: e.target.value })
+                        }
+                        placeholder="City, State"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                      id="website"
+                      value={personalInfo.website}
+                      onChange={(e) =>
+                        setPersonalInfo({ ...personalInfo, website: e.target.value })
+                      }
+                      placeholder="https://yourwebsite.com"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="linkedin">LinkedIn</Label>
+                      <Input
+                        id="linkedin"
+                        value={personalInfo.linkedin}
+                        onChange={(e) =>
+                          setPersonalInfo({ ...personalInfo, linkedin: e.target.value })
+                        }
+                        placeholder="linkedin.com/in/username"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="github">GitHub</Label>
+                      <Input
+                        id="github"
+                        value={personalInfo.github}
+                        onChange={(e) =>
+                          setPersonalInfo({ ...personalInfo, github: e.target.value })
+                        }
+                        placeholder="github.com/username"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Summary */}
+              {currentStep === 2 && (
+                <div>
+                  <Label htmlFor="summary">Professional Summary</Label>
+                  <Textarea
+                    id="summary"
+                    value={summary}
+                    onChange={(e) => setSummary(e.target.value)}
+                    placeholder="Write a brief professional summary highlighting your experience and skills..."
+                    className="min-h-[200px]"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                    onClick={async () => {
+                      // AI-powered summary generation
+                      showInfoToast('AI summary generation coming soon!')
+                    }}
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generate with AI
+                  </Button>
+                </div>
+              )}
+
+              {/* Step 3: Experience */}
+              {currentStep === 3 && (
+                <div className="space-y-4">
+                  {experiences.map((exp, index) => (
+                    <Card key={exp.id}>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">Experience {index + 1}</CardTitle>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeExperience(exp.id)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label>Job Title *</Label>
+                            <Input
+                              value={exp.title}
+                              onChange={(event) => {
+                                const updated = experiences.map((e) =>
+                                  e.id === exp.id ? { ...e, title: event.target.value } : e
+                                )
+                                setExperiences(updated)
+                              }}
+                              placeholder="Software Engineer"
+                            />
+                          </div>
+                          <div>
+                            <Label>Company *</Label>
+                            <Input
+                              value={exp.company}
+                              onChange={(event) => {
+                                const updated = experiences.map((e) =>
+                                  e.id === exp.id ? { ...e, company: event.target.value } : e
+                                )
+                                setExperiences(updated)
+                              }}
+                              placeholder="Company Name"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4">
+                          <div>
+                            <Label>Start Date *</Label>
+                            <Input
+                              type="month"
+                              value={exp.startDate}
+                              onChange={(event) => {
+                                const updated = experiences.map((e) =>
+                                  e.id === exp.id ? { ...e, startDate: event.target.value } : e
+                                )
+                                setExperiences(updated)
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <Label>End Date</Label>
+                            <Input
+                              type="month"
+                              value={exp.endDate}
+                              onChange={(event) => {
+                                const updated = experiences.map((e) =>
+                                  e.id === exp.id ? { ...e, endDate: event.target.value } : e
+                                )
+                                setExperiences(updated)
+                              }}
+                              disabled={exp.current}
+                            />
+                          </div>
+                          <div className="flex items-end">
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                id={`current-${exp.id}`}
+                                checked={exp.current}
+                                onChange={(event) => {
+                                  const updated = experiences.map((e) =>
+                                    e.id === exp.id ? { ...e, current: event.target.checked } : e
+                                  )
+                                  setExperiences(updated)
+                                }}
+                                className="rounded"
+                                aria-label="Current position"
+                              />
+                              <Label htmlFor={`current-${exp.id}`} className="cursor-pointer">
+                                Current
+                              </Label>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <Label>Description</Label>
+                          <Textarea
+                            value={exp.description}
+                            onChange={(event) => {
+                              const updated = experiences.map((e) =>
+                                e.id === exp.id ? { ...e, description: event.target.value } : e
+                              )
+                              setExperiences(updated)
+                            }}
+                            placeholder="Describe your role and responsibilities..."
+                            className="min-h-[100px]"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  <Button variant="outline" onClick={addExperience} className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Experience
+                  </Button>
+                </div>
+              )}
+
+              {/* Step 4: Education */}
+              {currentStep === 4 && (
+                <div className="space-y-4">
+                  {educations.map((edu, index) => (
+                    <Card key={edu.id}>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">Education {index + 1}</CardTitle>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeEducation(edu.id)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label>Degree *</Label>
+                            <Input
+                              value={edu.degree}
+                              onChange={(event) => {
+                                const updated = educations.map((e) =>
+                                  e.id === edu.id ? { ...e, degree: event.target.value } : e
+                                )
+                                setEducations(updated)
+                              }}
+                              placeholder="Bachelor of Science"
+                            />
+                          </div>
+                          <div>
+                            <Label>Institution *</Label>
+                            <Input
+                              value={edu.institution}
+                              onChange={(event) => {
+                                const updated = educations.map((e) =>
+                                  e.id === edu.id ? { ...e, institution: event.target.value } : e
+                                )
+                                setEducations(updated)
+                              }}
+                              placeholder="University Name"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label>Graduation Date *</Label>
+                            <Input
+                              type="month"
+                              value={edu.graduationDate}
+                              onChange={(event) => {
+                                const updated = educations.map((e) =>
+                                  e.id === edu.id ? { ...e, graduationDate: event.target.value } : e
+                                )
+                                setEducations(updated)
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <Label>GPA (Optional)</Label>
+                            <Input
+                              value={edu.gpa || ''}
+                              onChange={(event) => {
+                                const updated = educations.map((e) =>
+                                  e.id === edu.id ? { ...e, gpa: event.target.value } : e
+                                )
+                                setEducations(updated)
+                              }}
+                              placeholder="3.8"
+                            />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  <Button variant="outline" onClick={addEducation} className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Education
+                  </Button>
+                </div>
+              )}
+
+              {/* Step 5: Skills & Certifications */}
+              {currentStep === 5 && (
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold">Skills</h3>
+                      <Button variant="outline" size="sm" onClick={addSkill}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Skill
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      {skills.map((skill) => (
+                        <div key={skill.id} className="flex items-center gap-2">
+                          <Input
+                            value={skill.name}
+                            onChange={(e) => {
+                              const updated = skills.map((s) =>
+                                s.id === skill.id ? { ...s, name: e.target.value } : s
+                              )
+                              setSkills(updated)
+                            }}
+                            placeholder="Skill name"
+                            className="flex-1"
+                          />
+                          <select
+                            value={skill.level}
+                            onChange={(event) => {
+                              const updated = skills.map((s) =>
+                                s.id === skill.id
+                                  ? { ...s, level: event.target.value as Skill['level'] }
+                                  : s
+                              )
+                              setSkills(updated)
+                            }}
+                            className="px-3 py-2 border rounded-md"
+                            aria-label="Skill level"
+                          >
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="expert">Expert</option>
+                          </select>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeSkill(skill.id)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold">Certifications</h3>
+                      <Button variant="outline" size="sm" onClick={addCertification}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Certification
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      {certifications.map((cert) => (
+                        <div key={cert.id} className="flex items-center gap-2">
+                          <Input
+                            value={cert.name}
+                            onChange={(e) => {
+                              const updated = certifications.map((c) =>
+                                c.id === cert.id ? { ...c, name: e.target.value } : c
+                              )
+                              setCertifications(updated)
+                            }}
+                            placeholder="Certification name"
+                            className="flex-1"
+                          />
+                          <Input
+                            value={cert.issuer}
+                            onChange={(e) => {
+                              const updated = certifications.map((c) =>
+                                c.id === cert.id ? { ...c, issuer: e.target.value } : c
+                              )
+                              setCertifications(updated)
+                            }}
+                            placeholder="Issuer"
+                            className="flex-1"
+                          />
+                          <Input
+                            type="month"
+                            value={cert.date}
+                            onChange={(e) => {
+                              const updated = certifications.map((c) =>
+                                c.id === cert.id ? { ...c, date: e.target.value } : c
+                              )
+                              setCertifications(updated)
+                            }}
+                            className="w-32"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeCertification(cert.id)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 6: Review */}
+              {currentStep === 6 && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Review Your Resume</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-semibold">Personal Information</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {personalInfo.fullName || 'Not provided'}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {personalInfo.email || 'Not provided'}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Summary</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {summary || 'Not provided'}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Experience</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {experiences.length} {experiences.length === 1 ? 'entry' : 'entries'}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Education</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {educations.length} {educations.length === 1 ? 'entry' : 'entries'}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Skills</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {skills.length} {skills.length === 1 ? 'skill' : 'skills'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between pt-4 border-t">
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+                  disabled={currentStep === 1}
+                >
+                  Previous
+                </Button>
+                {currentStep < totalSteps ? (
+                  <Button onClick={() => setCurrentStep(currentStep + 1)}>Next</Button>
+                ) : (
+                  <Button onClick={handleGeneratePDF} disabled={isGenerating}>
+                    {isGenerating ? (
+                      <>
+                        <FileText className="h-4 w-4 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="h-4 w-4 mr-2" />
+                        Generate PDF
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Template Selector Sidebar */}
+        <div className="lg:col-span-1">
+          <Card>
+            <CardHeader>
+              <CardTitle>Template</CardTitle>
+              <CardDescription>Choose a resume template</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {RESUME_TEMPLATES.map((template) => (
+                <button
+                  key={template.id}
+                  onClick={() => setSelectedTemplate(template.id)}
+                  className={`w-full p-4 text-left border-2 rounded-lg transition-colors ${
+                    selectedTemplate === template.id
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <div className="font-semibold">{template.name}</div>
+                  <div className="text-sm text-muted-foreground">{template.description}</div>
+                </button>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
   )
 }
-

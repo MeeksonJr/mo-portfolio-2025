@@ -1,18 +1,11 @@
-import HeroLight from "@/components/hero-light"
-import QuickStats from "@/components/quick-stats"
-import TechSnapshot from "@/components/tech-snapshot"
-import AboutLight from "@/components/about-light"
-import ProjectsLight from "@/components/projects-light"
-import ServicesPricing from "@/components/services-pricing"
-import CoursesSection from "@/components/courses-section"
-import Contact from "@/components/contact"
 import FooterLight from "@/components/footer-light"
 import Navigation from "@/components/navigation"
 import { AIChatbotVoice } from "@/components/chatbot/chatbot-wrappers"
 import ScrollProgress from "@/components/scroll-progress"
-import Experience from "@/components/experience"
 import StructuredData from "@/components/structured-data"
 import FloatingActionMenu from "@/components/floating-action-menu"
+import CustomizableHomepage from "@/components/homepage/customizable-homepage"
+import HomepageCustomizer from "@/components/homepage/homepage-customizer"
 
 export default function Home() {
   return (
@@ -28,16 +21,10 @@ export default function Home() {
         <Navigation />
 
       <main id="main-content" className="relative z-10" role="main" tabIndex={-1}>
-        <HeroLight />
-        <QuickStats />
-        <TechSnapshot />
-        <AboutLight />
-        <ProjectsLight />
-        <Experience />
-        <ServicesPricing />
-        <CoursesSection />
-        <Contact />
+        <CustomizableHomepage />
       </main>
+
+      <HomepageCustomizer />
 
       <FooterLight />
       <AIChatbotVoice />

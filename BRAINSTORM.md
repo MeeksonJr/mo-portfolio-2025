@@ -2611,6 +2611,16 @@ content/
   - AI suggestions for improvements
 - **Tech:** React PDF, form builder
 - **Priority:** 🟢 Low
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Created ResumeGenerator component with 6-step wizard
+  - [x] Implemented personal information, summary, experience, education, skills sections
+  - [x] Added multiple resume templates (Modern, Classic, Creative)
+  - [x] Dynamic form with add/remove functionality for experiences, education, skills, certifications
+  - [x] Progress indicator showing current step
+  - [x] Review step before generation
+  - [x] Export functionality (JSON export, PDF generation ready)
+  - [x] Integrated into /resume-generator page
+  - [x] Added to navigation, command palette, and voice commands
 
 #### 9. **Code Review Simulator**
 - **Description:** Interactive code review experience showing your review process
@@ -2929,6 +2939,14 @@ content/
   - Reset to default
 - **Tech:** LocalStorage, drag-and-drop
 - **Priority:** 🟢 Low
+- **Status:** ✅ Completed (Nov 2025)
+  - [x] Created homepage-customization.ts library with section management
+  - [x] Implemented HomepageCustomizer component with drag-and-drop reordering
+  - [x] Added show/hide toggle for each section
+  - [x] Created CustomizableHomepage component to render sections dynamically
+  - [x] Integrated into home page with floating settings button
+  - [x] Save and reset functionality with localStorage persistence
+  - [x] Real-time updates when customization changes
 
 #### 3. **Bookmark System**
 - **Description:** Save favorite content

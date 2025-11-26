@@ -52,6 +52,7 @@ export default function Navigation() {
     { name: "Music", href: "/music" },
     { name: "Achievements", href: "/achievements" },
     { name: "Dashboard", href: "/dashboard" },
+    { name: "Resume Generator", href: "/resume-generator" },
   ]
 
   // Tools dropdown - Interactive tools and utilities

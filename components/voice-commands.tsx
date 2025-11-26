@@ -137,6 +137,11 @@ export default function VoiceCommands() {
       description: 'Navigate to personal dashboard',
     },
     {
+      command: 'go to resume generator',
+      action: () => router.push('/resume-generator'),
+      description: 'Navigate to resume generator',
+    },
+    {
       command: 'go to learning paths',
       action: () => router.push('/learning-paths'),
       description: 'Navigate to learning paths',

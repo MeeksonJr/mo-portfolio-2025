@@ -202,6 +202,12 @@ export default function CommandPalette() {
             <span>Personal Dashboard</span>
           </CommandItem>
           <CommandItem
+            onSelect={() => runCommand(() => router.push('/resume-generator'))}
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            <span>Resume Generator</span>
+          </CommandItem>
+          <CommandItem
             onSelect={() => runCommand(() => router.push('/learning-paths'))}
           >
             <Target className="mr-2 h-4 w-4" />
