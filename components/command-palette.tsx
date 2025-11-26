@@ -255,8 +255,8 @@ export default function CommandPalette() {
           <CommandItem
             onSelect={() => runCommand(() => router.push('/resume'))}
           >
-            <FileText className="mr-2 h-4 w-4" />
-            <span>Resume Hub</span>
+            <Download className="mr-2 h-4 w-4" />
+            <span>View Resume</span>
             <CommandShortcut>⌘R</CommandShortcut>
           </CommandItem>
           <CommandItem

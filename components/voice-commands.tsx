@@ -94,11 +94,6 @@ export default function VoiceCommands() {
       description: 'Navigate to home page',
     },
     {
-      command: 'go to about',
-      action: () => router.push('/about'),
-      description: 'Navigate to about page',
-    },
-    {
       command: 'go to contact',
       action: () => {
         const contactSection = document.getElementById('contact')
@@ -230,9 +225,9 @@ export default function VoiceCommands() {
     },
     // Developer Tools
     {
-      command: 'go to code snippets',
+      command: 'go to code hub',
       action: () => router.push('/code'),
-      description: 'Navigate to code snippet library',
+      description: 'Navigate to code hub',
     },
     {
       command: 'go to calendar',

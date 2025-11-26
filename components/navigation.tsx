@@ -38,6 +38,9 @@ export default function Navigation() {
     { name: "Contact", href: "#contact" },
   ]
 
+  // About Hub entry (for non-home pages)
+  const aboutLink = { name: "About", href: "/about" }
+
   // Content dropdown - Main content pages
   const contentLinks = [
     { name: "Projects", href: "/projects" },
@@ -68,11 +71,13 @@ export default function Navigation() {
 
   // Developer dropdown - Code and technical content
   const developerLinks = [
+    { name: "About Hub", href: "/about" },
     { name: "Calendar", href: "/calendar" },
   ]
 
   // For Agents & Recruiters
   const agentLinks = [
+    { name: "Resume Hub", href: "/resume" },
     { name: "Portfolio Comparison", href: "/portfolio-comparison" },
     { name: "Agent Dashboard", href: "/agent-dashboard" },
   ]
@@ -357,7 +362,7 @@ export default function Navigation() {
               {/* Footer Actions */}
               <div className="border-t border-border pt-3 mt-2 space-y-2">
                 <div className="flex items-center justify-between py-2">
-                  <span className="text-sm font-medium text-foreground/70">Preferences</span>
+                  <span className="text-sm font-medium text-foreground/70">Language</span>
                   <LanguageSwitcher />
                 </div>
                 <div className="flex items-center justify-between py-2">
