@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Play, Pause, SkipForward, SkipBack } from 'lucide-react'
+import { getProxyAudioUrl } from '@/lib/music-helpers'
 
 interface Song {
   title: string
@@ -25,7 +26,7 @@ export default function MusicPlayerContent() {
         // Transform API response to match component format
         const transformedSongs = (data.songs || []).map((song: any) => ({
           title: song.title,
-          file: song.file_url,
+          file: getProxyAudioUrl(song.file_url) || song.file_url,
         }))
         setSongs(transformedSongs)
       } catch (error) {
@@ -49,7 +50,13 @@ export default function MusicPlayerContent() {
     }
 
     const handleEnded = () => {
-      handleNext()
+      if (songs.length > 0) {
+        setCurrentTrack((prev) => (prev + 1) % songs.length)
+        setIsPlaying(true)
+        setTimeout(() => {
+          audioRef.current?.play()
+        }, 100)
+      }
     }
 
     audio.addEventListener('timeupdate', updateProgress)
@@ -59,7 +66,7 @@ export default function MusicPlayerContent() {
       audio.removeEventListener('timeupdate', updateProgress)
       audio.removeEventListener('ended', handleEnded)
     }
-  }, [currentTrack])
+  }, [currentTrack, songs.length])
 
   const handlePlayPause = () => {
     const audio = audioRef.current
@@ -108,7 +115,15 @@ export default function MusicPlayerContent() {
 
   return (
     <div className="space-y-4">
-      <audio ref={audioRef} src={songs[currentTrack]?.file} preload="auto" />
+      <audio 
+        ref={audioRef} 
+        src={songs[currentTrack]?.file || undefined} 
+        preload="auto"
+        onError={(e) => {
+          console.error('Audio loading error:', e)
+          console.error('Failed to load:', songs[currentTrack]?.file)
+        }}
+      />
       
       <div className="text-center">
         <h3 className="font-semibold text-lg mb-1">{songs[currentTrack]?.title}</h3>

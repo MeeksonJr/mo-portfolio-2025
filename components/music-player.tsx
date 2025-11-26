@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Play, Pause, SkipForward, SkipBack, Music2, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { getProxyAudioUrl } from "@/lib/music-helpers"
 
 interface Song {
   title: string
@@ -30,7 +31,7 @@ export default function MusicPlayer() {
         // Transform API response to match component format
         const transformedSongs = (data.songs || []).map((song: any) => ({
           title: song.title || song.artist ? `${song.title}${song.artist ? ' - ' + song.artist : ''}` : 'Unknown',
-          file: song.file_url || song.file_path,
+          file: getProxyAudioUrl(song.file_url || song.file_path) || song.file_url || song.file_path,
         }))
         setSongs(transformedSongs)
       } catch (error) {
@@ -61,7 +62,11 @@ export default function MusicPlayer() {
     }
 
     const handleEnded = () => {
-      handleNext()
+      if (songs.length > 0) {
+        setCurrentTrack((prev) => (prev + 1) % songs.length)
+        setIsPlaying(true)
+        setTimeout(() => audioRef.current?.play(), 100)
+      }
     }
 
     audio.addEventListener("timeupdate", updateProgress)
@@ -71,7 +76,7 @@ export default function MusicPlayer() {
       audio.removeEventListener("timeupdate", updateProgress)
       audio.removeEventListener("ended", handleEnded)
     }
-  }, [currentTrack])
+  }, [currentTrack, songs.length])
 
   const togglePlay = () => {
     const audio = audioRef.current
@@ -230,9 +235,8 @@ export default function MusicPlayer() {
       {/* Audio Element */}
       <audio
         ref={audioRef}
-        src={songs[currentTrack]?.file}
+        src={songs[currentTrack]?.file || undefined}
         preload="auto"
-        crossOrigin="anonymous"
         onLoadedMetadata={() => {
           if (audioRef.current) {
             setProgress(0)
@@ -241,6 +245,16 @@ export default function MusicPlayer() {
         onError={(e) => {
           console.error('Audio loading error:', e)
           console.error('Failed to load:', songs[currentTrack]?.file)
+          const audio = e.currentTarget
+          if (audio.error?.code === audio.error?.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+            console.error('Media source not supported. Trying to reload...')
+            // Try reloading after a short delay
+            setTimeout(() => {
+              if (audioRef.current && songs[currentTrack]?.file) {
+                audioRef.current.load()
+              }
+            }, 1000)
+          }
         }}
       />
     </>

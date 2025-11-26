@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Play, Pause, SkipForward, SkipBack, Search, Music2, Shuffle, Repeat, Volume2, VolumeX } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { getProxyAudioUrl } from '@/lib/music-helpers'
 
 interface Song {
   id: string
@@ -118,9 +119,14 @@ export default function MusicPlayerPage() {
 
     const currentSong = filteredSongs[currentTrack]
     if (currentSong) {
-      audio.src = currentSong.file_url
+      const proxyUrl = getProxyAudioUrl(currentSong.file_url) || currentSong.file_url
+      audio.src = proxyUrl
+      audio.load() // Reload the audio element with new source
       if (isPlaying) {
-        audio.play().catch(console.error)
+        audio.play().catch((error) => {
+          console.error('Error playing audio:', error)
+          setIsPlaying(false)
+        })
       }
     }
   }, [currentTrack, filteredSongs, isPlaying])
@@ -399,7 +405,18 @@ export default function MusicPlayerPage() {
       </div>
 
       {/* Audio Element */}
-      <audio ref={audioRef} preload="metadata" />
+      <audio 
+        ref={audioRef} 
+        preload="metadata"
+        onError={(e) => {
+          console.error('Audio loading error:', e)
+          const audio = e.currentTarget
+          if (audio.error) {
+            console.error('Audio error code:', audio.error.code)
+            console.error('Failed to load:', filteredSongs[currentTrack]?.file_url)
+          }
+        }}
+      />
     </div>
   )
 }
