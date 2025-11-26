@@ -188,8 +188,8 @@ function TimelineEventCard({ event, index, isActive, onActivate }: TimelineEvent
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                  More details coming soon...
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {milestone.description || 'This milestone represents an important moment in the journey. Explore the timeline to learn more about the progression and achievements.'}
                 </p>
               )}
             </motion.div>

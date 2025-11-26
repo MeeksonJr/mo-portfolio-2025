@@ -166,34 +166,80 @@ export default function ResumeGenerator() {
   const handleGeneratePDF = async () => {
     setIsGenerating(true)
     try {
-      // In a real implementation, this would call an API to generate PDF
-      // For now, we'll create a downloadable HTML version
+      // Transform resume generator data to match ResumePDF format
       const resumeData = {
-        template: selectedTemplate,
-        personalInfo,
-        summary,
-        experiences,
-        educations,
-        skills,
-        certifications,
+        personal: {
+          name: personalInfo.fullName || 'Your Name',
+          title: summary.split('.')[0] || 'Professional', // Use first sentence of summary as title
+          email: personalInfo.email || '',
+          phone: personalInfo.phone || '',
+          location: personalInfo.location || '',
+          github: personalInfo.github?.startsWith('http') ? personalInfo.github : personalInfo.github ? `https://github.com/${personalInfo.github.replace(/^https?:\/\//, '').replace(/^github\.com\//, '')}` : '',
+          linkedin: personalInfo.linkedin?.startsWith('http') ? personalInfo.linkedin : personalInfo.linkedin ? `https://linkedin.com/in/${personalInfo.linkedin.replace(/^https?:\/\//, '').replace(/^linkedin\.com\/in\//, '')}` : '',
+          website: personalInfo.website || '',
+          summary: summary || '',
+        },
+        experience: experiences.map((exp) => ({
+          role: exp.title,
+          company: exp.company,
+          location: exp.location,
+          startDate: exp.startDate,
+          endDate: exp.current ? 'Present' : exp.endDate,
+          description: exp.description.split('\n').filter((line) => line.trim()),
+          achievements: exp.achievements || [],
+        })),
+        education: educations.map((edu) => ({
+          degree: edu.degree,
+          school: edu.institution,
+          location: edu.location,
+          startDate: edu.graduationDate ? new Date(edu.graduationDate).getFullYear().toString() : '',
+          endDate: edu.graduationDate ? new Date(edu.graduationDate).getFullYear().toString() : 'Present',
+          gpa: edu.gpa,
+          achievements: edu.honors ? [edu.honors] : [],
+        })),
+        skills: {
+          frontend: skills.filter((s) => s.category === 'Frontend').map((s) => s.name),
+          backend: skills.filter((s) => s.category === 'Backend').map((s) => s.name),
+          tools: skills.filter((s) => s.category === 'Tools').map((s) => s.name),
+          other: skills.filter((s) => !['Frontend', 'Backend', 'Tools'].includes(s.category)).map((s) => s.name),
+        },
+        projects: [], // Can be populated if needed
+        certifications: certifications.map((cert) => ({
+          name: cert.name,
+          issuer: cert.issuer,
+          date: cert.date,
+          expiryDate: cert.expiryDate,
+        })),
       }
 
-      const blob = new Blob([JSON.stringify(resumeData, null, 2)], {
-        type: 'application/json',
+      // Call PDF generation API
+      const response = await fetch('/api/resume/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: resumeData,
+          format: selectedTemplate === 'creative' ? 'creative' : selectedTemplate === 'classic' ? 'traditional' : 'ats',
+        }),
       })
-      const url = URL.createObjectURL(blob)
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${personalInfo.fullName || 'resume'}-data.json`
+      a.download = `${personalInfo.fullName || 'resume'}-${selectedTemplate}-${new Date().getFullYear()}.pdf`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+      window.URL.revokeObjectURL(url)
 
-      showSuccessToast('Resume data exported! PDF generation coming soon.')
+      showSuccessToast('Resume PDF generated and downloaded successfully!')
     } catch (error) {
-      showErrorToast('Failed to generate resume')
-      console.error(error)
+      console.error('Error generating PDF:', error)
+      showErrorToast('Failed to generate PDF. Please try again.')
     } finally {
       setIsGenerating(false)
     }

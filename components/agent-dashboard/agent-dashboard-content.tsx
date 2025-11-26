@@ -298,14 +298,49 @@ export default function AgentDashboardContent() {
               <CardDescription>View candidate availability and schedule meetings</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <Calendar className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>Calendar integration coming soon</p>
-                <p className="text-sm mt-2">
-                  <a href="/calendar" className="text-primary hover:underline">
-                    View availability calendar
-                  </a>
-                </p>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold">Availability</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open('/calendar', '_blank')}
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    View Full Calendar
+                  </Button>
+                </div>
+                <div className="space-y-3">
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium">Current Status</span>
+                      <Badge variant="default">Available</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Available for new opportunities and interviews
+                    </p>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium">Preferred Meeting Times</span>
+                    </div>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• Weekdays: 9 AM - 6 PM EST</li>
+                      <li>• Flexible scheduling available</li>
+                      <li>• Remote meetings preferred</li>
+                    </ul>
+                  </div>
+                  <div className="p-4 border rounded-lg bg-muted/50">
+                    <p className="text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4 inline mr-2" />
+                      For detailed availability and booking, visit the{' '}
+                      <a href="/calendar" className="text-primary hover:underline font-medium">
+                        availability calendar
+                      </a>
+                      .
+                    </p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

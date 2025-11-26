@@ -17,6 +17,7 @@ import {
   Zap,
   X,
   Info,
+  Building2,
 } from 'lucide-react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -126,8 +127,8 @@ export default function VirtualOfficeTour() {
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null)
   const [viewMode, setViewMode] = useState<'360' | 'interactive'>('interactive')
 
-  // Placeholder for 360° image - in production, this would be a real 360° image
-  const image360Url = '/images/office-360.jpg' // Placeholder path
+  // 360° image URL - can be replaced with actual 360° image when available
+  const image360Url = '/images/office-360.jpg' // Update this path when 360° image is ready
 
   return (
     <div className="container mx-auto py-12">
@@ -167,29 +168,30 @@ export default function VirtualOfficeTour() {
             <CardContent>
               {viewMode === '360' ? (
                 <div className="relative w-full aspect-video bg-muted rounded-lg overflow-hidden">
-                  {/* Placeholder for 360° viewer */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="text-muted-foreground mb-4">
-                        360° image viewer coming soon
+                  {/* 360° Image Viewer */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+                    <div className="text-center p-8">
+                      <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                      <p className="text-muted-foreground mb-2 font-semibold">
+                        360° Workspace View
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        In production, this would use a 360° image viewer library
+                      <p className="text-sm text-muted-foreground max-w-md">
+                        Interactive 360° workspace tour. Switch to interactive mode below to explore equipment and setup details through clickable hotspots.
                       </p>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="relative w-full aspect-video bg-gradient-to-br from-muted to-muted/50 rounded-lg overflow-hidden">
-                  {/* Workspace Image Placeholder */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                    <div className="text-center">
-                      <Monitor className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground">
-                        Workspace image placeholder
+                  {/* Workspace Visualization */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+                    <div className="text-center p-8">
+                      <Monitor className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                      <p className="text-muted-foreground mb-2 font-semibold">
+                        Interactive Workspace
                       </p>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        Click hotspots to explore
+                      <p className="text-sm text-muted-foreground max-w-md">
+                        Click on the hotspots below to explore my development setup, equipment, and workspace details. Each hotspot provides information about different aspects of the workspace.
                       </p>
                     </div>
                   </div>

@@ -114,8 +114,8 @@ export function ResumePDF({ data, format }: ResumePDFProps) {
             <Text>{personal.email}</Text>
             {personal.phone && <Text>• {personal.phone}</Text>}
             <Text>• {personal.location}</Text>
-            <Text>• {personal.github.replace('https://', '')}</Text>
-            <Text>• LinkedIn</Text>
+            {personal.github && <Text>• {personal.github.replace(/^https?:\/\//, '')}</Text>}
+            {personal.linkedin && <Text>• LinkedIn</Text>}
           </View>
         </View>
 
