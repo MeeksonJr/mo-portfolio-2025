@@ -372,14 +372,22 @@ export default function LiveProjectShowcase() {
                   {/* Live Demo Tab */}
                   {selectedProject.homepage_url && (
                     <TabsContent value="demo" className="flex-1 m-0 p-0">
-                      <div className="h-full">
+                      <div className="h-full relative">
                         <iframe
                           src={selectedProject.homepage_url}
                           className="w-full h-full border-0"
                           title={`${selectedProject.name} Live Demo`}
-                          allow="camera; microphone; geolocation; encrypted-media"
-                          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+                          allow="camera; microphone; geolocation; encrypted-media; autoplay; fullscreen"
+                          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-top-navigation allow-downloads"
+                          referrerPolicy="no-referrer-when-downgrade"
                         />
+                        {!selectedProject.homepage_url.startsWith('http') && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                            <p className="text-muted-foreground">
+                              Invalid URL. Please provide a valid HTTP/HTTPS URL.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </TabsContent>
                   )}

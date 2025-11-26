@@ -7,8 +7,7 @@ import {
   validateMethod,
   parseJsonBody,
 } from '@/lib/api-optimization'
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
+import { callAI } from '@/lib/ai-providers'
 
 export const maxDuration = 60
 
@@ -124,9 +123,7 @@ Topics: ${repoData.topics?.join(', ') || 'None'}
 ${readmeData ? `\nREADME Preview: ${Buffer.from(readmeData.content, 'base64').toString('utf-8').substring(0, 1000)}` : ''}
 `
 
-      // Generate AI analysis
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
-
+      // Generate AI analysis using multi-provider fallback (Groq -> HuggingFace -> Gemini)
       const analysisPrompt = `
 Analyze this GitHub repository and provide a comprehensive analysis in JSON format.
 
@@ -170,9 +167,19 @@ Return the analysis as a JSON object with this structure:
 Be specific, actionable, and professional. Focus on practical insights that would help improve the repository.
 `
 
-      const result = await model.generateContent(analysisPrompt)
-      const response = await result.response
-      const text = response.text()
+      // Use multi-provider AI call (Groq -> HuggingFace -> Gemini)
+      const aiResponse = await callAI({
+        messages: [
+          {
+            role: 'user',
+            content: analysisPrompt,
+          },
+        ],
+        maxTokens: 4000,
+        temperature: 0.7,
+      })
+
+      const text = aiResponse.content
 
       // Parse AI response (handle markdown code blocks)
       let analysisJson = text

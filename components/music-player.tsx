@@ -24,9 +24,15 @@ export default function MusicPlayer() {
   useEffect(() => {
     const loadSongs = async () => {
       try {
-        const response = await fetch('/api/songs')
+        const response = await fetch('/api/music/songs')
+        if (!response.ok) throw new Error('Failed to fetch songs')
         const data = await response.json()
-        setSongs(data.songs || [])
+        // Transform API response to match component format
+        const transformedSongs = (data.songs || []).map((song: any) => ({
+          title: song.title || song.artist ? `${song.title}${song.artist ? ' - ' + song.artist : ''}` : 'Unknown',
+          file: song.file_url || song.file_path,
+        }))
+        setSongs(transformedSongs)
       } catch (error) {
         console.error('Failed to load songs:', error)
         // Fallback to hardcoded songs if API fails
@@ -222,7 +228,21 @@ export default function MusicPlayer() {
       </AnimatePresence>
 
       {/* Audio Element */}
-      <audio ref={audioRef} src={songs[currentTrack]?.file} />
+      <audio
+        ref={audioRef}
+        src={songs[currentTrack]?.file}
+        preload="auto"
+        crossOrigin="anonymous"
+        onLoadedMetadata={() => {
+          if (audioRef.current) {
+            setProgress(0)
+          }
+        }}
+        onError={(e) => {
+          console.error('Audio loading error:', e)
+          console.error('Failed to load:', songs[currentTrack]?.file)
+        }}
+      />
     </>
   )
 }

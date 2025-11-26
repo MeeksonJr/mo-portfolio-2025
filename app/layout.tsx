@@ -23,6 +23,7 @@ import VisitorProfileProvider from "@/components/personalization/visitor-profile
 import MobileBottomNav from "@/components/mobile/mobile-bottom-nav"
 import SkipToContent from "@/components/accessibility/skip-to-content"
 import CustomCursor from "@/components/ui/custom-cursor"
+import { TranslationProvider } from "@/components/i18n/translation-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -100,10 +101,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <PreferencesProvider>
-            <VisitorProfileProvider>
-              <ErrorHandler />
-              <ErrorBoundary>
-                {children}
+            <TranslationProvider>
+              <VisitorProfileProvider>
+                <ErrorHandler />
+                <ErrorBoundary>
+                  {children}
               <CommandPalette />
               <AchievementTracker />
               <KeyboardShortcutHint />
@@ -113,8 +115,9 @@ export default function RootLayout({
               <InstallPrompt />
               <OfflineIndicator />
               <FloatingActionMenu />
-            </ErrorBoundary>
-            </VisitorProfileProvider>
+                </ErrorBoundary>
+              </VisitorProfileProvider>
+            </TranslationProvider>
           </PreferencesProvider>
         </ThemeProvider>
         <Analytics />

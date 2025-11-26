@@ -9,24 +9,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { locales, localeNames, localeFlags, type Locale, detectLocale } from '@/lib/i18n/config'
+import { useTranslation } from './translation-provider'
 
 export default function LanguageSwitcher() {
-  const [currentLocale, setCurrentLocale] = useState<Locale>('en')
+  const { locale: currentLocale, setLocale } = useTranslation()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    const detected = detectLocale()
-    setCurrentLocale(detected)
   }, [])
 
   const handleLocaleChange = (locale: Locale) => {
-    setCurrentLocale(locale)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('locale', locale)
-      // Reload page to apply language change
-      window.location.reload()
-    }
+    setLocale(locale)
   }
 
   if (!mounted) {

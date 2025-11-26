@@ -17,8 +17,8 @@ export function middleware(request: NextRequest) {
     "img-src 'self' data: https: blob:",
     // Connections - API endpoints
     "connect-src 'self' https://*.vercel-analytics.com https://*.supabase.co https://api.github.com https://*.googleapis.com https://*.groq.com https://api-inference.huggingface.co wss://*.supabase.co",
-    // Frames - embedded content
-    "frame-src 'self' https://*.youtube.com https://*.vimeo.com https://*.cal.com",
+    // Frames - embedded content (allow all HTTPS for project demos)
+    "frame-src 'self' https: http:",
     // Media
     "media-src 'self' data: blob:",
     // Disallow object/embed
