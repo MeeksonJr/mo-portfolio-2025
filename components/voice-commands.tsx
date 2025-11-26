@@ -152,6 +152,16 @@ export default function VoiceCommands() {
       description: 'Navigate to live coding terminal',
     },
     {
+      command: 'go to activity status',
+      action: () => router.push('/activity-status'),
+      description: 'Navigate to activity status',
+    },
+    {
+      command: 'go to progress indicators',
+      action: () => router.push('/progress-indicators'),
+      description: 'Navigate to progress indicators',
+    },
+    {
       command: 'go to learning paths',
       action: () => router.push('/learning-paths'),
       description: 'Navigate to learning paths',

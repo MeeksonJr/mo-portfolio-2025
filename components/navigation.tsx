@@ -55,6 +55,8 @@ export default function Navigation() {
     { name: "Resume Generator", href: "/resume-generator" },
     { name: "Office Tour", href: "/office-tour" },
     { name: "Live Coding", href: "/live-coding" },
+    { name: "Activity Status", href: "/activity-status" },
+    { name: "Progress Indicators", href: "/progress-indicators" },
   ]
 
   // Tools dropdown - Interactive tools and utilities

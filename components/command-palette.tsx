@@ -43,6 +43,7 @@ import {
   TrendingUp,
   Monitor,
   Terminal,
+  Radio,
 } from 'lucide-react'
 import { GlobalSearch } from '@/components/search/global-search'
 
@@ -220,6 +221,18 @@ export default function CommandPalette() {
           >
             <Terminal className="mr-2 h-4 w-4" />
             <span>Live Coding Terminal</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/activity-status'))}
+          >
+            <Radio className="mr-2 h-4 w-4" />
+            <span>Activity Status</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/progress-indicators'))}
+          >
+            <Target className="mr-2 h-4 w-4" />
+            <span>Progress Indicators</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/learning-paths'))}
