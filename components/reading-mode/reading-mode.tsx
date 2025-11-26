@@ -87,6 +87,30 @@ export default function ReadingMode({ children, title, estimatedReadingTime }: R
     }
   }, [isReadingMode, localTheme, theme])
 
+  // Keyboard shortcut: R to toggle reading mode
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Only trigger if not typing in an input/textarea
+      if (
+        e.key === 'r' || e.key === 'R'
+      ) {
+        const target = e.target as HTMLElement
+        if (
+          target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable
+        ) {
+          return
+        }
+        e.preventDefault()
+        toggleReadingMode()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [isReadingMode])
+
   const toggleReadingMode = () => {
     setIsReadingMode(!isReadingMode)
     if (!isReadingMode) {

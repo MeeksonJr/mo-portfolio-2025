@@ -43,6 +43,7 @@ interface GlobalSearchProps {
 export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
+  const [suggestions, setSuggestions] = useState<string[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [recentSearches, setRecentSearches] = useState<string[]>([])
   const [selectedFilter, setSelectedFilter] = useState<string>('all')
@@ -56,6 +57,20 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
       setRecentSearches(JSON.parse(stored))
     }
   }, [])
+
+  // Generate autocomplete suggestions
+  useEffect(() => {
+    if (query.length >= 1 && query.length < 2) {
+      // Show suggestions from recent searches and common terms
+      const commonTerms = ['react', 'next.js', 'typescript', 'javascript', 'node.js', 'supabase', 'tailwind', 'ai', 'portfolio', 'projects', 'blog']
+      const filtered = [...recentSearches, ...commonTerms]
+        .filter(term => term.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 5)
+      setSuggestions(filtered)
+    } else {
+      setSuggestions([])
+    }
+  }, [query, recentSearches])
 
   // Perform search
   useEffect(() => {
@@ -100,6 +115,11 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     onOpenChange(false)
     router.push(result.url)
     setQuery('')
+  }
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setQuery(suggestion)
+    performSearch(suggestion)
   }
 
   const clearRecentSearches = () => {
@@ -155,6 +175,22 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
               </Button>
             ))}
           </div>
+        )}
+
+        {/* Autocomplete Suggestions */}
+        {query.length >= 1 && query.length < 2 && suggestions.length > 0 && (
+          <CommandGroup heading="Suggestions">
+            {suggestions.map((suggestion, idx) => (
+              <CommandItem
+                key={idx}
+                onSelect={() => handleSuggestionClick(suggestion)}
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <span>{suggestion}</span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
         )}
 
         {/* Search Results */}

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import SocialShareButton from '@/components/social-share/social-share-button'
 import { ContentPerformanceInsights } from '@/components/analytics/content-performance-insights'
+import SmartRecommendations from '@/components/recommendations/smart-recommendations'
 
 interface Project {
   id: string
@@ -190,6 +191,21 @@ export default function ProjectContent({ project, relatedProjects }: ProjectCont
           </div>
         </section>
       )}
+
+      {/* Smart Recommendations - You might also like */}
+      <div className="mt-16 pt-8 border-t">
+        <SmartRecommendations
+          currentItem={{
+            id: project.id,
+            title: project.name,
+            description: project.description || '',
+            type: 'project',
+            tags: project.tech_stack || [],
+          }}
+          contentType="project"
+          limit={3}
+        />
+      </div>
 
       {/* Content Performance Insights */}
       <div className="mt-16 pt-8 border-t">
