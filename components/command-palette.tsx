@@ -259,40 +259,16 @@ export default function CommandPalette() {
             <span>AI Portfolio Assistant</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => router.push('/analytics'))}
+            onSelect={() => runCommand(() => router.push('/insights'))}
           >
             <BarChart3 className="mr-2 h-4 w-4" />
-            <span>Portfolio Analytics</span>
+            <span>Insights Hub</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/calendar'))}
           >
             <Calendar className="mr-2 h-4 w-4" />
             <span>Book a Meeting</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/projects-timeline'))}
-          >
-            <Calendar className="mr-2 h-4 w-4" />
-            <span>Project Timeline</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/skills-tree'))}
-          >
-            <Target className="mr-2 h-4 w-4" />
-            <span>Interactive Skill Tree</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/activity'))}
-          >
-            <Activity className="mr-2 h-4 w-4" />
-            <span>Live Activity Feed</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/recommendations'))}
-          >
-            <Sparkles className="mr-2 h-4 w-4" />
-            <span>AI Recommendations</span>
           </CommandItem>
         </CommandGroup>
 

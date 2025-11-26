@@ -69,11 +69,7 @@ export default function Navigation() {
 
   // Analytics & Data dropdown - Data visualization and insights
   const analyticsLinks = [
-    { name: "Analytics", href: "/analytics" },
-    { name: "Activity Feed", href: "/activity" },
-    { name: "Recommendations", href: "/recommendations" },
-    { name: "Project Timeline", href: "/projects-timeline" },
-    { name: "Skill Tree", href: "/skills-tree" },
+    { name: "Insights Hub", href: "/insights" },
   ]
 
   // Developer dropdown - Code and technical content

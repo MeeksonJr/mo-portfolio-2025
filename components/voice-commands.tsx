@@ -234,29 +234,14 @@ export default function VoiceCommands() {
     },
     // Analytics & Data
     {
-      command: 'go to analytics',
-      action: () => router.push('/analytics'),
-      description: 'Navigate to analytics dashboard',
+      command: 'go to insights',
+      action: () => router.push('/insights'),
+      description: 'Navigate to insights hub',
     },
     {
-      command: 'go to activity',
-      action: () => router.push('/activity'),
-      description: 'Navigate to activity feed',
-    },
-    {
-      command: 'go to recommendations',
-      action: () => router.push('/recommendations'),
-      description: 'Navigate to content recommendations',
-    },
-    {
-      command: 'go to project timeline',
-      action: () => router.push('/projects-timeline'),
-      description: 'Navigate to project timeline',
-    },
-    {
-      command: 'go to skill tree',
-      action: () => router.push('/skills-tree'),
-      description: 'Navigate to skill tree',
+      command: 'go to insights hub',
+      action: () => router.push('/insights'),
+      description: 'Navigate to insights hub',
     },
     // Developer Tools
     {
