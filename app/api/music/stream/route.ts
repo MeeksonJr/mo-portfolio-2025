@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 /**
  * Proxy route to stream audio files from Supabase storage
@@ -59,40 +57,56 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid file path format' }, { status: 400 })
     }
 
-    // Create Supabase client
-    const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
     // Get range header for partial content support (audio streaming)
     const range = request.headers.get('range')
     
-    // Download file from Supabase storage
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .download(filePathInBucket, {
-        transform: {
-          width: undefined,
-          height: undefined,
-        },
-      })
+    // Construct the public URL for the file
+    const publicUrl = `${supabaseUrl}/storage/v1/object/public/${bucket}/${filePathInBucket}`
+    
+    // Fetch the file directly from Supabase public storage
+    const fetchOptions: RequestInit = {
+      headers: range ? { Range: range } : {},
+    }
+    
+    const response = await fetch(publicUrl, fetchOptions)
 
-    if (error) {
-      console.error('Error downloading file from Supabase:', error)
-      return NextResponse.json({ error: 'Failed to fetch file' }, { status: 500 })
+    if (!response.ok) {
+      console.error('Error fetching file from Supabase:', response.status, response.statusText)
+      console.error('URL:', publicUrl)
+      return NextResponse.json({ 
+        error: 'Failed to fetch file', 
+        details: `HTTP ${response.status}: ${response.statusText}`
+      }, { status: response.status })
     }
 
-    if (!data) {
-      return NextResponse.json({ error: 'File not found' }, { status: 404 })
-    }
-
-    // Convert blob to array buffer
-    const arrayBuffer = await data.arrayBuffer()
+    // Get the file as array buffer
+    const arrayBuffer = await response.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    // Determine content type
-    const contentType = getContentType(filePathInBucket)
+    // Determine content type (prefer response header, fallback to file extension)
+    const contentType = response.headers.get('Content-Type') || getContentType(filePathInBucket)
 
     // Handle range requests for audio streaming
-    if (range) {
+    if (range && response.status === 206) {
+      // If Supabase already handled the range request, forward the response
+      const contentRange = response.headers.get('Content-Range')
+      const contentLength = response.headers.get('Content-Length')
+      
+      return new NextResponse(buffer, {
+        status: 206,
+        headers: {
+          'Content-Range': contentRange || `bytes 0-${buffer.length - 1}/${buffer.length}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': contentLength || buffer.length.toString(),
+          'Content-Type': contentType,
+          'Cache-Control': 'public, max-age=31536000, immutable',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+          'Access-Control-Allow-Headers': 'Range',
+        },
+      })
+    } else if (range) {
+      // Handle range request manually if Supabase didn't
       const parts = range.replace(/bytes=/, '').split('-')
       const start = parseInt(parts[0], 10)
       const end = parts[1] ? parseInt(parts[1], 10) : buffer.length - 1
@@ -128,7 +142,11 @@ export async function GET(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Error in music stream API:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Error stack:', error?.stack)
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error?.message || 'Unknown error'
+    }, { status: 500 })
   }
 }
 
