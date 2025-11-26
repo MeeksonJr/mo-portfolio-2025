@@ -46,16 +46,10 @@ export default function Navigation() {
     { name: "Architecture", href: "/architecture" },
     { name: "Collaboration", href: "/collaboration" },
     { name: "Resources", href: "/resources" },
-    { name: "Learning Paths", href: "/learning-paths" },
     { name: "Testimonials", href: "/testimonials" },
     { name: "Timeline", href: "/timeline" },
     { name: "Music", href: "/music" },
     { name: "Achievements", href: "/achievements" },
-    { name: "Dashboard", href: "/dashboard" },
-    { name: "Office Tour", href: "/office-tour" },
-    { name: "Live Coding", href: "/live-coding" },
-    { name: "Activity Status", href: "/activity-status" },
-    { name: "Progress Indicators", href: "/progress-indicators" },
   ]
 
   // Tools dropdown - Interactive tools and utilities
@@ -74,7 +68,6 @@ export default function Navigation() {
 
   // Developer dropdown - Code and technical content
   const developerLinks = [
-    { name: "Uses", href: "/uses" },
     { name: "Calendar", href: "/calendar" },
   ]
 

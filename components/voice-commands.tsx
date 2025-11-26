@@ -132,14 +132,14 @@ export default function VoiceCommands() {
       description: 'Navigate to resources',
     },
     {
-      command: 'go to dashboard',
-      action: () => router.push('/dashboard'),
-      description: 'Navigate to personal dashboard',
+      command: 'go to about',
+      action: () => router.push('/about'),
+      description: 'Navigate to about hub',
     },
     {
-      command: 'go to office tour',
-      action: () => router.push('/office-tour'),
-      description: 'Navigate to virtual office tour',
+      command: 'go to about hub',
+      action: () => router.push('/about'),
+      description: 'Navigate to about hub',
     },
     {
       command: 'go to code hub',
@@ -150,21 +150,6 @@ export default function VoiceCommands() {
       command: 'go to code',
       action: () => router.push('/code'),
       description: 'Navigate to code hub',
-    },
-    {
-      command: 'go to activity status',
-      action: () => router.push('/activity-status'),
-      description: 'Navigate to activity status',
-    },
-    {
-      command: 'go to progress indicators',
-      action: () => router.push('/progress-indicators'),
-      description: 'Navigate to progress indicators',
-    },
-    {
-      command: 'go to learning paths',
-      action: () => router.push('/learning-paths'),
-      description: 'Navigate to learning paths',
     },
     {
       command: 'go to testimonials',
@@ -248,11 +233,6 @@ export default function VoiceCommands() {
       command: 'go to code snippets',
       action: () => router.push('/code'),
       description: 'Navigate to code snippet library',
-    },
-    {
-      command: 'go to uses',
-      action: () => router.push('/uses'),
-      description: 'Navigate to uses page',
     },
     {
       command: 'go to calendar',

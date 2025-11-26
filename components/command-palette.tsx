@@ -199,10 +199,10 @@ export default function CommandPalette() {
             <span>Resources</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => router.push('/dashboard'))}
+            onSelect={() => runCommand(() => router.push('/about'))}
           >
-            <TrendingUp className="mr-2 h-4 w-4" />
-            <span>Personal Dashboard</span>
+            <User className="mr-2 h-4 w-4" />
+            <span>About Hub</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/resume'))}
@@ -211,34 +211,10 @@ export default function CommandPalette() {
             <span>Resume Hub</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => router.push('/office-tour'))}
-          >
-            <Monitor className="mr-2 h-4 w-4" />
-            <span>Virtual Office Tour</span>
-          </CommandItem>
-          <CommandItem
             onSelect={() => runCommand(() => router.push('/code'))}
           >
             <Code2 className="mr-2 h-4 w-4" />
             <span>Code Hub</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/activity-status'))}
-          >
-            <Radio className="mr-2 h-4 w-4" />
-            <span>Activity Status</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/progress-indicators'))}
-          >
-            <Target className="mr-2 h-4 w-4" />
-            <span>Progress Indicators</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/learning-paths'))}
-          >
-            <Target className="mr-2 h-4 w-4" />
-            <span>Learning Paths</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/tools'))}
