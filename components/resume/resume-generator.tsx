@@ -362,8 +362,31 @@ export default function ResumeGenerator() {
                     size="sm"
                     className="mt-2"
                     onClick={async () => {
-                      // AI-powered summary generation
-                      showInfoToast('AI summary generation coming soon!')
+                      try {
+                        showInfoToast('Generating AI summary...')
+                        const response = await fetch('/api/ai-summary', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            personalInfo,
+                            experiences,
+                            educations,
+                            skills,
+                            certifications,
+                          }),
+                        })
+
+                        if (response.ok) {
+                          const data = await response.json()
+                          setSummary(data.summary || '')
+                          showSuccessToast('AI summary generated!')
+                        } else {
+                          throw new Error('Failed to generate summary')
+                        }
+                      } catch (error) {
+                        console.error('Error generating AI summary:', error)
+                        showErrorToast('Failed to generate AI summary. Please try again.')
+                      }
                     }}
                   >
                     <Sparkles className="h-4 w-4 mr-2" />

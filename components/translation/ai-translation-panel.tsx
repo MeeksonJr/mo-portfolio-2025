@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { locales, localeNames, localeFlags, type Locale } from '@/lib/i18n/config'
+import { showSuccessToast, showErrorToast } from '@/lib/toast-helpers'
 
 export default function AITranslationPanel() {
   const [sourceText, setSourceText] = useState('')
@@ -34,13 +35,24 @@ export default function AITranslationPanel() {
 
       if (response.ok) {
         const data = await response.json()
-        setTranslatedText(data.translatedText || 'Translation would appear here...')
+        if (data.error) {
+          setTranslatedText(sourceText) // Return original text if error
+          showErrorToast('Translation failed. Original text returned.')
+        } else {
+          setTranslatedText(data.translatedText || sourceText)
+          if (data.translatedText) {
+            showSuccessToast('Translation completed!')
+          }
+        }
       } else {
-        // Fallback: show placeholder
-        setTranslatedText('Translation would appear here... (API not configured)')
+        const errorData = await response.json().catch(() => ({}))
+        setTranslatedText(sourceText) // Return original text as fallback
+        showErrorToast(errorData.error || 'Translation failed. Please try again.')
       }
     } catch (error) {
-      setTranslatedText('Translation would appear here... (API not configured)')
+      console.error('Translation error:', error)
+      setTranslatedText(sourceText) // Return original text as fallback
+      showErrorToast('Translation service unavailable. Please try again later.')
     } finally {
       setIsTranslating(false)
     }

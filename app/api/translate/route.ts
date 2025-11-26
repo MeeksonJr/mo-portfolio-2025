@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { callAI } from '@/lib/ai-providers'
 import type { Locale } from '@/lib/i18n/config'
 
 export async function POST(request: NextRequest) {
@@ -13,10 +13,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // In a real implementation, use Gemini AI for translation
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
-
     const localeNames: Record<Locale, string> = {
       en: 'English',
       fr: 'French',
@@ -29,23 +25,27 @@ export async function POST(request: NextRequest) {
     ${text}`
 
     try {
-      const result = await model.generateContent(prompt)
-      const response = await result.response
-      const translatedText = response.text()
+      const aiResponse = await callAI({
+        messages: [{ role: 'user', content: prompt }],
+        maxTokens: 1000,
+      })
 
       return NextResponse.json({
-        translatedText,
+        translatedText: aiResponse.content.trim(),
         sourceLocale: 'en',
         targetLocale,
       })
     } catch (error) {
-      // Fallback: return placeholder if API fails
-      return NextResponse.json({
-        translatedText: `[Translation to ${localeNames[targetLocale as Locale] || targetLocale} would appear here]`,
-        sourceLocale: 'en',
-        targetLocale,
-        note: 'Translation API not fully configured',
-      })
+      console.error('Translation error:', error)
+      return NextResponse.json(
+        { 
+          error: 'Failed to translate text',
+          translatedText: text, // Return original text as fallback
+          sourceLocale: 'en',
+          targetLocale,
+        },
+        { status: 500 }
+      )
     }
   } catch (error) {
     console.error('Translation error:', error)

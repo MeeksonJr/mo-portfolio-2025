@@ -48,10 +48,14 @@ const TeamCollaborationProof = () => {
 
   const fetchCollaborationData = async () => {
     try {
-      // Fetch GitHub data
-      const response = await fetch('/api/github-repos')
-      if (response.ok) {
-        const data = await response.json()
+      // Fetch GitHub data in parallel
+      const [reposResponse, collaborationResponse] = await Promise.all([
+        fetch('/api/github-repos'),
+        fetch('/api/github-collaboration'),
+      ])
+
+      if (reposResponse.ok) {
+        const data = await reposResponse.json()
         
         // Calculate stats from repositories
         const totalContributions = data.repositories?.reduce((acc: number, repo: any) => 
@@ -69,43 +73,56 @@ const TeamCollaborationProof = () => {
             isTeamProject: true
           })) || []
 
-        // Mock recent activity (in real implementation, fetch from GitHub API)
-        const recentActivity = [
-          {
-            date: '2024-11-20',
-            type: 'pr' as const,
-            repo: 'edusphere-ai',
-            description: 'Merged PR: Enhanced AI features'
-          },
-          {
-            date: '2024-11-18',
-            type: 'review' as const,
-            repo: 'interview-prep-ai',
-            description: 'Code review: Performance optimizations'
-          },
-          {
-            date: '2024-11-15',
-            type: 'commit' as const,
-            repo: 'portfolio-2025',
-            description: 'Collaborative feature: Architecture showcase'
+        // Fetch real collaboration data
+        let pullRequests = 0
+        let codeReviews = 0
+        let issues = 0
+        let recentActivity: Array<{
+          date: string
+          type: 'commit' | 'pr' | 'issue' | 'review'
+          repo: string
+          description: string
+        }> = []
+
+        if (collaborationResponse.ok) {
+          const collaborationData = await collaborationResponse.json()
+          pullRequests = collaborationData.pullRequests || 0
+          codeReviews = collaborationData.codeReviews || 0
+          issues = collaborationData.issues || 0
+          recentActivity = collaborationData.recentActivity || []
+        }
+
+        // Calculate language distribution from repositories
+        const languageMap = new Map<string, number>()
+        data.repositories?.forEach((repo: any) => {
+          if (repo.language) {
+            languageMap.set(repo.language, (languageMap.get(repo.language) || 0) + 1)
           }
-        ]
+        })
+        const totalReposWithLanguages = Array.from(languageMap.values()).reduce((a, b) => a + b, 0)
+        const languages = Array.from(languageMap.entries())
+          .map(([name, count]) => ({
+            name,
+            percentage: Math.round((count / totalReposWithLanguages) * 100),
+          }))
+          .sort((a, b) => b.percentage - a.percentage)
+          .slice(0, 4)
 
         setStats({
           totalContributions: totalContributions,
           repositories: data.repositories?.length || 0,
-          pullRequests: 45, // Mock data
-          codeReviews: 32, // Mock data
-          issues: 28, // Mock data
-          stars: data.user?.public_repos || 0,
-          forks: data.repositories?.reduce((acc: number, repo: any) => acc + (repo.forks_count || 0), 0) || 0,
-          languages: [
+          pullRequests,
+          codeReviews,
+          issues,
+          stars: data.stats?.total_stars || 0,
+          forks: data.stats?.total_forks || 0,
+          languages: languages.length > 0 ? languages : [
             { name: 'TypeScript', percentage: 45 },
             { name: 'JavaScript', percentage: 30 },
             { name: 'Python', percentage: 15 },
             { name: 'Other', percentage: 10 }
           ],
-          recentActivity
+          recentActivity: recentActivity.length > 0 ? recentActivity : []
         })
 
         setTeamProjects(teamProjectsData)
