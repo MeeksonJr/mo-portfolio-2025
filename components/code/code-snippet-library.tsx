@@ -11,8 +11,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
 import { toast } from 'sonner'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism'
@@ -330,10 +328,8 @@ export default function CodeSnippetLibrary() {
   }
 
   return (
-    <>
-      <Navigation />
-      <div className="min-h-screen bg-background pt-20 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="w-full">
+        <div className="w-full">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -570,9 +566,7 @@ export default function CodeSnippetLibrary() {
             </motion.div>
           </div>
         </div>
-      </div>
-      <FooterLight />
-    </>
+    </div>
   )
 }
 

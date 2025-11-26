@@ -147,9 +147,14 @@ export default function VoiceCommands() {
       description: 'Navigate to virtual office tour',
     },
     {
-      command: 'go to live coding',
-      action: () => router.push('/live-coding'),
-      description: 'Navigate to live coding terminal',
+      command: 'go to code hub',
+      action: () => router.push('/code'),
+      description: 'Navigate to code hub',
+    },
+    {
+      command: 'go to code',
+      action: () => router.push('/code'),
+      description: 'Navigate to code hub',
     },
     {
       command: 'go to activity status',
@@ -300,11 +305,6 @@ export default function VoiceCommands() {
       action: () => router.push('/agent-dashboard'),
       description: 'Navigate to agent dashboard',
     },
-    {
-      command: 'go to portfolio code',
-      action: () => router.push('/portfolio-code'),
-      description: 'Navigate to portfolio code viewer',
-    },
     // Utilities
     {
       command: 'open command palette',
@@ -358,16 +358,6 @@ export default function VoiceCommands() {
       command: 'go to project analyzer',
       action: () => router.push('/project-analyzer'),
       description: 'Navigate to project analyzer',
-    },
-    {
-      command: 'go to code playground',
-      action: () => router.push('/code-playground'),
-      description: 'Navigate to code playground',
-    },
-    {
-      command: 'go to code review',
-      action: () => router.push('/code-review'),
-      description: 'Navigate to code review simulator',
     },
     {
       command: 'analyze project',

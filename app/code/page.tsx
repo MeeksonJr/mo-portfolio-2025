@@ -1,15 +1,25 @@
 import { Metadata } from 'next'
-import CodeSnippetLibrary from '@/components/code/code-snippet-library'
+import Navigation from '@/components/navigation'
+import FooterLight from '@/components/footer-light'
+import CodeHub from '@/components/code/code-hub'
 import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
-  title: 'Code Snippets Library | Mohamed Datt',
-  description: 'Browse and learn from real production code snippets. Searchable library of code examples with syntax highlighting, categorized by technology and use case.',
+  title: 'Code Hub | Mohamed Datt',
+  description: 'Explore, learn, and interact with real production code. Interactive playgrounds, code reviews, portfolio source code, and a searchable library of code snippets.',
   type: 'website',
-  tags: ['code snippets', 'code examples', 'programming', 'tutorials', 'Mohamed Datt'],
+  tags: ['code', 'programming', 'code examples', 'code review', 'portfolio code', 'Mohamed Datt'],
 })
 
 export default function CodePage() {
-  return <CodeSnippetLibrary />
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <main id="main-content" role="main" className="pt-20" tabIndex={-1}>
+        <CodeHub />
+      </main>
+      <FooterLight />
+    </div>
+  )
 }
 

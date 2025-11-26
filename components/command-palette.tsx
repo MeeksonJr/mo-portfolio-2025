@@ -217,10 +217,10 @@ export default function CommandPalette() {
             <span>Virtual Office Tour</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => router.push('/live-coding'))}
+            onSelect={() => runCommand(() => router.push('/code'))}
           >
-            <Terminal className="mr-2 h-4 w-4" />
-            <span>Live Coding Terminal</span>
+            <Code2 className="mr-2 h-4 w-4" />
+            <span>Code Hub</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/activity-status'))}
@@ -293,18 +293,6 @@ export default function CommandPalette() {
           >
             <Calendar className="mr-2 h-4 w-4" />
             <span>Book a Meeting</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/code'))}
-          >
-            <Code2 className="mr-2 h-4 w-4" />
-            <span>Code Snippets Library</span>
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => router.push('/code-review'))}
-          >
-            <Code2 className="mr-2 h-4 w-4" />
-            <span>Code Review Simulator</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/projects-timeline'))}

@@ -1,10 +1,10 @@
 # Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
-.env
-.env.local*
-.pnpm-store/
-.next/
-.git/
-.github/
-.vscode/
-.cursorignore
-.cursorignore
+!.env
+!.env.local*
+!.pnpm-store/
+!.next/
+!.git/
+!.github/
+!.vscode/
+!.cursorignore
+!.cursorignore

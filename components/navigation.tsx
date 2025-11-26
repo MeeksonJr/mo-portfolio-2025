@@ -63,9 +63,7 @@ export default function Navigation() {
   const toolsLinks = [
     { name: "AI Assistant", href: "/portfolio-assistant" },
     { name: "Project Analyzer", href: "/project-analyzer" },
-    { name: "Code Playground", href: "/code-playground" },
-    { name: "Code Review Simulator", href: "/code-review" },
-    { name: "Portfolio Code", href: "/portfolio-code" },
+    { name: "Code Hub", href: "/code" },
     { name: "Skills Match", href: "/skills-match" },
     { name: "ROI Calculator", href: "/roi-calculator" },
     { name: "Assessment", href: "/assessment" },
@@ -86,7 +84,6 @@ export default function Navigation() {
 
   // Developer dropdown - Code and technical content
   const developerLinks = [
-    { name: "Code Snippets", href: "/code" },
     { name: "Uses", href: "/uses" },
     { name: "Calendar", href: "/calendar" },
   ]
