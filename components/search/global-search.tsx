@@ -20,19 +20,24 @@ import {
   Wrench,
   Clock,
   X,
+  Code2,
+  Layers,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { searchHubs, HUB_SEARCH_DATA, type Hub, type HubTab } from '@/lib/hub-search-data'
 
 interface SearchResult {
   id: string
-  type: 'blog' | 'project' | 'case-study' | 'resource'
+  type: 'blog' | 'project' | 'case-study' | 'resource' | 'hub' | 'hub-tab'
   title: string
   description: string | null
   url: string
   category?: string | null
   tags?: string[] | null
   date?: string | null
+  hubId?: string
+  tabValue?: string
 }
 
 interface GlobalSearchProps {
@@ -50,6 +55,14 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const router = useRouter()
   const debouncedQuery = useDebounce(query, 300)
 
+  // Hub search results
+  const hubResults = useMemo(() => {
+    if (debouncedQuery.length >= 2) {
+      return searchHubs(debouncedQuery)
+    }
+    return []
+  }, [debouncedQuery])
+
   // Load recent searches from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('recent_searches')
@@ -61,9 +74,14 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   // Generate autocomplete suggestions
   useEffect(() => {
     if (query.length >= 1 && query.length < 2) {
-      // Show suggestions from recent searches and common terms
+      // Show suggestions from recent searches, hub names, and common terms
+      const hubNames = HUB_SEARCH_DATA.map(hub => hub.name.toLowerCase())
+      const hubTabNames = HUB_SEARCH_DATA.flatMap(hub => 
+        hub.tabs.map(tab => `${hub.name} ${tab.label}`.toLowerCase())
+      )
       const commonTerms = ['react', 'next.js', 'typescript', 'javascript', 'node.js', 'supabase', 'tailwind', 'ai', 'portfolio', 'projects', 'blog']
-      const filtered = [...recentSearches, ...commonTerms]
+      const allSuggestions = [...recentSearches, ...hubNames, ...hubTabNames, ...commonTerms]
+      const filtered = allSuggestions
         .filter(term => term.toLowerCase().includes(query.toLowerCase()))
         .slice(0, 5)
       setSuggestions(filtered)
@@ -80,16 +98,37 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
       setResults([])
       setIsSearching(false)
     }
-  }, [debouncedQuery, selectedFilter])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, selectedFilter, hubResults])
 
   const performSearch = async (searchQuery: string) => {
     setIsSearching(true)
     try {
-      const response = await fetch(
-        `/api/search?q=${encodeURIComponent(searchQuery)}&type=${selectedFilter}`
-      )
-      const data = await response.json()
-      setResults(data.results || [])
+      // Search content (blog, projects, etc.) - only if filter is not 'hub'
+      let contentResults: SearchResult[] = []
+      if (selectedFilter !== 'hub') {
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(searchQuery)}&type=${selectedFilter === 'all' ? 'all' : selectedFilter}`
+        )
+        const data = await response.json()
+        contentResults = data.results || []
+      }
+
+      // Add hub results if filter is 'all' or 'hub'
+      let hubSearchResults: SearchResult[] = []
+      if (selectedFilter === 'all' || selectedFilter === 'hub') {
+        hubSearchResults = hubResults.map(({ hub, tab, matchType }) => ({
+          id: `hub-${hub.id}${tab ? `-${tab.value}` : ''}`,
+          type: tab ? ('hub-tab' as const) : ('hub' as const),
+          title: tab ? `${hub.name} - ${tab.label}` : hub.name,
+          description: tab ? tab.description : hub.description,
+          url: tab ? `${hub.url}?tab=${tab.value}` : hub.url,
+          hubId: hub.id,
+          tabValue: tab?.value,
+        }))
+      }
+
+      setResults([...hubSearchResults, ...contentResults])
 
       // Save to recent searches
       if (searchQuery && !recentSearches.includes(searchQuery)) {
@@ -132,6 +171,8 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     project: FolderGit2,
     'case-study': BookOpen,
     resource: Wrench,
+    hub: Layers,
+    'hub-tab': Code2,
   }
 
   const typeLabels = {
@@ -139,31 +180,54 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
     project: 'Project',
     'case-study': 'Case Study',
     resource: 'Resource',
+    hub: 'Hub',
+    'hub-tab': 'Hub Tab',
   }
 
   const groupedResults = useMemo(() => {
     const grouped: Record<string, SearchResult[]> = {}
+    const hubGrouped: Record<string, SearchResult[]> = {}
+    
     results.forEach(result => {
-      if (!grouped[result.type]) {
-        grouped[result.type] = []
+      // Group hub results by hub
+      if (result.type === 'hub' || result.type === 'hub-tab') {
+        const hubId = result.hubId || 'other'
+        if (!hubGrouped[hubId]) {
+          hubGrouped[hubId] = []
+        }
+        hubGrouped[hubId].push(result)
+      } else {
+        // Group other results by type
+        if (!grouped[result.type]) {
+          grouped[result.type] = []
+        }
+        grouped[result.type].push(result)
       }
-      grouped[result.type].push(result)
     })
+
+    // Add hub groups to main grouped object
+    Object.keys(hubGrouped).forEach(hubId => {
+      const hub = HUB_SEARCH_DATA.find(h => h.id === hubId)
+      if (hub) {
+        grouped[`hub-${hubId}`] = hubGrouped[hubId]
+      }
+    })
+
     return grouped
   }, [results])
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandInput
-        placeholder="Search blog posts, projects, case studies, resources..."
+        placeholder="Search hubs, tabs, blog posts, projects, case studies, resources..."
         value={query}
         onValueChange={setQuery}
       />
       <CommandList>
         {/* Filters */}
         {query.length >= 2 && (
-          <div className="px-2 py-1.5 border-b flex gap-1">
-            {['all', 'blog', 'project', 'case-study', 'resource'].map(filter => (
+          <div className="px-2 py-1.5 border-b flex gap-1 flex-wrap">
+            {['all', 'hub', 'blog', 'project', 'case-study', 'resource'].map(filter => (
               <Button
                 key={filter}
                 variant={selectedFilter === filter ? 'default' : 'ghost'}
@@ -171,7 +235,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
                 onClick={() => setSelectedFilter(filter)}
                 className="h-7 text-xs"
               >
-                {filter === 'all' ? 'All' : typeLabels[filter as keyof typeof typeLabels]}
+                {filter === 'all' ? 'All' : typeLabels[filter as keyof typeof typeLabels] || filter}
               </Button>
             ))}
           </div>
@@ -202,8 +266,50 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
           ) : results.length > 0 ? (
             <>
               {Object.entries(groupedResults).map(([type, items]) => {
+                // Handle hub grouping
+                if (type.startsWith('hub-')) {
+                  const hubId = type.replace('hub-', '')
+                  const hub = HUB_SEARCH_DATA.find(h => h.id === hubId)
+                  if (!hub) return null
+
+                  return (
+                    <CommandGroup key={type} heading={hub.name}>
+                      {items.map(result => {
+                        const Icon = result.type === 'hub-tab' ? Code2 : Layers
+                        return (
+                          <CommandItem
+                            key={result.id}
+                            onSelect={() => handleSelect(result)}
+                            className="flex items-start gap-3 py-3"
+                          >
+                            <Icon className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium truncate">
+                                {result.type === 'hub-tab' ? result.title.replace(`${hub.name} - `, '') : result.title}
+                              </div>
+                              {result.description && (
+                                <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                                  {result.description}
+                                </div>
+                              )}
+                              {result.type === 'hub-tab' && (
+                                <Badge variant="outline" className="text-xs h-4 mt-1">
+                                  {hub.name}
+                                </Badge>
+                              )}
+                            </div>
+                          </CommandItem>
+                        )
+                      })}
+                    </CommandGroup>
+                  )
+                }
+
+                // Handle other result types
                 const Icon = typeIcons[type as keyof typeof typeIcons]
                 const label = typeLabels[type as keyof typeof typeLabels]
+                if (!Icon || !label) return null
+
                 return (
                   <CommandGroup key={type} heading={label}>
                     {items.map(result => (
