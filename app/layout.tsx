@@ -26,6 +26,7 @@ import CustomCursor from "@/components/ui/custom-cursor"
 import { TranslationProvider } from "@/components/i18n/translation-provider"
 import KeyboardShortcutsHandler from "@/components/keyboard-shortcuts-handler"
 import KeyboardShortcutsModal from "@/components/keyboard-shortcuts-modal"
+import EnhancedKeyboardNavigation from "@/components/accessibility/enhanced-keyboard-navigation"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -115,6 +116,7 @@ export default function RootLayout({
                 <ErrorHandler />
                 <ErrorBoundary>
                   <KeyboardShortcutsHandler />
+                  <EnhancedKeyboardNavigation />
                   {children}
               <CommandPalette />
               <KeyboardShortcutsModal />
