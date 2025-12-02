@@ -2100,6 +2100,7 @@ content/
 - **Description:** Engaging first-time visitor experience
 - **Features:**
   - [x] Personalized welcome animation
+  - [x] Visitor type-based personalized messages (recruiter, company, agent, student, developer)
   - [x] Interactive tutorial (skip option)
   - [x] Feature highlights (9 key features)
   - [x] Quick wins (unlock "Tour Guide" achievement)
@@ -2108,11 +2109,12 @@ content/
   - [x] "Skip tour" option
   - [x] Direct links to featured pages
   - [x] Step-by-step navigation
+  - [x] Integration with visitor profiling system
   - [ ] Personalized recommendations - Future enhancement
 - **WOW Factor:** "This portfolio welcomes me and shows me around!"
-- **Tech:** Framer Motion, localStorage, Achievement system
+- **Tech:** Framer Motion, localStorage, Achievement system, Visitor Profiling
 - **Priority:** 🟡 Medium
-- **Status:** ✅ Completed
+- **Status:** ✅ Completed (Enhanced with personalization)
 
 #### 12. **Personalized Experience Engine** 🎨
 - **Description:** AI-powered personalization based on visitor behavior

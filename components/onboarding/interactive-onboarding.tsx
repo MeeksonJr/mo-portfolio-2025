@@ -5,13 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   X, ArrowRight, Sparkles, CheckCircle2, 
   Zap, Target, MessageCircle, FolderGit2,
-  Briefcase, GraduationCap, Calculator, Play
+  Briefcase, GraduationCap, Calculator, Play,
+  User, Building2, GraduationCap as School, Code
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import Link from 'next/link'
+import { usePersonalization } from '@/components/personalization/visitor-profile-provider'
 
 interface OnboardingStep {
   id: string
@@ -24,10 +26,41 @@ interface OnboardingStep {
   highlight?: string
 }
 
+// Get personalized welcome message based on visitor type
+const getWelcomeMessage = (visitorType?: string) => {
+  const messages: Record<string, { title: string; description: string }> = {
+    recruiter: {
+      title: 'Welcome, Recruiter! 👔',
+      description: 'I\'m Mohamed Datt, a Full Stack Developer. This tour will show you the tools designed specifically for recruiters - Quick Assessment, Skills Matching, and One-Click Resume. Let\'s get started!',
+    },
+    company: {
+      title: 'Welcome! 🏢',
+      description: 'I\'m Mohamed Datt, a Full Stack Developer. Discover how I can help your company with ROI calculations, live project demos, and technical expertise. This tour will guide you through everything.',
+    },
+    agent: {
+      title: 'Welcome, Agent! 🤝',
+      description: 'I\'m Mohamed Datt, a Full Stack Developer. This tour highlights the Candidate Summary, Portfolio Comparison, and Agent Dashboard - all designed to make your job easier.',
+    },
+    student: {
+      title: 'Welcome, Student! 🎓',
+      description: 'I\'m Mohamed Datt, a Full Stack Developer. Explore my learning paths, code snippets library, and project implementations. This tour will show you how to learn from my portfolio.',
+    },
+    developer: {
+      title: 'Welcome, Fellow Developer! 💻',
+      description: 'I\'m Mohamed Datt, a Full Stack Developer. Check out my code playground, technical architecture, and open-source projects. This tour will show you the technical side of my portfolio.',
+    },
+    default: {
+      title: 'Welcome to My Portfolio! 👋',
+      description: 'I\'m Mohamed Datt, a Full Stack Developer. This interactive tour will show you around. You can skip anytime!',
+    },
+  }
+  return messages[visitorType || 'default'] || messages.default
+}
+
 const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: 'welcome',
-    title: 'Welcome to My Portfolio! 👋',
+    title: 'Welcome to My Portfolio! 👋', // Will be overridden dynamically
     description: 'I\'m Mohamed Datt, a Full Stack Developer. This interactive tour will show you around. You can skip anytime!',
     icon: Sparkles,
   },
@@ -107,6 +140,20 @@ export default function InteractiveOnboarding() {
   const [isOpen, setIsOpen] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false)
+  const { profile } = usePersonalization()
+
+  // Get personalized welcome message
+  const welcomeMessage = getWelcomeMessage(profile?.type)
+  const personalizedSteps = ONBOARDING_STEPS.map((step, index) => {
+    if (index === 0) {
+      return {
+        ...step,
+        title: welcomeMessage.title,
+        description: welcomeMessage.description,
+      }
+    }
+    return step
+  })
 
   useEffect(() => {
     // Check if user has seen onboarding before
@@ -152,9 +199,9 @@ export default function InteractiveOnboarding() {
     }
   }
 
-  const currentStepData = ONBOARDING_STEPS[currentStep]
+  const currentStepData = personalizedSteps[currentStep]
   const Icon = currentStepData.icon
-  const progress = ((currentStep + 1) / ONBOARDING_STEPS.length) * 100
+  const progress = ((currentStep + 1) / personalizedSteps.length) * 100
 
   if (hasSeenOnboarding || !isOpen) {
     return null
@@ -192,7 +239,7 @@ export default function InteractiveOnboarding() {
                       <CardTitle className="text-xl">{currentStepData.title}</CardTitle>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="outline" className="text-xs">
-                          Step {currentStep + 1} of {ONBOARDING_STEPS.length}
+                          Step {currentStep + 1} of {personalizedSteps.length}
                         </Badge>
                       </div>
                     </div>
@@ -253,7 +300,7 @@ export default function InteractiveOnboarding() {
                     onClick={handleNext}
                     className={currentStep > 0 ? 'flex-1' : 'w-full'}
                   >
-                    {currentStep === ONBOARDING_STEPS.length - 1 ? (
+                    {currentStep === personalizedSteps.length - 1 ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 mr-2" />
                         Complete Tour
