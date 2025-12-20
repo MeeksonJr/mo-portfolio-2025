@@ -45,6 +45,7 @@ import {
 import ContentCreationModal from '@/components/admin/content-creation-modal'
 import ContentPreviewModal from '@/components/admin/content-preview-modal'
 import BulkOperationsBar from '@/components/admin/bulk-operations-bar'
+import AdvancedFilters from '@/components/admin/advanced-filters'
 import { adminNotificationManager } from '@/lib/notifications/admin-notifications'
 import {
   DropdownMenu,
@@ -105,12 +106,57 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
       )
     }
 
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter((cs) => cs.status === filterStatus)
+    // Status filter (multiple)
+    if (filterStatus.length > 0) {
+      filtered = filtered.filter((cs) => filterStatus.includes(cs.status))
     }
 
+    // Date range filter
+    if (dateFrom) {
+      filtered = filtered.filter(
+        (cs) => new Date(cs.updated_at) >= dateFrom
+      )
+    }
+    if (dateTo) {
+      filtered = filtered.filter(
+        (cs) => new Date(cs.updated_at) <= dateTo
+      )
+    }
+
+    // Sort
+    filtered = [...filtered].sort((a, b) => {
+      let aValue: any
+      let bValue: any
+
+      switch (sortBy) {
+        case 'title':
+          aValue = a.title.toLowerCase()
+          bValue = b.title.toLowerCase()
+          break
+        case 'status':
+          aValue = a.status
+          bValue = b.status
+          break
+        case 'created_at':
+          aValue = new Date(a.created_at).getTime()
+          bValue = new Date(b.created_at).getTime()
+          break
+        case 'updated_at':
+        default:
+          aValue = new Date(a.updated_at).getTime()
+          bValue = new Date(b.updated_at).getTime()
+          break
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0
+      } else {
+        return aValue < bValue ? 1 : aValue > bValue ? -1 : 0
+      }
+    })
+
     return filtered
-  }, [caseStudies, searchQuery, filterStatus])
+  }, [caseStudies, searchQuery, filterStatus, dateFrom, dateTo, sortBy, sortOrder])
 
   const totalPages = Math.ceil(filteredCaseStudies.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
@@ -270,7 +316,7 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
         headers['Authorization'] = `Bearer ${session.access_token}`
       }
 
-      const statusParam = filterStatus !== 'all' ? filterStatus : 'all'
+      const statusParam = filterStatus.length > 0 ? filterStatus.join(',') : 'all'
       const url = `/api/admin/content/export?type=case-study&format=${format}&status=${statusParam}`
       
       const response = await fetch(url, {
@@ -331,20 +377,63 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
               className="pl-8 w-full"
             />
           </div>
-          <Select value={filterStatus} onValueChange={(value) => {
-            setFilterStatus(value)
-            setCurrentPage(1)
-          }}>
-            <SelectTrigger className="w-[140px] flex-shrink-0">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="scheduled">Scheduled</SelectItem>
-            </SelectContent>
-          </Select>
+          <AdvancedFilters
+            statusOptions={[
+              { id: 'published', label: 'Published', value: 'published' },
+              { id: 'draft', label: 'Draft', value: 'draft' },
+              { id: 'scheduled', label: 'Scheduled', value: 'scheduled' },
+            ]}
+            statusFilter={filterStatus}
+            onStatusFilterChange={(statuses) => {
+              setFilterStatus(statuses)
+              setCurrentPage(1)
+            }}
+            dateFrom={dateFrom}
+            dateTo={dateTo}
+            onDateFromChange={(date) => {
+              setDateFrom(date)
+              setCurrentPage(1)
+            }}
+            onDateToChange={(date) => {
+              setDateTo(date)
+              setCurrentPage(1)
+            }}
+            sortOptions={[
+              { id: 'updated_at', label: 'Last Updated', value: 'updated_at' },
+              { id: 'created_at', label: 'Created Date', value: 'created_at' },
+              { id: 'title', label: 'Title', value: 'title' },
+              { id: 'status', label: 'Status', value: 'status' },
+            ]}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSortChange={(by, order) => {
+              setSortBy(by)
+              setSortOrder(order)
+            }}
+            activeFilterCount={
+              filterStatus.length +
+              (dateFrom ? 1 : 0) +
+              (dateTo ? 1 : 0) +
+              (sortBy !== 'updated_at' || sortOrder !== 'desc' ? 1 : 0)
+            }
+            presets={[
+              {
+                label: 'Published',
+                filters: { status: ['published'] },
+              },
+              {
+                label: 'Drafts',
+                filters: { status: ['draft'] },
+              },
+              {
+                label: 'Recent (Last 7 Days)',
+                filters: {
+                  dateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                  dateTo: new Date(),
+                },
+              },
+            ]}
+          />
         </div>
         <div className="flex gap-2 flex-shrink-0">
           <Select
