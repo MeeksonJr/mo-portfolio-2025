@@ -3,6 +3,7 @@ import AdminHeader from '@/components/admin/admin-header'
 import AdminAuthWrapper from '@/components/admin/admin-auth-wrapper'
 import AdminKeyboardShortcuts from '@/components/admin/admin-keyboard-shortcuts'
 import KeyboardShortcutsHelp from '@/components/admin/keyboard-shortcuts-help'
+import MobileAdminWrapper from '@/components/admin/mobile-admin-wrapper'
 
 export default function AdminLayout({
   children,
@@ -13,7 +14,8 @@ export default function AdminLayout({
     <AdminAuthWrapper>
       <AdminKeyboardShortcuts />
       <KeyboardShortcutsHelp />
-      <div className="min-h-screen bg-background">
+      {/* Desktop Layout */}
+      <div className="hidden lg:block min-h-screen bg-background">
         <div className="flex">
           {/* Sidebar */}
           <AdminSidebar />
@@ -29,6 +31,11 @@ export default function AdminLayout({
           </div>
         </div>
       </div>
+      
+      {/* Mobile Layout */}
+      <MobileAdminWrapper>
+        {children}
+      </MobileAdminWrapper>
     </AdminAuthWrapper>
   )
 }
