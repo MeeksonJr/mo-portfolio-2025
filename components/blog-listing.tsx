@@ -16,6 +16,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { format } from 'date-fns'
 import { trackClick } from '@/lib/analytics'
+import EnhancedFilters from '@/components/filters/enhanced-filters'
+import SocialShareButton from '@/components/sharing/social-share-button'
+import { EnhancedScrollReveal } from '@/components/animations/enhanced-scroll-reveal'
 
 interface BlogPost {
   id: string
@@ -38,8 +41,12 @@ interface BlogListingProps {
 export default function BlogListing({ posts }: BlogListingProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({
+    category: [],
+    tags: [],
+  })
 
-  // Get unique categories
+  // Get unique categories and tags
   const categories = useMemo(
     () =>
       Array.from(
@@ -47,6 +54,27 @@ export default function BlogListing({ posts }: BlogListingProps) {
       ).sort(),
     [posts]
   )
+
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>()
+    posts.forEach((post) => {
+      post.tags?.forEach((tag) => tagSet.add(tag))
+    })
+    return Array.from(tagSet).sort()
+  }, [posts])
+
+  const filterOptions = useMemo(() => ({
+    category: categories.map((cat) => ({
+      value: cat,
+      label: cat,
+      count: posts.filter((p) => p.category === cat).length,
+    })),
+    tags: allTags.map((tag) => ({
+      value: tag,
+      label: tag,
+      count: posts.filter((p) => p.tags?.includes(tag)).length,
+    })),
+  }), [categories, allTags, posts])
 
   // Filter posts
   const filteredPosts = useMemo(() => {
@@ -65,8 +93,36 @@ export default function BlogListing({ posts }: BlogListingProps) {
       filtered = filtered.filter((post) => post.category === filterCategory)
     }
 
+    // Enhanced filters
+    if (activeFilters.category.length > 0) {
+      filtered = filtered.filter((post) => 
+        post.category && activeFilters.category.includes(post.category)
+      )
+    }
+
+    if (activeFilters.tags.length > 0) {
+      filtered = filtered.filter((post) =>
+        post.tags?.some((tag) => activeFilters.tags.includes(tag))
+      )
+    }
+
     return filtered
-  }, [posts, searchQuery, filterCategory])
+  }, [posts, searchQuery, filterCategory, activeFilters])
+
+  const handleFilterChange = (filterType: string, value: string) => {
+    setActiveFilters((prev) => {
+      const current = prev[filterType] || []
+      const updated = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value]
+      return { ...prev, [filterType]: updated }
+    })
+  }
+
+  const handleClearFilters = () => {
+    setActiveFilters({ category: [], tags: [] })
+    setFilterCategory('all')
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -78,31 +134,43 @@ export default function BlogListing({ posts }: BlogListingProps) {
         </p>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Search posts..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+      {/* Search and Filters */}
+      <div className="mb-8 space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search posts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          {categories.length > 0 && (
+            <Select value={filterCategory} onValueChange={setFilterCategory}>
+              <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
-        {categories.length > 0 && (
-          <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        
+        {/* Enhanced Filters */}
+        {(filterOptions.category.length > 0 || filterOptions.tags.length > 0) && (
+          <EnhancedFilters
+            filters={filterOptions}
+            activeFilters={activeFilters}
+            onFilterChange={handleFilterChange}
+            onClearFilters={handleClearFilters}
+          />
         )}
       </div>
 
@@ -113,13 +181,13 @@ export default function BlogListing({ posts }: BlogListingProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPosts.map((post) => (
-            <Link
-              key={post.id}
-              href={`/blog/${post.slug}`}
-              className="group glass rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
-              onClick={() => trackClick('blog_post', post.id, { source: 'listing' })}
-            >
+          {filteredPosts.map((post, index) => (
+            <EnhancedScrollReveal key={post.id} variant="fade" delay={index * 0.1}>
+              <Link
+                href={`/blog/${post.slug}`}
+                className="group glass rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full"
+                onClick={() => trackClick('blog_post', post.id, { source: 'listing' })}
+              >
               {post.featured_image && (
                 <div className="relative w-full h-48 overflow-hidden">
                   <img
@@ -174,12 +242,21 @@ export default function BlogListing({ posts }: BlogListingProps) {
                     )}
                   </div>
                 )}
-                <div className="mt-4 flex items-center text-primary group-hover:gap-2 transition-all">
-                  <span className="text-sm font-medium">Read more</span>
-                  <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                <div className="mt-auto pt-4 flex items-center justify-between border-t border-border">
+                  <div className="flex items-center text-primary group-hover:gap-2 transition-all">
+                    <span className="text-sm font-medium">Read more</span>
+                    <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <SocialShareButton
+                    url={`${typeof window !== 'undefined' ? window.location.origin : ''}/blog/${post.slug}`}
+                    title={post.title}
+                    description={post.excerpt || ''}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  />
                 </div>
               </div>
             </Link>
+            </EnhancedScrollReveal>
           ))}
         </div>
       )}

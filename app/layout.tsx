@@ -28,6 +28,7 @@ import KeyboardShortcutsHandler from "@/components/keyboard-shortcuts-handler"
 import KeyboardShortcutsModal from "@/components/keyboard-shortcuts-modal"
 import EnhancedKeyboardNavigation from "@/components/accessibility/enhanced-keyboard-navigation"
 import ClientLayoutWrapper from "@/components/layout/client-layout-wrapper"
+import AccessibilityAudit from "@/components/accessibility/accessibility-audit"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -118,6 +119,7 @@ export default function RootLayout({
                 <ErrorBoundary>
                   <KeyboardShortcutsHandler />
                   <EnhancedKeyboardNavigation />
+                  <AccessibilityAudit />
                   <ClientLayoutWrapper>
                     {children}
                   </ClientLayoutWrapper>
