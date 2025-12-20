@@ -46,9 +46,11 @@ export function getUserPreferences(): UserPreferences {
     if (stored) {
       const parsed = JSON.parse(stored)
       // Merge with defaults to handle missing properties
+      // Explicitly ensure highContrast defaults to false if not set
       return {
         ...DEFAULT_PREFERENCES,
         ...parsed,
+        highContrast: parsed.highContrast === true ? true : false, // Explicitly default to false
         contentFilters: {
           ...DEFAULT_PREFERENCES.contentFilters,
           ...(parsed.contentFilters || {}),

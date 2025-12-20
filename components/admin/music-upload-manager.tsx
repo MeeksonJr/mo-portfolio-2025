@@ -457,7 +457,12 @@ export default function MusicUploadManager() {
 
                 <div className="flex gap-2">
                   <button
-                    onClick={handleUpload}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleUpload()
+                    }}
                     disabled={isUploading || !selectedFile || !uploadForm.title}
                     className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >

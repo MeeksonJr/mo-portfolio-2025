@@ -54,9 +54,12 @@ export function PreferencesProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     const root = document.documentElement
     
-    if (preferences.highContrast) {
+    // Ensure high contrast is only applied when explicitly enabled
+    // Default should be false, so remove it if not explicitly true
+    if (preferences.highContrast === true) {
       root.classList.add('high-contrast')
     } else {
+      // Explicitly remove to ensure it's not enabled by default
       root.classList.remove('high-contrast')
     }
 
