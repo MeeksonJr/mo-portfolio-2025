@@ -176,6 +176,12 @@ export default function MusicUploadManager() {
       }
 
       const data = await response.json()
+      
+      if (!data.success || !data.song) {
+        throw new Error(data.error || 'Upload succeeded but song data not returned')
+      }
+
+      console.log('Upload successful, song data:', data.song)
       alert('Song uploaded successfully!')
       
       // Reset form
@@ -189,8 +195,10 @@ export default function MusicUploadManager() {
       })
       setShowUploadModal(false)
       
-      // Reload songs
-      loadSongs()
+      // Reload songs with a small delay to ensure DB is updated
+      setTimeout(() => {
+        loadSongs()
+      }, 500)
     } catch (error: any) {
       console.error('Upload error:', error)
       alert(`Upload failed: ${error.message}`)

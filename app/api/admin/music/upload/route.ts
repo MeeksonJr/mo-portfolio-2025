@@ -296,11 +296,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (!songData) {
+      console.error('Song data is null after insert')
+      return NextResponse.json({ error: 'Failed to retrieve uploaded song data' }, { status: 500 })
+    }
+
+    console.log('Song uploaded successfully:', songData.id)
+
     return NextResponse.json({
       success: true,
       song: songData,
+      data: songData, // Also include as 'data' for consistency
       message: 'Song uploaded successfully',
-    })
+    }, { status: 201 })
   } catch (error: any) {
     console.error('Upload error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

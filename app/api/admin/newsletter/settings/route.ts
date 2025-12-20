@@ -3,8 +3,23 @@ import { createAdminClient, createServerClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createServerClient()
-    const { data: { session } } = await supabase.auth.getSession()
+    // Check for Authorization header first
+    const authHeader = request.headers.get('authorization')
+    let session = null
+
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '')
+      const supabase = await createServerClient()
+      const { data: { session: sessionData } } = await supabase.auth.getSession()
+      // Verify token matches session
+      if (sessionData?.access_token === token) {
+        session = sessionData
+      }
+    } else {
+      const supabase = await createServerClient()
+      const { data: { session: sessionData } } = await supabase.auth.getSession()
+      session = sessionData
+    }
 
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -46,8 +61,23 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = await createServerClient()
-    const { data: { session } } = await supabase.auth.getSession()
+    // Check for Authorization header first
+    const authHeader = request.headers.get('authorization')
+    let session = null
+
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '')
+      const supabase = await createServerClient()
+      const { data: { session: sessionData } } = await supabase.auth.getSession()
+      // Verify token matches session
+      if (sessionData?.access_token === token) {
+        session = sessionData
+      }
+    } else {
+      const supabase = await createServerClient()
+      const { data: { session: sessionData } } = await supabase.auth.getSession()
+      session = sessionData
+    }
 
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
