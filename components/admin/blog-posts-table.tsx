@@ -51,6 +51,7 @@ import {
 import ContentCreationModal from '@/components/admin/content-creation-modal'
 import ContentPreviewModal from '@/components/admin/content-preview-modal'
 import BulkOperationsBar from '@/components/admin/bulk-operations-bar'
+import AdvancedFilters, { FilterOption } from '@/components/admin/advanced-filters'
 import { adminNotificationManager } from '@/lib/notifications/admin-notifications'
 import { format } from 'date-fns'
 
@@ -78,8 +79,12 @@ type ItemsPerPage = 12 | 24 | 48 | 96
 export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts)
   const [searchQuery, setSearchQuery] = useState('')
-  const [filterStatus, setFilterStatus] = useState<string>('all')
-  const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [filterStatus, setFilterStatus] = useState<string[]>([])
+  const [filterCategory, setFilterCategory] = useState<string[]>([])
+  const [dateFrom, setDateFrom] = useState<Date | null>(null)
+  const [dateTo, setDateTo] = useState<Date | null>(null)
+  const [sortBy, setSortBy] = useState<string>('updated_at')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState<ItemsPerPage>(24)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -117,18 +122,68 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
       )
     }
 
-    // Status filter
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter((post) => post.status === filterStatus)
+    // Status filter (multiple)
+    if (filterStatus.length > 0) {
+      filtered = filtered.filter((post) => filterStatus.includes(post.status))
     }
 
-    // Category filter
-    if (filterCategory !== 'all') {
-      filtered = filtered.filter((post) => post.category === filterCategory)
+    // Category filter (multiple)
+    if (filterCategory.length > 0) {
+      filtered = filtered.filter(
+        (post) => post.category && filterCategory.includes(post.category)
+      )
     }
+
+    // Date range filter
+    if (dateFrom) {
+      filtered = filtered.filter(
+        (post) => new Date(post.updated_at) >= dateFrom
+      )
+    }
+    if (dateTo) {
+      filtered = filtered.filter(
+        (post) => new Date(post.updated_at) <= dateTo
+      )
+    }
+
+    // Sort
+    filtered = [...filtered].sort((a, b) => {
+      let aValue: any
+      let bValue: any
+
+      switch (sortBy) {
+        case 'title':
+          aValue = a.title.toLowerCase()
+          bValue = b.title.toLowerCase()
+          break
+        case 'status':
+          aValue = a.status
+          bValue = b.status
+          break
+        case 'views':
+          aValue = a.views
+          bValue = b.views
+          break
+        case 'created_at':
+          aValue = new Date(a.created_at).getTime()
+          bValue = new Date(b.created_at).getTime()
+          break
+        case 'updated_at':
+        default:
+          aValue = new Date(a.updated_at).getTime()
+          bValue = new Date(b.updated_at).getTime()
+          break
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : aValue < bValue ? -1 : 0
+      } else {
+        return aValue < bValue ? 1 : aValue > bValue ? -1 : 0
+      }
+    })
 
     return filtered
-  }, [posts, searchQuery, filterStatus, filterCategory])
+  }, [posts, searchQuery, filterStatus, filterCategory, dateFrom, dateTo, sortBy, sortOrder])
 
   // Pagination
   const totalPages = Math.ceil(filteredPosts.length / itemsPerPage)
@@ -309,7 +364,7 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
         headers['Authorization'] = `Bearer ${session.access_token}`
       }
 
-      const statusParam = filterStatus !== 'all' ? filterStatus : 'all'
+      const statusParam = filterStatus.length > 0 ? filterStatus.join(',') : 'all'
       const url = `/api/admin/content/export?type=blog&format=${format}&status=${statusParam}`
       
       const response = await fetch(url, {
@@ -371,38 +426,75 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
               className="pl-8 w-full"
             />
           </div>
-          <Select value={filterStatus} onValueChange={(value) => {
-            setFilterStatus(value)
-            setCurrentPage(1)
-          }}>
-            <SelectTrigger className="w-[140px] flex-shrink-0">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="scheduled">Scheduled</SelectItem>
-            </SelectContent>
-          </Select>
-          {categories.length > 0 && (
-            <Select value={filterCategory} onValueChange={(value) => {
-              setFilterCategory(value)
+          <AdvancedFilters
+            statusOptions={[
+              { id: 'published', label: 'Published', value: 'published' },
+              { id: 'draft', label: 'Draft', value: 'draft' },
+              { id: 'scheduled', label: 'Scheduled', value: 'scheduled' },
+            ]}
+            statusFilter={filterStatus}
+            onStatusFilterChange={(statuses) => {
+              setFilterStatus(statuses)
               setCurrentPage(1)
-            }}>
-              <SelectTrigger className="w-[140px] flex-shrink-0">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+            }}
+            dateFrom={dateFrom}
+            dateTo={dateTo}
+            onDateFromChange={(date) => {
+              setDateFrom(date)
+              setCurrentPage(1)
+            }}
+            onDateToChange={(date) => {
+              setDateTo(date)
+              setCurrentPage(1)
+            }}
+            categoryOptions={categories.map((cat) => ({
+              id: cat,
+              label: cat,
+              value: cat,
+            }))}
+            categoryFilter={filterCategory}
+            onCategoryFilterChange={(cats) => {
+              setFilterCategory(cats)
+              setCurrentPage(1)
+            }}
+            sortOptions={[
+              { id: 'updated_at', label: 'Last Updated', value: 'updated_at' },
+              { id: 'created_at', label: 'Created Date', value: 'created_at' },
+              { id: 'title', label: 'Title', value: 'title' },
+              { id: 'status', label: 'Status', value: 'status' },
+              { id: 'views', label: 'Views', value: 'views' },
+            ]}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSortChange={(by, order) => {
+              setSortBy(by)
+              setSortOrder(order)
+            }}
+            activeFilterCount={
+              filterStatus.length +
+              filterCategory.length +
+              (dateFrom ? 1 : 0) +
+              (dateTo ? 1 : 0) +
+              (sortBy !== 'updated_at' || sortOrder !== 'desc' ? 1 : 0)
+            }
+            presets={[
+              {
+                label: 'Published',
+                filters: { status: ['published'] },
+              },
+              {
+                label: 'Drafts',
+                filters: { status: ['draft'] },
+              },
+              {
+                label: 'Recent (Last 7 Days)',
+                filters: {
+                  dateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                  dateTo: new Date(),
+                },
+              },
+            ]}
+          />
         </div>
         <div className="flex gap-2 flex-shrink-0">
           <Select
