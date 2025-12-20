@@ -18,9 +18,9 @@ export default function BentoCardWrapper({
   variant = 'default',
 }: BentoCardWrapperProps) {
   const paddingClasses = {
-    default: 'p-6 md:p-8',
-    featured: 'p-8 md:p-12',
-    compact: 'p-4 md:p-6',
+    default: 'p-5 md:p-8 lg:p-10 xl:p-12',
+    featured: 'p-8 md:p-12 lg:p-16 xl:p-20',
+    compact: 'p-4 md:p-6 lg:p-8',
   }
 
   return (
@@ -34,7 +34,7 @@ export default function BentoCardWrapper({
         delay,
         ease: [0.25, 0.46, 0.45, 0.94],
       }}
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -6, scale: 1.01 }}
     >
       {/* Subtle gradient overlay on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-transparent transition-all duration-500 pointer-events-none" />

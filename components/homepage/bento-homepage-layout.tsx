@@ -27,26 +27,71 @@ const SECTION_COMPONENTS: Record<string, React.ComponentType> = {
   Contact,
 }
 
-// Bento grid configuration - responsive and centered
+// Bento grid configuration - responsive and spacious
 const BENTO_LAYOUT = {
-  // Hero takes full width
-  hero: { colSpan: 'col-span-full', rowSpan: 'row-span-1', order: 0 },
-  // Quick stats - compact row
-  quickStats: { colSpan: 'col-span-full md:col-span-4', rowSpan: 'row-span-1', order: 1 },
-  // Tech snapshot - medium card
-  techSnapshot: { colSpan: 'col-span-full md:col-span-4 lg:col-span-3', rowSpan: 'row-span-2', order: 2 },
-  // About - medium card
-  about: { colSpan: 'col-span-full md:col-span-4 lg:col-span-3', rowSpan: 'row-span-2', order: 3 },
-  // Projects - large featured
-  projects: { colSpan: 'col-span-full lg:col-span-6', rowSpan: 'row-span-3', order: 4 },
-  // Experience - medium card
-  experience: { colSpan: 'col-span-full md:col-span-6 lg:col-span-3', rowSpan: 'row-span-2', order: 5 },
-  // Services - medium card
-  services: { colSpan: 'col-span-full md:col-span-6 lg:col-span-3', rowSpan: 'row-span-2', order: 6 },
-  // Courses - full width
-  courses: { colSpan: 'col-span-full', rowSpan: 'row-span-2', order: 7 },
-  // Contact - full width
-  contact: { colSpan: 'col-span-full', rowSpan: 'row-span-1', order: 8 },
+  // Hero takes full width with generous spacing
+  hero: { 
+    colSpan: 'col-span-full', 
+    rowSpan: 'row-span-1', 
+    order: 0,
+    minHeight: 'min-h-[calc(100vh-120px)]',
+  },
+  // Quick stats - compact row, spans 4 columns on desktop
+  quickStats: { 
+    colSpan: 'col-span-full md:col-span-8 lg:col-span-4', 
+    rowSpan: 'row-span-1', 
+    order: 1,
+    minHeight: 'min-h-[200px]',
+  },
+  // Tech snapshot - medium card, 4 columns on desktop
+  techSnapshot: { 
+    colSpan: 'col-span-full md:col-span-4 lg:col-span-4', 
+    rowSpan: 'row-span-2', 
+    order: 2,
+    minHeight: 'min-h-[400px]',
+  },
+  // About - medium card, 4 columns on desktop
+  about: { 
+    colSpan: 'col-span-full md:col-span-4 lg:col-span-4', 
+    rowSpan: 'row-span-2', 
+    order: 3,
+    minHeight: 'min-h-[400px]',
+  },
+  // Projects - large featured, 8 columns on desktop
+  projects: { 
+    colSpan: 'col-span-full lg:col-span-8', 
+    rowSpan: 'row-span-3', 
+    order: 4,
+    minHeight: 'min-h-[600px]',
+  },
+  // Experience - medium card, 4 columns on desktop
+  experience: { 
+    colSpan: 'col-span-full md:col-span-6 lg:col-span-4', 
+    rowSpan: 'row-span-2', 
+    order: 5,
+    minHeight: 'min-h-[400px]',
+  },
+  // Services - medium card, 4 columns on desktop
+  services: { 
+    colSpan: 'col-span-full md:col-span-6 lg:col-span-4', 
+    rowSpan: 'row-span-2', 
+    order: 6,
+    minHeight: 'min-h-[400px]',
+  },
+  // Courses - full width with internal grid
+  courses: { 
+    colSpan: 'col-span-full', 
+    rowSpan: 'row-span-2', 
+    order: 7,
+    minHeight: 'min-h-[400px]',
+  },
+  // Contact - full width, centered
+  contact: { 
+    colSpan: 'col-span-full', 
+    rowSpan: 'row-span-1', 
+    order: 8,
+    minHeight: 'min-h-[300px]',
+  },
 }
 
 export default function BentoHomepageLayout() {
@@ -84,9 +129,10 @@ export default function BentoHomepageLayout() {
       style={{ opacity }}
       className="min-h-screen"
     >
-      {/* Bento Grid Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-6 gap-4 md:gap-6 auto-rows-min">
+      {/* Bento Grid Container - Spacious and Responsive */}
+      <div className="w-full mx-auto px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-8 md:py-12 lg:py-16 xl:py-20">
+        <div className="max-w-[1280px] lg:max-w-[1440px] xl:max-w-[1600px] mx-auto">
+          <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-4 md:gap-6 lg:gap-8 xl:gap-10 auto-rows-min">
           {visibleSections.map((section, index) => {
             const Component = SECTION_COMPONENTS[section.component]
             if (!Component) {
@@ -100,19 +146,19 @@ export default function BentoHomepageLayout() {
               order: index,
             }
 
-            // Special handling for hero - full width outside grid, centered
+            // Special handling for hero - full width with generous spacing
             if (section.id === 'hero') {
               return (
                 <div 
                   key={section.id} 
-                  className="col-span-full mb-8 md:mb-12 flex justify-center items-center"
+                  className="col-span-full mb-12 md:mb-16 lg:mb-20 xl:mb-24 flex justify-center items-center"
                   style={{ 
                     minHeight: 'calc(100vh - 120px)',
                     position: 'relative',
                     zIndex: 1
                   }}
                 >
-                  <div className="w-full max-w-6xl">
+                  <div className="w-full max-w-7xl px-4 sm:px-6 md:px-8 lg:px-12">
                     <EnhancedScrollReveal variant="fade" delay={0.1}>
                       <Component />
                     </EnhancedScrollReveal>
@@ -124,7 +170,7 @@ export default function BentoHomepageLayout() {
             return (
               <motion.div
                 key={section.id}
-                className={`${layout.colSpan} ${layout.rowSpan} relative`}
+                className={`${layout.colSpan} ${layout.rowSpan} ${layout.minHeight || ''} relative`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
@@ -139,8 +185,8 @@ export default function BentoHomepageLayout() {
                   zIndex: 1
                 }}
               >
-                <HoverLift lift={4}>
-                  <div className="h-full glass rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-8 border border-border/50 hover:border-primary/30 transition-all duration-300 overflow-hidden relative group will-change-transform">
+                <HoverLift lift={6}>
+                  <div className="h-full glass rounded-2xl md:rounded-3xl p-5 md:p-8 lg:p-10 xl:p-12 border border-border/50 hover:border-primary/30 transition-all duration-300 overflow-hidden relative group will-change-transform">
                     {/* Subtle gradient overlay on hover */}
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-transparent transition-all duration-500 pointer-events-none" />
                     
@@ -150,12 +196,13 @@ export default function BentoHomepageLayout() {
                     </div>
 
                     {/* Decorative corner accent */}
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   </div>
                 </HoverLift>
               </motion.div>
             )
           })}
+          </div>
         </div>
       </div>
     </motion.div>
