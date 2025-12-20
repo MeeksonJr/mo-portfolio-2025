@@ -2,11 +2,12 @@ import { createAdminClient } from '@/lib/supabase/server'
 import CaseStudiesTable from '@/components/admin/case-studies-table'
 
 export default async function CaseStudiesPage() {
-  const adminClient = createAdminClient()
-
-  // Fetch case studies
   let caseStudies = []
+  
   try {
+    const adminClient = createAdminClient()
+
+    // Fetch case studies
     const { data, error } = await adminClient
       .from('case_studies')
       .select('*')
@@ -18,8 +19,9 @@ export default async function CaseStudiesPage() {
     } else {
       caseStudies = data || []
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in CaseStudiesPage:', error)
+    // Return page with empty case studies - component will handle it
   }
 
   return (

@@ -2,11 +2,12 @@ import { createAdminClient } from '@/lib/supabase/server'
 import BlogPostsTable from '@/components/admin/blog-posts-table'
 
 export default async function BlogPostsPage() {
-  const adminClient = createAdminClient()
-
-  // Fetch blog posts
   let blogPosts = []
+  
   try {
+    const adminClient = createAdminClient()
+
+    // Fetch blog posts
     const { data, error } = await adminClient
       .from('blog_posts')
       .select('*')
@@ -18,8 +19,9 @@ export default async function BlogPostsPage() {
     } else {
       blogPosts = data || []
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in BlogPostsPage:', error)
+    // Return page with empty posts - component will handle it
   }
 
   return (

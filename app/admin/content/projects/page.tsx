@@ -2,10 +2,11 @@ import { createAdminClient } from '@/lib/supabase/server'
 import ProjectsTable from '@/components/admin/projects-table'
 
 export default async function ProjectsPage() {
-  const adminClient = createAdminClient()
-
   let projects = []
+  
   try {
+    const adminClient = createAdminClient()
+
     const { data, error } = await adminClient
       .from('projects')
       .select('*')
@@ -17,8 +18,9 @@ export default async function ProjectsPage() {
     } else {
       projects = data || []
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in ProjectsPage:', error)
+    // Return page with empty projects - component will handle it
   }
 
   return (

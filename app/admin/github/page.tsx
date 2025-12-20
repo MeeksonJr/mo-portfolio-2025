@@ -2,11 +2,12 @@ import { createAdminClient } from '@/lib/supabase/server'
 import GitHubReposBrowser from '@/components/admin/github-repos-browser'
 
 export default async function AdminGitHubPage() {
-  const adminClient = createAdminClient()
-
-  // Fetch cached repos from database
   let cachedRepos = []
+  
   try {
+    const adminClient = createAdminClient()
+
+    // Fetch cached repos from database
     const { data, error } = await adminClient
       .from('github_repos_cache')
       .select('*')
@@ -18,8 +19,9 @@ export default async function AdminGitHubPage() {
     } else {
       cachedRepos = data || []
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in AdminGitHubPage:', error)
+    // Return page with empty repos - component will handle it
   }
 
   return (

@@ -127,6 +127,7 @@ export default function ContentCreationModal({
   const [generatingField, setGeneratingField] = useState<string | null>(null)
   const [readmeContent, setReadmeContent] = useState<string | null>(null)
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
   
   const isEditing = !!initialData
 

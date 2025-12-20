@@ -2,10 +2,11 @@ import { createAdminClient } from '@/lib/supabase/server'
 import ResourcesTable from '@/components/admin/resources-table'
 
 export default async function ResourcesPage() {
-  const adminClient = createAdminClient()
-
   let resources = []
+  
   try {
+    const adminClient = createAdminClient()
+
     const { data, error } = await adminClient
       .from('resources')
       .select('*')
@@ -17,8 +18,9 @@ export default async function ResourcesPage() {
     } else {
       resources = data || []
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in ResourcesPage:', error)
+    // Return page with empty resources - component will handle it
   }
 
   return (

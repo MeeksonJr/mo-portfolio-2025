@@ -104,18 +104,22 @@ export default function ActivityFeed({ limit = 10 }: { limit?: number }) {
         }
 
         // Fetch projects
-        const { data: projects } = await supabase
+        const { data: projects, error: projectsError } = await supabase
           .from('projects')
-          .select('id, title, updated_at, status')
+          .select('id, name, updated_at, status')
           .order('updated_at', { ascending: false })
           .limit(limit)
+
+        if (projectsError) {
+          console.error('Error fetching projects:', projectsError)
+        }
 
         if (projects) {
           projects.forEach((project) => {
             allActivities.push({
               id: project.id,
               type: 'project',
-              title: project.title,
+              title: project.name || 'Untitled Project',
               action: project.status === 'published' ? 'published' : 'updated',
               timestamp: project.updated_at,
             })
