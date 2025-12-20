@@ -3,6 +3,18 @@ import { createServerClient, createAdminClient } from '@/lib/supabase/server'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
+// Configure route for large file uploads
+export const runtime = 'nodejs'
+export const maxDuration = 60
+
+// Handle GET requests (for debugging/preflight)
+export async function GET() {
+  return NextResponse.json({ 
+    error: 'Method not allowed. Use POST to upload files.',
+    maxFileSize: '50MB'
+  }, { status: 405 })
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Try to get auth token from Authorization header first (most reliable for FormData)
@@ -134,8 +146,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    // Get form data
-    const formData = await request.formData()
+    // Get form data with better error handling
+    let formData: FormData
+    try {
+      formData = await request.formData()
+    } catch (error: any) {
+      console.error('Error parsing form data:', error)
+      if (error.message?.includes('413') || error.message?.includes('too large')) {
+        return NextResponse.json({ 
+          error: 'File too large. Maximum file size is 50MB. Please compress your audio file or use a smaller file.',
+          maxSize: '50MB'
+        }, { status: 413 })
+      }
+      return NextResponse.json({ error: 'Failed to parse form data' }, { status: 400 })
+    }
+
     const file = formData.get('file') as File
     const title = formData.get('title') as string
     const artist = formData.get('artist') as string | null
@@ -143,11 +168,11 @@ export async function POST(request: NextRequest) {
     const genre = formData.get('genre') as string | null
     const description = formData.get('description') as string | null
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    if (!file || file.size === 0) {
+      return NextResponse.json({ error: 'No file provided or file is empty' }, { status: 400 })
     }
 
-    if (!title) {
+    if (!title || title.trim() === '') {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 })
     }
 

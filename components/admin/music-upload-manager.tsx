@@ -150,12 +150,29 @@ export default function MusicUploadManager() {
         credentials: 'include',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
+          // Don't set Content-Type header - browser will set it with boundary for FormData
         },
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Upload failed')
+        let errorMessage = 'Upload failed'
+        try {
+          const error = await response.json()
+          errorMessage = error.error || errorMessage
+          
+          // Handle specific error codes
+          if (response.status === 413) {
+            errorMessage = `File too large: ${errorMessage}. Maximum size is 50MB.`
+          } else if (response.status === 401) {
+            errorMessage = 'Authentication failed. Please log in again.'
+          } else if (response.status === 403) {
+            errorMessage = 'You do not have permission to upload songs.'
+          }
+        } catch (e) {
+          // If response is not JSON, use status text
+          errorMessage = response.statusText || errorMessage
+        }
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
