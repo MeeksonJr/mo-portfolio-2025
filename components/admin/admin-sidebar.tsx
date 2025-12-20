@@ -16,6 +16,7 @@ import {
   Music,
   Globe,
   MessageSquare,
+  Mail,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -58,6 +59,7 @@ const navGroups = [
     label: 'Analytics & Settings',
     items: [
       { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+      { href: '/admin/newsletter', label: 'Newsletter', icon: Mail },
       { href: '/admin/settings', label: 'Settings', icon: Settings },
     ],
   },

@@ -23,6 +23,7 @@ import {
   Music,
   Globe,
   MessageSquare,
+  Mail,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -56,6 +57,7 @@ const navGroups = [
     label: 'Analytics & Settings',
     items: [
       { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+      { href: '/admin/newsletter', label: 'Newsletter', icon: Mail },
       { href: '/admin/settings', label: 'Settings', icon: Settings },
     ],
   },
