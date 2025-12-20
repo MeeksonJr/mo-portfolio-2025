@@ -44,6 +44,7 @@ import {
 } from '@/components/ui/pagination'
 import ContentCreationModal from '@/components/admin/content-creation-modal'
 import ContentPreviewModal from '@/components/admin/content-preview-modal'
+import BulkOperationsBar from '@/components/admin/bulk-operations-bar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -285,48 +286,18 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
   return (
     <div className="space-y-4 w-full max-w-full overflow-hidden">
       {/* Bulk Actions Bar */}
-      {selectedCaseStudies.size > 0 && (
-        <div className="flex items-center justify-between p-4 bg-primary/10 border border-primary/20 rounded-lg">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">
-              {selectedCaseStudies.size} case study(ies) selected
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Select
-              value=""
-              onValueChange={(value) => handleBulkStatusChange(value as 'draft' | 'published' | 'scheduled')}
-              disabled={isBulkOperating}
-            >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Change status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="published">Set to Published</SelectItem>
-                <SelectItem value="draft">Set to Draft</SelectItem>
-                <SelectItem value="scheduled">Set to Scheduled</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setBulkDeleteDialogOpen(true)}
-              disabled={isBulkOperating}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete Selected
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedCaseStudies(new Set())}
-              disabled={isBulkOperating}
-            >
-              Clear Selection
-            </Button>
-          </div>
-        </div>
-      )}
+      <BulkOperationsBar
+        selectedCount={selectedCaseStudies.size}
+        onClearSelection={() => setSelectedCaseStudies(new Set())}
+        onBulkDelete={() => setBulkDeleteDialogOpen(true)}
+        onBulkStatusChange={(value) => handleBulkStatusChange(value as 'draft' | 'published' | 'scheduled')}
+        statusOptions={[
+          { value: 'published', label: 'Set to Published' },
+          { value: 'draft', label: 'Set to Draft' },
+          { value: 'scheduled', label: 'Set to Scheduled' },
+        ]}
+        isLoading={isBulkOperating}
+      />
 
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between sticky top-0 z-10 bg-background pb-4 w-full">
         <div className="flex flex-1 gap-2 w-full sm:w-auto min-w-0">

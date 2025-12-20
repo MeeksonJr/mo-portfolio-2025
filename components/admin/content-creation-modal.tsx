@@ -28,6 +28,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { X, Sparkles, Image as ImageIcon, Save, Eye } from 'lucide-react'
 import MDXEditor from '@/components/admin/mdx-editor'
+import { useAutoSave } from '@/hooks/use-auto-save'
+import SaveStatusIndicator from '@/components/admin/save-status-indicator'
 
 type ContentType = 'blog' | 'case-study' | 'resource' | 'project'
 
@@ -564,6 +566,85 @@ export default function ContentCreationModal({
     }
   }
 
+  // Auto-save function for drafts
+  const handleAutoSave = async (data: any) => {
+    // Only auto-save drafts, not published content
+    if (data.status !== 'draft') return
+
+    try {
+      const endpointMap: Record<ContentType, string> = {
+        'blog': '/api/admin/content/blog',
+        'case-study': '/api/admin/content/case-studies',
+        'resource': '/api/admin/content/resources',
+        'project': '/api/admin/content/projects',
+      }
+
+      let endpoint = endpointMap[selectedType]
+      let method = 'POST'
+
+      if (isEditing && initialData?.id) {
+        endpoint = `${endpoint}/${initialData.id}`
+        method = 'PUT'
+      }
+
+      const cleanedData = { ...data }
+      Object.keys(cleanedData).forEach(key => {
+        if (cleanedData[key] === '') {
+          if (['excerpt', 'category', 'seo_title', 'seo_description', 'published_at', 'description', 'url', 'homepage_url', 'featured_image'].includes(key)) {
+            cleanedData[key] = null
+          } else {
+            delete cleanedData[key]
+          }
+        }
+      })
+
+      const payload = {
+        ...cleanedData,
+        status: 'draft', // Always save as draft for auto-save
+        github_repo_id: repo?.id || initialData?.github_repo_id,
+      }
+
+      const { data: { session } } = await supabase.auth.getSession()
+      const headers: HeadersInit = { 'Content-Type': 'application/json' }
+      
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+
+      await fetch(endpoint, {
+        method,
+        headers,
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      })
+
+      setSaveError(null)
+    } catch (error: any) {
+      console.error('Auto-save error:', error)
+      setSaveError(error)
+      throw error
+    }
+  }
+
+  // Watch form status for auto-save enablement
+  const formStatus = form.watch('status')
+  const isDraft = formStatus === 'draft'
+  const formValues = form.watch() // Watch all form values for auto-save
+
+  // Auto-save hook
+  const { getSaveStatus } = useAutoSave({
+    data: formValues,
+    onSave: handleAutoSave,
+    interval: 30000, // 30 seconds
+    enabled: open && (isEditing || isDraft), // Only enable for drafts
+    onSaveError: (error) => {
+      console.error('Auto-save failed:', error)
+      setSaveError(error)
+    },
+  })
+
+  const saveStatus = getSaveStatus()
+
   const onSubmit = async (data: any) => {
     console.log('=== FORM SUBMISSION STARTED ===')
     console.log('Form data:', data)
@@ -709,14 +790,26 @@ export default function ContentCreationModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Content' : 'Create Content'}</DialogTitle>
-          <DialogDescription>
-            {isEditing
-              ? `Edit ${selectedType === 'blog' ? 'blog post' : selectedType === 'case-study' ? 'case study' : selectedType === 'resource' ? 'resource' : 'project'}`
-              : repo
-              ? `Create content from repository: ${repo.name}`
-              : 'Create new content'}
-          </DialogDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle>{isEditing ? 'Edit Content' : 'Create Content'}</DialogTitle>
+              <DialogDescription>
+                {isEditing
+                  ? `Edit ${selectedType === 'blog' ? 'blog post' : selectedType === 'case-study' ? 'case study' : selectedType === 'resource' ? 'resource' : 'project'}`
+                  : repo
+                  ? `Create content from repository: ${repo.name}`
+                  : 'Create new content'}
+              </DialogDescription>
+            </div>
+            {(isEditing || formValues.status === 'draft') && (
+              <SaveStatusIndicator
+                isSaving={saveStatus.isSaving}
+                hasUnsavedChanges={saveStatus.hasUnsavedChanges}
+                lastSave={saveStatus.lastSave}
+                error={saveError}
+              />
+            )}
+          </div>
         </DialogHeader>
 
         <Tabs value={selectedType} onValueChange={(v) => setSelectedType(v as ContentType)} className="w-full">

@@ -1,6 +1,8 @@
 import AdminSidebar from '@/components/admin/admin-sidebar'
 import AdminHeader from '@/components/admin/admin-header'
 import AdminAuthWrapper from '@/components/admin/admin-auth-wrapper'
+import AdminKeyboardShortcuts from '@/components/admin/admin-keyboard-shortcuts'
+import KeyboardShortcutsHelp from '@/components/admin/keyboard-shortcuts-help'
 
 export default function AdminLayout({
   children,
@@ -9,6 +11,8 @@ export default function AdminLayout({
 }) {
   return (
     <AdminAuthWrapper>
+      <AdminKeyboardShortcuts />
+      <KeyboardShortcutsHelp />
       <div className="min-h-screen bg-background">
         <div className="flex">
           {/* Sidebar */}
