@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
       content_type,
       content_id,
       status = 'draft',
+      scheduled_at,
     } = body
 
     if (!title || !subject || !content_html) {
@@ -77,7 +78,8 @@ export async function POST(request: NextRequest) {
         images: images || [],
         content_type: content_type || 'custom',
         content_id: content_id || null,
-        status,
+        status: scheduled_at ? 'scheduled' : status,
+        scheduled_at: scheduled_at ? new Date(scheduled_at).toISOString() : null,
         created_by: session.user.id,
       })
       .select()

@@ -86,6 +86,19 @@ export async function PUT(
       }
     }
 
+    // Check if this is a new publication (status changed to published)
+    let wasJustPublished = false
+    if (body.status === 'published') {
+      const { data: existingProject } = await adminClient
+        .from('projects')
+        .select('status')
+        .eq('id', id)
+        .single()
+
+      // Only send newsletter if it wasn't already published
+      wasJustPublished = existingProject?.status !== 'published'
+    }
+
     const { data, error } = await adminClient
       .from('projects')
       .update({
@@ -98,6 +111,23 @@ export async function PUT(
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    // Send auto-newsletter if just published
+    if (wasJustPublished && data) {
+      try {
+        const { sendAutoNewsletter } = await import('@/lib/newsletter/auto-send')
+        await sendAutoNewsletter('project', {
+          id: data.id,
+          name: data.name,
+          title: data.name,
+          description: data.description,
+          featured_image: data.featured_image,
+        })
+      } catch (newsletterError) {
+        console.error('Error sending auto-newsletter:', newsletterError)
+        // Don't fail the request if newsletter fails
+      }
     }
 
     return NextResponse.json({ data, success: true })

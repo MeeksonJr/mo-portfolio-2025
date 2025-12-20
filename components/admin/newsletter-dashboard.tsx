@@ -70,10 +70,13 @@ export default function NewsletterDashboard() {
     content_type: 'custom' as 'blog' | 'project' | 'case-study' | 'music' | 'custom',
     content_id: '',
     auto_send: false,
+    scheduled_at: '',
   })
   const [isSaving, setIsSaving] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [settings, setSettings] = useState<Record<string, any>>({})
+  const [loadingSettings, setLoadingSettings] = useState(false)
 
   // Load campaigns and subscriber count
   const loadData = useCallback(async () => {
@@ -137,7 +140,8 @@ export default function NewsletterDashboard() {
         },
         body: JSON.stringify({
           ...formData,
-          status: 'draft',
+          status: formData.scheduled_at ? 'scheduled' : 'draft',
+          scheduled_at: formData.scheduled_at || null,
         }),
       })
 
@@ -313,6 +317,7 @@ export default function NewsletterDashboard() {
       content_type: 'custom',
       content_id: '',
       auto_send: false,
+      scheduled_at: '',
     })
   }
 
@@ -631,19 +636,80 @@ export default function NewsletterDashboard() {
               </TabsContent>
 
               <TabsContent value="settings" className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="space-y-4">
                   <div>
-                    <Label>Auto-send on publish</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Automatically send newsletter when content is published
+                    <Label>Schedule Send</Label>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Schedule this newsletter to be sent at a specific time
                     </p>
+                    <Input
+                      type="datetime-local"
+                      value={formData.scheduled_at}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, scheduled_at: e.target.value }))
+                      }
+                      min={new Date().toISOString().slice(0, 16)}
+                    />
+                    {formData.scheduled_at && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Scheduled for: {new Date(formData.scheduled_at).toLocaleString()}
+                      </p>
+                    )}
                   </div>
-                  <Switch
-                    checked={formData.auto_send}
-                    onCheckedChange={(checked) =>
-                      setFormData((prev) => ({ ...prev, auto_send: checked }))
-                    }
-                  />
+
+                  <div className="border-t pt-4">
+                    <Label className="text-base font-semibold mb-4 block">Auto-Send Settings</Label>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Control automatic newsletter sending when content is published
+                    </p>
+                    <div className="space-y-3">
+                      {[
+                        { key: 'auto_send_blog', label: 'Auto-send for Blog Posts' },
+                        { key: 'auto_send_project', label: 'Auto-send for Projects' },
+                        { key: 'auto_send_case_study', label: 'Auto-send for Case Studies' },
+                        { key: 'auto_send_music', label: 'Auto-send for Music Uploads' },
+                      ].map((setting) => (
+                        <div key={setting.key} className="flex items-center justify-between">
+                          <Label htmlFor={setting.key} className="cursor-pointer">
+                            {setting.label}
+                          </Label>
+                          <Switch
+                            id={setting.key}
+                            checked={settings[setting.key]?.enabled !== false}
+                            onCheckedChange={async (checked) => {
+                              try {
+                                const { data: { session } } = await supabase.auth.getSession()
+                                if (!session) return
+
+                                const response = await fetch('/api/admin/newsletter/settings', {
+                                  method: 'PUT',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${session.access_token}`,
+                                  },
+                                  body: JSON.stringify({
+                                    setting_key: setting.key,
+                                    setting_value: { enabled: checked },
+                                  }),
+                                })
+
+                                if (response.ok) {
+                                  setSettings((prev) => ({
+                                    ...prev,
+                                    [setting.key]: { enabled: checked },
+                                  }))
+                                  toast.success(`${setting.label} ${checked ? 'enabled' : 'disabled'}`)
+                                }
+                              } catch (error) {
+                                console.error('Error updating setting:', error)
+                                toast.error('Failed to update setting')
+                              }
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
@@ -658,7 +724,12 @@ export default function NewsletterDashboard() {
                 {isSaving ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
+                    {formData.scheduled_at ? 'Scheduling...' : 'Saving...'}
+                  </>
+                ) : formData.scheduled_at ? (
+                  <>
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Schedule
                   </>
                 ) : (
                   <>
@@ -667,23 +738,25 @@ export default function NewsletterDashboard() {
                   </>
                 )}
               </Button>
-              <Button
-                onClick={handleSend}
-                disabled={isSaving}
-                className="flex-1"
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <Send className="h-4 w-4 mr-2" />
-                    Send to {subscriberCount} Subscribers
-                  </>
-                )}
-              </Button>
+              {!formData.scheduled_at && (
+                <Button
+                  onClick={handleSend}
+                  disabled={isSaving}
+                  className="flex-1"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Send to {subscriberCount} Subscribers
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </div>
         </div>

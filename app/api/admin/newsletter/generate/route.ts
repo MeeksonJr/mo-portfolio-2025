@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient, createServerClient } from '@/lib/supabase/server'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Generate newsletter content using AI (simplified - you can integrate with OpenAI, etc.)
+    // Generate newsletter content using AI (Gemini)
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mohameddatt.com'
     
     let content_html = ''
@@ -62,7 +63,70 @@ export async function POST(request: NextRequest) {
     let preview_text = ''
     let generatedSubject = subject || title
 
-    if (contentData) {
+    // Try to use Gemini AI for enhanced generation
+    const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
+    if (geminiApiKey) {
+      try {
+        const genAI = new GoogleGenerativeAI(geminiApiKey)
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+
+        let prompt = `Create a professional newsletter email for a full-stack developer portfolio. `
+        
+        if (contentData) {
+          prompt += `The newsletter is about a new ${content_type}: "${contentData.title || contentData.name || title}". `
+          if (contentData.description || contentData.excerpt) {
+            prompt += `Description: ${contentData.description || contentData.excerpt}. `
+          }
+          prompt += `Generate an engaging newsletter that highlights this ${content_type} in a professional but friendly tone. `
+        } else {
+          prompt += `The newsletter title is: "${title}". `
+          if (subject) {
+            prompt += `Subject: "${subject}". `
+          }
+          prompt += `Generate an engaging newsletter that showcases updates from a full-stack developer portfolio. `
+        }
+
+        prompt += `Return a JSON object with:
+        - subject: Email subject line (engaging, under 60 characters)
+        - preview_text: Preview text for email clients (under 150 characters)
+        - content_html: HTML content for the newsletter (professional, responsive, include a call-to-action button)
+        - content_text: Plain text version of the content
+
+        Make it engaging, professional, and include a clear call-to-action.`
+
+        const result = await model.generateContent(prompt)
+        const response = await result.response
+        const text = response.text()
+
+        // Try to parse JSON from response
+        try {
+          const jsonMatch = text.match(/\{[\s\S]*\}/)
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0])
+            if (parsed.subject) generatedSubject = parsed.subject
+            if (parsed.preview_text) preview_text = parsed.preview_text
+            if (parsed.content_html) content_html = parsed.content_html
+            if (parsed.content_text) content_text = parsed.content_text
+          } else {
+            // If no JSON, use the text as content
+            content_html = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><p style="font-size: 16px; line-height: 1.6; color: #484848;">${text.replace(/\n/g, '<br>')}</p></div>`
+            content_text = text
+          }
+        } catch (parseError) {
+          console.error('Error parsing Gemini response:', parseError)
+          // Fall through to default generation
+        }
+      } catch (geminiError) {
+        console.error('Error using Gemini AI:', geminiError)
+        // Fall through to default generation
+      }
+    }
+
+      // Fallback to default generation if AI failed or not configured
+    }
+    
+    if (!content_html) {
+      if (contentData) {
       // Generate based on content
       const contentTitle = contentData.title || contentData.name || title
       const contentDescription = contentData.description || contentData.excerpt || ''

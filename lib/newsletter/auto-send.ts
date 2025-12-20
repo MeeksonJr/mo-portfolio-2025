@@ -27,6 +27,20 @@ export async function sendAutoNewsletter(
     const adminClient = createAdminClient()
 
     // Check if auto-send is enabled for this content type
+    const settingKey = `auto_send_${contentType === 'case-study' ? 'case_study' : contentType}`
+    const { data: setting } = await adminClient
+      .from('newsletter_settings')
+      .select('setting_value')
+      .eq('setting_key', settingKey)
+      .single()
+
+    const isEnabled = setting?.setting_value?.enabled !== false // Default to true if not set
+    if (!isEnabled) {
+      console.log(`Auto-newsletter disabled for ${contentType}`)
+      return { success: false, reason: 'Auto-send disabled for this content type' }
+    }
+
+    // Check if auto-send is enabled for this content type
     // For now, we'll check if there's a setting or just send for all published content
     // You can add a settings table later to control this per content type
 

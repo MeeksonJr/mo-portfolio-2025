@@ -280,6 +280,22 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: 'Failed to save song metadata' }, { status: 500 })
         }
 
+    // Send auto-newsletter for new music upload
+    if (songData) {
+      try {
+        const { sendAutoNewsletter } = await import('@/lib/newsletter/auto-send')
+        await sendAutoNewsletter('music', {
+          id: songData.id,
+          title: songData.title,
+          name: songData.title,
+          description: songData.description || `${songData.artist ? `${songData.artist} - ` : ''}${songData.title}`,
+        })
+      } catch (newsletterError) {
+        console.error('Error sending auto-newsletter:', newsletterError)
+        // Don't fail the request if newsletter fails
+      }
+    }
+
     return NextResponse.json({
       success: true,
       song: songData,

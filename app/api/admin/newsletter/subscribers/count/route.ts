@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { data, error } = await adminClient
+    const { count, error } = await adminClient
       .from('newsletter_subscribers')
-      .select('id', { count: 'exact', head: true })
+      .select('*', { count: 'exact', head: true })
       .eq('status', 'confirmed')
 
     if (error) {
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to count subscribers' }, { status: 500 })
     }
 
-    return NextResponse.json({ count: data?.length || 0 })
+    return NextResponse.json({ count: count || 0 })
   } catch (error) {
     console.error('Error in GET subscribers/count:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

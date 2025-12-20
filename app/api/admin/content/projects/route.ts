@@ -85,6 +85,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
+    // Send auto-newsletter if published
+    if ((status === 'published' || data?.status === 'published') && data) {
+      try {
+        const { sendAutoNewsletter } = await import('@/lib/newsletter/auto-send')
+        await sendAutoNewsletter('project', {
+          id: data.id,
+          name: data.name,
+          title: data.name,
+          description: data.description,
+          featured_image: data.featured_image,
+        })
+      } catch (newsletterError) {
+        console.error('Error sending auto-newsletter:', newsletterError)
+        // Don't fail the request if newsletter fails
+      }
+    }
+
     return NextResponse.json({ success: true, data }, { status: 201 })
   } catch (error: any) {
     console.error('Error in project creation:', error)
