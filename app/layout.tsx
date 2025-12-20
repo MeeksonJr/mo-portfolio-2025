@@ -27,6 +27,7 @@ import { TranslationProvider } from "@/components/i18n/translation-provider"
 import KeyboardShortcutsHandler from "@/components/keyboard-shortcuts-handler"
 import KeyboardShortcutsModal from "@/components/keyboard-shortcuts-modal"
 import EnhancedKeyboardNavigation from "@/components/accessibility/enhanced-keyboard-navigation"
+import ClientLayoutWrapper from "@/components/layout/client-layout-wrapper"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -108,7 +109,7 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="light"
           enableSystem
-          disableTransitionOnChange
+          enableColorScheme
         >
           <PreferencesProvider>
             <TranslationProvider>
@@ -117,7 +118,9 @@ export default function RootLayout({
                 <ErrorBoundary>
                   <KeyboardShortcutsHandler />
                   <EnhancedKeyboardNavigation />
-                  {children}
+                  <ClientLayoutWrapper>
+                    {children}
+                  </ClientLayoutWrapper>
               <CommandPalette />
               <KeyboardShortcutsModal />
               <AchievementTracker />

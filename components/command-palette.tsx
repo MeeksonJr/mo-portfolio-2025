@@ -93,8 +93,11 @@ export default function CommandPalette() {
   return (
     <>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a command or search..." />
-        <CommandList>
+        <CommandInput 
+          placeholder="Type a command or search..." 
+          className="h-12"
+        />
+        <CommandList className="max-h-[400px]">
           <CommandEmpty>No results found.</CommandEmpty>
 
           {/* Quick Search */}
