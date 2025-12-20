@@ -45,6 +45,7 @@ import {
 import ContentCreationModal from '@/components/admin/content-creation-modal'
 import ContentPreviewModal from '@/components/admin/content-preview-modal'
 import BulkOperationsBar from '@/components/admin/bulk-operations-bar'
+import { adminNotificationManager } from '@/lib/notifications/admin-notifications'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -161,13 +162,22 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
         throw new Error('Failed to delete case studies')
       }
 
+      const count = selectedCaseStudies.size
       setCaseStudies(caseStudies.filter((cs) => !selectedCaseStudies.has(cs.id)))
       setSelectedCaseStudies(new Set())
       setBulkDeleteDialogOpen(false)
-      toast.success(`Deleted ${selectedCaseStudies.size} case study(ies) successfully`)
+      toast.success(`Deleted ${count} case study(ies) successfully`)
+      adminNotificationManager.success(
+        'Case Studies Deleted',
+        `${count} case study(ies) deleted successfully`
+      )
     } catch (error) {
       console.error('Error deleting case studies:', error)
       toast.error('Failed to delete case studies. Please try again.')
+      adminNotificationManager.error(
+        'Delete Failed',
+        'Failed to delete case studies. Please try again.'
+      )
     } finally {
       setIsBulkOperating(false)
     }
@@ -201,9 +211,17 @@ export default function CaseStudiesTable({ initialCaseStudies }: CaseStudiesTabl
       const count = selectedCaseStudies.size
       setSelectedCaseStudies(new Set())
       toast.success(`Updated ${count} case study(ies) to ${status}`)
+      adminNotificationManager.success(
+        'Case Studies Updated',
+        `${count} case study(ies) changed to ${status}`
+      )
     } catch (error) {
       console.error('Error updating case studies:', error)
       toast.error('Failed to update case studies. Please try again.')
+      adminNotificationManager.error(
+        'Update Failed',
+        'Failed to update case studies. Please try again.'
+      )
     } finally {
       setIsBulkOperating(false)
     }

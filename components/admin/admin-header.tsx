@@ -24,6 +24,7 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { Badge } from '@/components/ui/badge'
+import NotificationCenter from '@/components/admin/notification-center'
 
 const quickActions = [
   { label: 'Create Blog Post', href: '/admin/content/blog/new', shortcut: '⌘B' },
@@ -103,17 +104,7 @@ export default function AdminHeader() {
               <Command className="h-4 w-4" />
             </Button>
             
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-4 w-4" />
-              {notifications > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                >
-                  {notifications}
-                </Badge>
-              )}
-            </Button>
+            <NotificationCenter />
 
             <ThemeToggle />
 

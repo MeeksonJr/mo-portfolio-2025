@@ -51,6 +51,7 @@ import {
 import ContentCreationModal from '@/components/admin/content-creation-modal'
 import ContentPreviewModal from '@/components/admin/content-preview-modal'
 import BulkOperationsBar from '@/components/admin/bulk-operations-bar'
+import { adminNotificationManager } from '@/lib/notifications/admin-notifications'
 import { format } from 'date-fns'
 
 interface BlogPost {
@@ -182,14 +183,23 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
         throw new Error('Failed to delete posts')
       }
 
+      const count = selectedPosts.size
       // Remove from local state
       setPosts(posts.filter((post) => !selectedPosts.has(post.id)))
       setSelectedPosts(new Set())
       setBulkDeleteDialogOpen(false)
-      toast.success(`Deleted ${selectedPosts.size} post(s) successfully`)
+      toast.success(`Deleted ${count} post(s) successfully`)
+      adminNotificationManager.success(
+        'Blog Posts Deleted',
+        `${count} post(s) deleted successfully`
+      )
     } catch (error) {
       console.error('Error deleting posts:', error)
       toast.error('Failed to delete posts. Please try again.')
+      adminNotificationManager.error(
+        'Delete Failed',
+        'Failed to delete blog posts. Please try again.'
+      )
     } finally {
       setIsBulkOperating(false)
     }
@@ -222,10 +232,19 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
         )
       )
       setSelectedPosts(new Set())
-      toast.success(`Updated ${selectedPosts.size} post(s) to ${status}`)
+      const count = selectedPosts.size
+      toast.success(`Updated ${count} post(s) to ${status}`)
+      adminNotificationManager.success(
+        `Blog Posts Updated`,
+        `${count} post(s) changed to ${status}`
+      )
     } catch (error) {
       console.error('Error updating posts:', error)
       toast.error('Failed to update posts. Please try again.')
+      adminNotificationManager.error(
+        'Update Failed',
+        'Failed to update blog posts. Please try again.'
+      )
     } finally {
       setIsBulkOperating(false)
     }
@@ -248,10 +267,20 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
       // Remove from local state
       setPosts(posts.filter((post) => post.id !== postToDelete.id))
       setDeleteDialogOpen(false)
+      const deletedTitle = postToDelete.title
       setPostToDelete(null)
+      toast.success('Post deleted successfully')
+      adminNotificationManager.success(
+        'Blog Post Deleted',
+        `"${deletedTitle}" has been deleted`
+      )
     } catch (error) {
       console.error('Error deleting post:', error)
-      alert('Failed to delete post. Please try again.')
+      toast.error('Failed to delete post. Please try again.')
+      adminNotificationManager.error(
+        'Delete Failed',
+        'Failed to delete blog post. Please try again.'
+      )
     } finally {
       setIsDeleting(false)
     }

@@ -30,6 +30,8 @@ import { X, Sparkles, Image as ImageIcon, Save, Eye } from 'lucide-react'
 import MDXEditor from '@/components/admin/mdx-editor'
 import { useAutoSave } from '@/hooks/use-auto-save'
 import SaveStatusIndicator from '@/components/admin/save-status-indicator'
+import { adminNotificationManager } from '@/lib/notifications/admin-notifications'
+import { toast } from 'sonner'
 
 type ContentType = 'blog' | 'case-study' | 'resource' | 'project'
 
@@ -780,7 +782,11 @@ export default function ContentCreationModal({
     } catch (error: any) {
       console.error('Error saving content:', error)
       const errorMessage = error.message || 'Unknown error occurred'
-      alert(`Failed to save: ${errorMessage}\n\nCheck the browser console for more details.`)
+      toast.error(`Failed to save: ${errorMessage}`)
+      adminNotificationManager.error(
+        'Save Failed',
+        errorMessage
+      )
     } finally {
       setIsSubmitting(false)
     }
