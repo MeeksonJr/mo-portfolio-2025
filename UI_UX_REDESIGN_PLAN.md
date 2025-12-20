@@ -75,7 +75,7 @@ Comprehensive plan for redesigning and enhancing the portfolio's UI/UX, covering
 - [x] Spacing and layout refinements
 
 ### Phase 5: Page Redesigns ✅
-- [ ] Homepage enhancement (in progress)
+- [x] Homepage enhancement (Bento-style layout, soft animations, centered elements)
 - [x] Blog pages redesign
 - [x] Project pages redesign
 - [x] About/Resume pages

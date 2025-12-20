@@ -220,12 +220,19 @@ export default function InteractiveOnboarding() {
             onClick={handleSkip}
           />
 
-          {/* Onboarding Card */}
+          {/* Onboarding Card - Centered and fixed */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md mx-4"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-full max-w-md mx-4 tour-guide"
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              willChange: 'transform',
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <Card className="shadow-2xl border-2">

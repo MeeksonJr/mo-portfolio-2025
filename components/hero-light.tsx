@@ -37,7 +37,7 @@ export default function HeroLight() {
   ]
 
   return (
-    <section className="min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-20">
+    <section className="min-h-[80vh] md:min-h-screen flex items-center justify-center relative overflow-hidden px-4 py-12 md:py-20">
       {/* Subtle animated background */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/10 to-purple-500/10"></div>
@@ -64,10 +64,10 @@ export default function HeroLight() {
 
       <div className="max-w-6xl mx-auto w-full relative z-10">
         <motion.div
-          className="glass rounded-3xl p-8 md:p-12 shadow-xl"
+          className="glass rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-12 shadow-xl border border-border/50"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left side - Photo */}

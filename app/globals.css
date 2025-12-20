@@ -104,80 +104,6 @@
   --ring: 0 0% 100%;
 }
 
-/* Enhanced Focus Indicators - WCAG AA Compliance */
-*:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-/* Tab focus indicators */
-[role="tab"]:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
-  z-index: 10;
-}
-
-/* Button focus indicators */
-button:focus-visible,
-a:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
-}
-
-/* Input focus indicators */
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
-}
-
-/* Remove default outline for mouse users, keep for keyboard */
-*:focus:not(:focus-visible) {
-  outline: none;
-}
-
-/* High Contrast Mode - Enhanced borders and focus indicators */
-.high-contrast * {
-  border-color: hsl(var(--border)) !important;
-}
-
-.high-contrast button,
-.high-contrast a,
-.high-contrast input,
-.high-contrast textarea,
-.high-contrast select {
-  border-width: 2px !important;
-}
-
-.high-contrast button:focus-visible,
-.high-contrast a:focus-visible,
-.high-contrast input:focus-visible,
-.high-contrast textarea:focus-visible,
-.high-contrast select:focus-visible {
-  outline: 3px solid hsl(var(--ring)) !important;
-  outline-offset: 2px !important;
-}
-
-/* High Contrast Mode - Ensure text is always readable */
-.high-contrast p,
-.high-contrast span,
-.high-contrast div,
-.high-contrast h1,
-.high-contrast h2,
-.high-contrast h3,
-.high-contrast h4,
-.high-contrast h5,
-.high-contrast h6 {
-  color: hsl(var(--foreground)) !important;
-}
-
-.high-contrast .text-muted-foreground {
-  color: hsl(var(--foreground)) !important;
-  opacity: 0.8;
-}
-
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
@@ -292,10 +218,6 @@ select:focus-visible {
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -429,11 +351,34 @@ select:focus-visible {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
-}
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+  /* Bento grid utilities */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Performance optimizations */
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+
+  /* GPU acceleration for animations */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
 }
 
 /* Custom scrollbar */
@@ -477,149 +422,48 @@ html {
   border-radius: calc(var(--radius) - 2px);
 }
 
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+/* Bento card hover effects */
+.bento-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary));
-  border-radius: 5px;
+.bento-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.8);
+.dark .bento-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-/* Terminal Background Animations - Performance Optimized */
-@keyframes gridMove {
-  0% {
-    transform: translate(0, 0);
-  }
-  100% {
-    transform: translate(50px, 50px);
-  }
+/* Centered tour guide positioning */
+.tour-guide {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  pointer-events: none;
 }
 
-@keyframes float0 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.2;
-  }
-  50% {
-    transform: translate(20px, -30px) scale(1.2);
-    opacity: 0.4;
-  }
+.tour-guide-content {
+  pointer-events: all;
 }
 
-@keyframes float1 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.15;
-  }
-  50% {
-    transform: translate(-15px, -25px) scale(1.1);
-    opacity: 0.35;
+/* Responsive text scaling */
+@media (max-width: 640px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-@keyframes float2 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.25;
-  }
-  50% {
-    transform: translate(25px, -20px) scale(1.15);
-    opacity: 0.45;
-  }
-}
-
-@keyframes scanline {
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(100vh);
-  }
-}
-
-/* MDX Editor Styles */
-.md-editor-wrapper {
-  @apply border border-border rounded-b-lg overflow-hidden;
-}
-
-.md-editor-wrapper .w-md-editor {
-  @apply bg-background;
-}
-
-.md-editor-wrapper .w-md-editor-text {
-  @apply bg-background text-foreground;
-}
-
-.md-editor-wrapper .w-md-editor-text-textarea {
-  @apply bg-background text-foreground;
-}
-
-.md-editor-wrapper .w-md-editor-preview {
-  @apply bg-background text-foreground;
-}
-
-.md-editor-wrapper .w-md-editor-preview .wmde-markdown {
-  @apply bg-background text-foreground;
-}
-
-.md-editor-wrapper .w-md-editor-toolbar {
-  @apply bg-muted border-b border-border;
-}
-
-.md-editor-wrapper .w-md-editor-toolbar button {
-  @apply text-foreground hover:bg-muted-foreground/20;
-}
-
-.md-editor-wrapper .w-md-editor-toolbar button.active {
-  @apply bg-primary text-primary-foreground;
-}
-
-/* Mobile Bottom Navigation Safe Area */
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0);
-}
-
-/* Touch-optimized interactions */
-@media (hover: none) and (pointer: coarse) {
-  /* Increase tap target sizes on mobile */
-  button,
-  a,
-  [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
-  /* Better touch feedback */
-  button:active,
-  a:active,
-  [role="button"]:active {
-    opacity: 0.7;
-    transform: scale(0.98);
-  }
-}
-
-/* Pull-to-refresh indicator (for future use) */
-@keyframes pull-to-refresh {
-  0% {
-    transform: translateY(-100%);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-/* Custom Cursor Styles */
-.custom-cursor-active * {
-  cursor: none !important;
-}
-
-@media (hover: none) {
-  .custom-cursor-active * {
-    cursor: auto !important;
+/* Performance: Reduce animations on low-end devices */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
