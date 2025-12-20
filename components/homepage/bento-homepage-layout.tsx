@@ -146,12 +146,15 @@ export default function BentoHomepageLayout() {
               order: index,
             }
 
-            // Special handling for hero - full width with generous spacing
+            // Special handling for hero - full width with generous spacing and enhanced animations
             if (section.id === 'hero') {
               return (
-                <div 
+                <motion.div 
                   key={section.id} 
                   className="col-span-full mb-12 md:mb-16 lg:mb-20 xl:mb-24 flex justify-center items-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
                   style={{ 
                     minHeight: 'calc(100vh - 120px)',
                     position: 'relative',
@@ -159,11 +162,11 @@ export default function BentoHomepageLayout() {
                   }}
                 >
                   <div className="w-full max-w-7xl px-4 sm:px-6 md:px-8 lg:px-12">
-                    <EnhancedScrollReveal variant="fade" delay={0.1}>
+                    <EnhancedScrollReveal variant="fade" delay={0.2} duration={0.8}>
                       <Component />
                     </EnhancedScrollReveal>
                   </div>
-                </div>
+                </motion.div>
               )
             }
 
@@ -171,12 +174,12 @@ export default function BentoHomepageLayout() {
               <motion.div
                 key={section.id}
                 className={`${layout.colSpan} ${layout.rowSpan} ${layout.minHeight || ''} relative`}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{
-                  duration: 0.5,
-                  delay: index * 0.1,
+                  duration: 0.6,
+                  delay: index * 0.08,
                   ease: [0.25, 0.46, 0.45, 0.94],
                 }}
                 style={{ 
@@ -186,17 +189,26 @@ export default function BentoHomepageLayout() {
                 }}
               >
                 <HoverLift lift={6}>
-                  <div className="h-full glass rounded-2xl md:rounded-3xl p-5 md:p-8 lg:p-10 xl:p-12 border border-border/50 hover:border-primary/30 transition-all duration-300 overflow-hidden relative group will-change-transform">
-                    {/* Subtle gradient overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-transparent transition-all duration-500 pointer-events-none" />
+                  <div className="h-full glass-enhanced rounded-2xl md:rounded-3xl p-5 md:p-8 lg:p-10 xl:p-12 border border-border/50 hover:border-primary/40 transition-all duration-300 overflow-hidden relative group will-change-transform">
+                    {/* Enhanced gradient overlay on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/0 group-hover:from-primary/8 group-hover:via-primary/3 group-hover:to-transparent transition-all duration-500 pointer-events-none" />
+                    
+                    {/* Animated border glow on hover */}
+                    <div className="absolute inset-0 rounded-2xl md:rounded-3xl border-2 border-primary/0 group-hover:border-primary/20 transition-all duration-500 pointer-events-none" />
+                    
+                    {/* Shimmer effect on hover */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+                    </div>
                     
                     {/* Content */}
                     <div className="relative z-10 h-full flex flex-col">
                       <Component />
                     </div>
 
-                    {/* Decorative corner accent */}
-                    <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    {/* Enhanced decorative corner accents */}
+                    <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-primary/15 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute bottom-0 left-0 w-16 h-16 md:w-20 md:h-20 bg-gradient-to-tr from-primary/10 to-transparent rounded-tr-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                   </div>
                 </HoverLift>
               </motion.div>

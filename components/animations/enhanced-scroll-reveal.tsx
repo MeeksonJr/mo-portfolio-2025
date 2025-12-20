@@ -23,6 +23,45 @@ export function EnhancedScrollReveal({
   stagger = 0,
   threshold = 0.1,
 }: EnhancedScrollRevealProps) {
+  // Enhanced variants with better easing
+  const enhancedVariants = {
+    fade: {
+      initial: { opacity: 0 },
+      animate: { opacity: 1 },
+      transition: { duration, delay, ease: [0.25, 0.46, 0.45, 0.94] }
+    },
+    slideUp: {
+      initial: { opacity: 0, y: 30 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration, delay, ease: [0.25, 0.46, 0.45, 0.94] }
+    },
+    slideLeft: {
+      initial: { opacity: 0, x: -30 },
+      animate: { opacity: 1, x: 0 },
+      transition: { duration, delay, ease: [0.25, 0.46, 0.45, 0.94] }
+    },
+    slideRight: {
+      initial: { opacity: 0, x: 30 },
+      animate: { opacity: 1, x: 0 },
+      transition: { duration, delay, ease: [0.25, 0.46, 0.45, 0.94] }
+    },
+    slideDown: {
+      initial: { opacity: 0, y: -30 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration, delay, ease: [0.25, 0.46, 0.45, 0.94] }
+    },
+    scale: {
+      initial: { opacity: 0, scale: 0.9 },
+      animate: { opacity: 1, scale: 1 },
+      transition: { duration, delay, ease: [0.25, 0.46, 0.45, 0.94] }
+    },
+    blur: {
+      initial: { opacity: 0, filter: 'blur(10px)' },
+      animate: { opacity: 1, filter: 'blur(0px)' },
+      transition: { duration, delay, ease: [0.25, 0.46, 0.45, 0.94] }
+    },
+  }
+
   return (
     <ScrollReveal
       variant={variant}
