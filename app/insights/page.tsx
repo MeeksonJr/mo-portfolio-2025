@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import InsightsHub from '@/components/insights/insights-hub'
+import StructuredData from '@/components/structured-data'
 import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
@@ -13,13 +13,20 @@ export const metadata: Metadata = genMeta({
 
 export default function InsightsPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      <main id="main-content" role="main" className="pt-20" tabIndex={-1}>
+    <>
+      <StructuredData
+        type="WebSite"
+        title="Insights Hub | Mohamed Datt"
+        description="Explore portfolio analytics, activity feeds, and personalized recommendations"
+        url="/insights"
+      />
+      <EnhancedPageLayout
+        title="Insights Hub"
+        description="Explore portfolio analytics, activity feeds, personalized recommendations, project timelines, and skill visualizations."
+      >
         <InsightsHub />
-      </main>
-      <FooterLight />
-    </div>
+      </EnhancedPageLayout>
+    </>
   )
 }
 

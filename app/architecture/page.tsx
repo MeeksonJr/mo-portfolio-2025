@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import TechnicalArchitectureShowcase from '@/components/architecture/technical-architecture-showcase'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import StructuredData from '@/components/structured-data'
 import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
@@ -14,11 +14,18 @@ export const metadata: Metadata = genMeta({
 export default function ArchitecturePage() {
   return (
     <>
-      <div className="min-h-screen bg-background">
-        <Navigation />
+      <StructuredData
+        type="WebSite"
+        title="Technical Architecture | Mohamed Datt"
+        description="Explore technical architecture patterns, scalability solutions, and security implementations"
+        url="/architecture"
+      />
+      <EnhancedPageLayout
+        title="Technical Architecture"
+        description="Explore technical architecture patterns, scalability solutions, and security implementations. Interactive diagrams showcasing full-stack, scalability, and security architectures."
+      >
         <TechnicalArchitectureShowcase />
-        <FooterLight />
-      </div>
+      </EnhancedPageLayout>
     </>
   )
 }

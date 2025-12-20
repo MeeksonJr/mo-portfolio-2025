@@ -1,5 +1,4 @@
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import AboutHub from '@/components/about/about-hub'
 import StructuredData from '@/components/structured-data'
 import { generateMetadata as genMeta } from '@/lib/seo'
@@ -21,13 +20,12 @@ export default function AboutPage() {
         description="Full Stack Developer specializing in AI-powered web applications. Journey from Guinea to NYC to Norfolk, Virginia."
         url="/about"
       />
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main id="main-content" role="main" className="pt-20" tabIndex={-1}>
-          <AboutHub />
-        </main>
-        <FooterLight />
-      </div>
+      <EnhancedPageLayout
+        title="About"
+        description="Learn about my journey, setup, workspace, activity, progress, learning paths, and personal dashboard."
+      >
+        <AboutHub />
+      </EnhancedPageLayout>
     </>
   )
 }

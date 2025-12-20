@@ -344,10 +344,39 @@ select:focus-visible {
     letter-spacing: -0.02em;
   }
   
+  h4 {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+  }
+  
+  h5 {
+    font-size: clamp(1.125rem, 2vw, 1.25rem);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+  
+  h6 {
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    line-height: 1.5;
+    letter-spacing: -0.005em;
+  }
+  
   p {
     font-size: clamp(1rem, 2vw, 1.125rem);
     line-height: 1.7;
     letter-spacing: -0.01em;
+  }
+  
+  /* Enhanced spacing system */
+  .space-section {
+    margin-top: clamp(3rem, 8vw, 6rem);
+    margin-bottom: clamp(3rem, 8vw, 6rem);
+  }
+  
+  .space-content {
+    margin-top: clamp(2rem, 5vw, 4rem);
+    margin-bottom: clamp(2rem, 5vw, 4rem);
   }
   
   /* Better text rendering */
@@ -355,6 +384,26 @@ select:focus-visible {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+  }
+  
+  /* Improved readability */
+  article, .prose {
+    max-width: 65ch;
+    line-height: 1.75;
+  }
+  
+  article p, .prose p {
+    margin-bottom: 1.5em;
+  }
+  
+  article h2, .prose h2 {
+    margin-top: 2em;
+    margin-bottom: 1em;
+  }
+  
+  article h3, .prose h3 {
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
   }
 }
 

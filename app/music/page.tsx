@@ -1,5 +1,4 @@
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import MusicPlayerPage from '@/components/music-player-page'
 import StructuredData from '@/components/structured-data'
 import { generateMetadata as genMeta } from '@/lib/seo'
@@ -20,13 +19,12 @@ export default function MusicPage() {
         description="Browse and play music collection"
         url="/music"
       />
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main className="pt-20 pb-16">
-          <MusicPlayerPage />
-        </main>
-        <FooterLight />
-      </div>
+      <EnhancedPageLayout
+        title="Music"
+        description="Browse and play music from my collection. Discover new tracks, search by artist or genre, and enjoy a Spotify-like music experience."
+      >
+        <MusicPlayerPage />
+      </EnhancedPageLayout>
     </>
   )
 }

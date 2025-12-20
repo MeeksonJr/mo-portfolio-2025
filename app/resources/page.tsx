@@ -1,6 +1,5 @@
 import { createServerClient } from '@/lib/supabase/server'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import ResourcesListing from '@/components/resources-listing'
 import StructuredData from '@/components/structured-data'
 import { generateMetadata as genMeta } from '@/lib/seo'
@@ -43,13 +42,12 @@ export default async function ResourcesPage() {
         description="Curated collection of tools, courses, books, articles, and videos for developers"
         url="/resources"
       />
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main id="main-content" role="main" className="pt-20 pb-16" tabIndex={-1}>
-          <ResourcesListing resources={resources} />
-        </main>
-        <FooterLight />
-      </div>
+      <EnhancedPageLayout
+        title="Resources"
+        description="Curated collection of tools, courses, books, articles, and videos for developers. Resources for learning web development, AI, and modern technologies."
+      >
+        <ResourcesListing resources={resources} />
+      </EnhancedPageLayout>
     </>
   )
 }

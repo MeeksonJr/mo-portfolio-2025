@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import AgentDashboardContent from '@/components/agent-dashboard/agent-dashboard-content'
+import StructuredData from '@/components/structured-data'
 import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
@@ -13,11 +13,21 @@ export const metadata: Metadata = genMeta({
 
 export default function AgentDashboardPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      <AgentDashboardContent />
-      <FooterLight />
-    </div>
+    <>
+      <StructuredData
+        type="WebSite"
+        title="Agent Dashboard | Mohamed Datt"
+        description="Special dashboard for recruiters and headhunters"
+        url="/agent-dashboard"
+      />
+      <EnhancedPageLayout
+        title="Agent Dashboard"
+        description="Special dashboard for recruiters and headhunters. Candidate overview, skills matrix, availability calendar, and contact management."
+        className="bg-muted/30"
+      >
+        <AgentDashboardContent />
+      </EnhancedPageLayout>
+    </>
   )
 }
 

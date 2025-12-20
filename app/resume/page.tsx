@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import ResumeHub from '@/components/resume/resume-hub'
+import StructuredData from '@/components/structured-data'
 import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
@@ -13,13 +13,20 @@ export const metadata: Metadata = genMeta({
 
 export default function ResumePage() {
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      <main id="main-content" role="main" className="pt-20" tabIndex={-1}>
+    <>
+      <StructuredData
+        type="WebSite"
+        title="Resume Hub | Mohamed Datt"
+        description="View, generate, and share professional resumes"
+        url="/resume"
+      />
+      <EnhancedPageLayout
+        title="Resume Hub"
+        description="View, generate, and share professional resumes. Multiple formats available including ATS-optimized, creative, and traditional formats."
+      >
         <ResumeHub />
-      </main>
-      <FooterLight />
-    </div>
+      </EnhancedPageLayout>
+    </>
   )
 }
 

@@ -1,6 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import ProjectsListing from '@/components/projects-listing'
 import StructuredData from '@/components/structured-data'
 import { generateMetadata as genMeta } from '@/lib/seo'
@@ -44,13 +43,12 @@ export default async function ProjectsPage() {
         description="Portfolio of projects, applications, and technical implementations"
         url="/projects"
       />
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main id="main-content" role="main" className="pt-20 pb-16" tabIndex={-1}>
-          <ProjectsListing projects={projects} />
-        </main>
-        <FooterLight />
-      </div>
+      <EnhancedPageLayout
+        title="Projects"
+        description="Portfolio of projects, applications, and technical implementations. Showcasing full-stack web applications, AI-powered solutions, and modern web technologies."
+      >
+        <ProjectsListing projects={projects} />
+      </EnhancedPageLayout>
     </>
   )
 }

@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import TeamCollaborationProof from '@/components/collaboration/team-collaboration-proof'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import StructuredData from '@/components/structured-data'
 import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
@@ -14,11 +14,18 @@ export const metadata: Metadata = genMeta({
 export default function CollaborationPage() {
   return (
     <>
-      <div className="min-h-screen bg-background">
-        <Navigation />
+      <StructuredData
+        type="WebSite"
+        title="Team Collaboration | Mohamed Datt"
+        description="Showcasing teamwork, code reviews, and collaborative development"
+        url="/collaboration"
+      />
+      <EnhancedPageLayout
+        title="Team Collaboration"
+        description="Showcasing teamwork, code reviews, and collaborative development through GitHub contributions, team projects, and open source work."
+      >
         <TeamCollaborationProof />
-        <FooterLight />
-      </div>
+      </EnhancedPageLayout>
     </>
   )
 }

@@ -54,10 +54,11 @@ export function BottomNavigation() {
     <>
       {/* Bottom Navigation Bar */}
       <motion.nav
-        className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border lg:hidden"
+        className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border lg:hidden shadow-lg"
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        aria-label="Mobile navigation"
       >
         <div className="flex items-center justify-around h-16 px-2 safe-area-bottom">
           {navItems.map((item) => {

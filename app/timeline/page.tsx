@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import InteractiveTimeline from '@/components/timeline/interactive-timeline'
 import StructuredData from '@/components/structured-data'
 
@@ -18,13 +17,12 @@ export default function TimelinePage() {
         description="Interactive timeline showing the journey from Guinea to NYC to Norfolk"
         url="/timeline"
       />
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main className="pt-20 pb-16">
-          <InteractiveTimeline />
-        </main>
-        <FooterLight />
-      </div>
+      <EnhancedPageLayout
+        title="Timeline"
+        description="Interactive timeline of my journey from Guinea to NYC to Norfolk - A story of growth, learning, and building."
+      >
+        <InteractiveTimeline />
+      </EnhancedPageLayout>
     </>
   )
 }

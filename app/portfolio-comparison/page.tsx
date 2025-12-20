@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import PortfolioComparisonContent from '@/components/portfolio-comparison/portfolio-comparison-content'
+import StructuredData from '@/components/structured-data'
 import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
@@ -13,11 +13,21 @@ export const metadata: Metadata = genMeta({
 
 export default function PortfolioComparisonPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      <PortfolioComparisonContent />
-      <FooterLight />
-    </div>
+    <>
+      <StructuredData
+        type="WebSite"
+        title="Portfolio Comparison | Mohamed Datt"
+        description="Compare skills, experience, and qualifications side-by-side"
+        url="/portfolio-comparison"
+      />
+      <EnhancedPageLayout
+        title="Portfolio Comparison"
+        description="Compare skills, experience, and qualifications side-by-side. Useful tool for recruiters and hiring managers to evaluate candidates."
+        className="bg-muted/30"
+      >
+        <PortfolioComparisonContent />
+      </EnhancedPageLayout>
+    </>
   )
 }
 

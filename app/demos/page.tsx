@@ -1,5 +1,7 @@
 import { Metadata } from 'next'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import LiveProjectShowcase from '@/components/demos/live-project-showcase'
+import StructuredData from '@/components/structured-data'
 import { generateMetadata as genMeta } from '@/lib/seo'
 
 export const metadata: Metadata = genMeta({
@@ -10,6 +12,21 @@ export const metadata: Metadata = genMeta({
 })
 
 export default function DemosPage() {
-  return <LiveProjectShowcase />
+  return (
+    <>
+      <StructuredData
+        type="WebSite"
+        title="Live Project Demos | Mohamed Datt"
+        description="See projects in action. Interactive live demos of real working applications"
+        url="/demos"
+      />
+      <EnhancedPageLayout
+        title="Live Project Demos"
+        description="See my projects in action. Interactive live demos of real working applications."
+      >
+        <LiveProjectShowcase />
+      </EnhancedPageLayout>
+    </>
+  )
 }
 

@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
-import Navigation from '@/components/navigation'
-import FooterLight from '@/components/footer-light'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 import TestimonialsPageContent from '@/components/testimonials/testimonials-page-content'
 import StructuredData from '@/components/structured-data'
 
@@ -18,13 +17,12 @@ export default function TestimonialsPage() {
         description="Client testimonials and reviews"
         url="/testimonials"
       />
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main className="pt-20 pb-16">
-          <TestimonialsPageContent />
-        </main>
-        <FooterLight />
-      </div>
+      <EnhancedPageLayout
+        title="Testimonials"
+        description="Client testimonials and reviews from projects, colleagues, and collaborators."
+      >
+        <TestimonialsPageContent />
+      </EnhancedPageLayout>
     </>
   )
 }
