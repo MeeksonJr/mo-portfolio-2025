@@ -45,6 +45,7 @@ const navGroups = [
       { href: '/admin/content/case-studies', label: 'Case Studies', icon: Briefcase },
       { href: '/admin/content/resources', label: 'Resources', icon: Package },
       { href: '/admin/testimonials', label: 'Testimonials', icon: MessageSquare },
+      { href: '/admin/guestbook', label: 'Guestbook', icon: MessageSquare },
     ],
   },
   {

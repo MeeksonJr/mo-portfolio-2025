@@ -1,0 +1,107 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+// POST - Add reaction to guestbook message
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params
+    const body = await request.json()
+    const { reaction_type } = body
+
+    if (!id || !reaction_type) {
+      return NextResponse.json(
+        { error: 'Missing required fields: id, reaction_type' },
+        { status: 400 }
+      )
+    }
+
+    if (!['like', 'heart', 'smile'].includes(reaction_type)) {
+      return NextResponse.json(
+        { error: 'Invalid reaction type. Must be: like, heart, or smile' },
+        { status: 400 }
+      )
+    }
+
+    // Get IP address for duplicate prevention
+    const ipAddress =
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip') ||
+      'unknown'
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    // Check if message exists and is approved
+    const { data: message, error: messageError } = await supabase
+      .from('guestbook')
+      .select('id, status')
+      .eq('id', id)
+      .single()
+
+    if (messageError || !message) {
+      return NextResponse.json(
+        { error: 'Message not found' },
+        { status: 404 }
+      )
+    }
+
+    if (message.status !== 'approved') {
+      return NextResponse.json(
+        { error: 'Message is not approved' },
+        { status: 403 }
+      )
+    }
+
+    // Check if reaction already exists from this IP
+    const { data: existingReaction } = await supabase
+      .from('guestbook_reactions')
+      .select('id')
+      .eq('guestbook_id', id)
+      .eq('ip_address', ipAddress)
+      .eq('reaction_type', reaction_type)
+      .single()
+
+    if (existingReaction) {
+      return NextResponse.json(
+        { error: 'You have already reacted to this message' },
+        { status: 409 }
+      )
+    }
+
+    // Insert reaction
+    const { data: reaction, error: insertError } = await supabase
+      .from('guestbook_reactions')
+      .insert({
+        guestbook_id: id,
+        reaction_type,
+        ip_address: ipAddress,
+      })
+      .select()
+      .single()
+
+    if (insertError) {
+      console.error('Error inserting reaction:', insertError)
+      return NextResponse.json(
+        { error: insertError.message || 'Failed to add reaction' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      reaction,
+    })
+  } catch (error: any) {
+    console.error('Error in POST /api/guestbook/[id]/reactions:', error)
+    return NextResponse.json(
+      { error: 'Internal server error', message: error.message },
+      { status: 500 }
+    )
+  }
+}
+
