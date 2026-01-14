@@ -53,11 +53,34 @@ export async function PUT(
     const body = await request.json()
     const adminClient = createAdminClient()
 
+    console.log('Blog post update - received fields:', {
+      featured_image: body.featured_image ? 'provided' : 'missing',
+      seo_title: body.seo_title ? 'provided' : 'missing',
+      seo_description: body.seo_description ? 'provided' : 'missing',
+      status: body.status,
+    })
+
     // If status is being set to published and published_at is not set, set it to now
     const updateData: any = {
       ...body,
       updated_at: new Date().toISOString(),
+      // Explicitly handle optional fields to ensure they're saved even if null
+      featured_image: body.featured_image !== undefined ? (body.featured_image || null) : undefined,
+      seo_title: body.seo_title !== undefined ? (body.seo_title || null) : undefined,
+      seo_description: body.seo_description !== undefined ? (body.seo_description || null) : undefined,
     }
+
+    // Remove undefined values to avoid overwriting existing data
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined) {
+        delete updateData[key]
+      }
+    })
+
+    console.log('Blog post update - updating with:', {
+      ...updateData,
+      content: updateData.content ? `${updateData.content.substring(0, 50)}...` : 'empty',
+    })
 
     // Handle published_at when status is published
     if (body.status === 'published' && !body.published_at) {

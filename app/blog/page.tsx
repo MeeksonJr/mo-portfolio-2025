@@ -22,7 +22,8 @@ export default async function BlogPage() {
       .from('blog_posts')
       .select('*')
       .eq('status', 'published')
-      .order('published_at', { ascending: false })
+      .order('published_at', { ascending: false, nullsLast: true })
+      .order('created_at', { ascending: false })
       .limit(50)
 
     if (error) {

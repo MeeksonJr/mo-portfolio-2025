@@ -34,6 +34,13 @@ export async function POST(request: Request) {
       github_repo_id,
     } = body
 
+    console.log('Blog post creation - received fields:', {
+      featured_image: featured_image ? 'provided' : 'missing',
+      seo_title: seo_title ? 'provided' : 'missing',
+      seo_description: seo_description ? 'provided' : 'missing',
+      status,
+    })
+
     // Generate unique slug if not provided or if it already exists
     let finalSlug = slug || createSlug(title)
     
@@ -60,22 +67,30 @@ export async function POST(request: Request) {
       finalPublishedAt = new Date().toISOString()
     }
 
-    const { data, error } = await adminClient.from('blog_posts').insert({
+    // Prepare insert data - explicitly handle undefined/null values
+    const insertData: any = {
       title,
       slug: finalSlug,
-      excerpt,
+      excerpt: excerpt || null,
       content,
-      category,
+      category: category || null,
       tags: tags || [],
       status: finalStatus,
-      featured_image,
-      seo_title,
-      seo_description,
+      featured_image: featured_image || null,
+      seo_title: seo_title || null,
+      seo_description: seo_description || null,
       published_at: finalPublishedAt,
-      github_repo_id,
+      github_repo_id: github_repo_id || null,
       author_id: user.id,
       reading_time,
-    }).select().single()
+    }
+
+    console.log('Blog post creation - inserting data:', {
+      ...insertData,
+      content: insertData.content ? `${insertData.content.substring(0, 50)}...` : 'empty',
+    })
+
+    const { data, error } = await adminClient.from('blog_posts').insert(insertData).select().single()
 
     if (error) {
       console.error('Error creating blog post:', error)

@@ -728,13 +728,36 @@ export default function ContentCreationModal({
         }
       }
 
-      console.log('Submitting payload:', { endpoint, method, payload })
+      // Ensure SEO and featured_image fields are always included (even if null) for blog posts
+      if (selectedType === 'blog') {
+        if (!('featured_image' in payload)) {
+          payload.featured_image = null
+        }
+        if (!('seo_title' in payload)) {
+          payload.seo_title = null
+        }
+        if (!('seo_description' in payload)) {
+          payload.seo_description = null
+        }
+      }
+
+      console.log('Submitting payload:', { 
+        endpoint, 
+        method, 
+        payload: {
+          ...payload,
+          content: payload.content ? `${payload.content.substring(0, 50)}...` : 'empty',
+        },
+        featured_image: payload.featured_image,
+        seo_title: payload.seo_title,
+        seo_description: payload.seo_description,
+      })
 
       // Clean up payload: remove undefined, convert empty strings to null for optional fields
       Object.keys(payload).forEach(key => {
         if (payload[key] === undefined) {
           delete payload[key]
-        } else if (payload[key] === '' && ['excerpt', 'category', 'seo_title', 'seo_description', 'published_at', 'description', 'url', 'homepage_url'].includes(key)) {
+        } else if (payload[key] === '' && ['excerpt', 'category', 'seo_title', 'seo_description', 'published_at', 'description', 'url', 'homepage_url', 'featured_image'].includes(key)) {
           // Convert empty strings to null for optional fields
           payload[key] = null
         } else if (payload[key] === '' && key !== 'github_url') {
