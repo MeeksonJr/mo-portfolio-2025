@@ -4,6 +4,12 @@ import { sendScheduledNewsletter } from '@/lib/newsletter/scheduled-send'
 
 // This endpoint should be called by a cron job (e.g., Vercel Cron, GitHub Actions, etc.)
 // to check for scheduled newsletters and send them
+// 
+// NOTE: Vercel Free Plan (Hobby) only allows ONE cron job per day
+// Schedule: "0 0 * * *" runs once daily at midnight UTC
+// For more frequent checks, upgrade to Pro plan or use external cron service
+export const maxDuration = 300 // 5 minutes max execution time
+
 export async function GET(request: NextRequest) {
   try {
     // Optional: Add authentication for cron job
