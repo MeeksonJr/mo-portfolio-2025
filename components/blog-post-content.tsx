@@ -12,6 +12,7 @@ import ReadingMode from '@/components/reading-mode/reading-mode'
 import { ContentPerformanceInsights } from '@/components/analytics/content-performance-insights'
 import SmartRecommendations from '@/components/recommendations/smart-recommendations'
 import FeedbackWidget from '@/components/feedback/feedback-widget'
+import CommentsSection from '@/components/comments/comments-section'
 
 interface BlogPost {
   id: string
@@ -247,6 +248,16 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
           <FeedbackWidget
             contentId={post.id}
             contentType="blog_post"
+          />
+        </div>
+      )}
+
+      {/* Comments Section */}
+      {post.id && (
+        <div className="mt-16 pt-8 border-t">
+          <CommentsSection
+            contentType="blog_post"
+            contentId={post.id}
           />
         </div>
       )}
