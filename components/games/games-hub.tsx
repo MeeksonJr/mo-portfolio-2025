@@ -23,6 +23,7 @@ import MemoryGame from './memory-game'
 import TicTacToeGame from './tic-tac-toe-game'
 import BreakoutGame from './breakout-game'
 import WordPuzzleGame from './word-puzzle-game'
+import Leaderboard from './leaderboard'
 import { toast } from 'sonner'
 
 const GAME_TABS = [
@@ -138,6 +139,11 @@ export default function GamesHub() {
             </TabsContent>
           </AnimatePresence>
         </Tabs>
+
+        {/* Leaderboard */}
+        <div className="mt-12">
+          <Leaderboard />
+        </div>
       </div>
     </div>
   )

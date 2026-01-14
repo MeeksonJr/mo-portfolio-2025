@@ -11,6 +11,7 @@ import SocialShareButton from '@/components/social-share/social-share-button'
 import ReadingMode from '@/components/reading-mode/reading-mode'
 import { ContentPerformanceInsights } from '@/components/analytics/content-performance-insights'
 import SmartRecommendations from '@/components/recommendations/smart-recommendations'
+import FeedbackWidget from '@/components/feedback/feedback-widget'
 
 interface BlogPost {
   id: string
@@ -236,6 +237,16 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
             contentId={post.id}
             contentType="blog_post"
             contentTitle={post.title}
+          />
+        </div>
+      )}
+
+      {/* Feedback Widget */}
+      {post.id && (
+        <div className="mt-16 pt-8 border-t">
+          <FeedbackWidget
+            contentId={post.id}
+            contentType="blog_post"
           />
         </div>
       )}
