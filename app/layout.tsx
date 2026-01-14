@@ -32,6 +32,7 @@ import AccessibilityAudit from "@/components/accessibility/accessibility-audit"
 import OrganizationSchema from "@/components/structured-data/organization-schema"
 import WebsiteSchema from "@/components/structured-data/website-schema"
 import ConversionTracker from "@/components/analytics/conversion-tracker"
+import GuidedTour from "@/components/onboarding/guided-tour"
 
 const inter = Inter({ subsets: ["latin"] })
 
