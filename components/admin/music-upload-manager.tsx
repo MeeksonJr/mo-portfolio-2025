@@ -136,40 +136,68 @@ export default function MusicUploadManager() {
         return
       }
 
-      const formData = new FormData()
-      formData.append('file', selectedFile)
-      formData.append('title', uploadForm.title)
-      if (uploadForm.artist) formData.append('artist', uploadForm.artist)
-      if (uploadForm.album) formData.append('album', uploadForm.album)
-      if (uploadForm.genre) formData.append('genre', uploadForm.genre)
-      if (uploadForm.description) formData.append('description', uploadForm.description)
+      // Validate file size (max 50MB)
+      const maxSize = 50 * 1024 * 1024 // 50MB
+      if (selectedFile.size > maxSize) {
+        alert(`File too large. Maximum size is 50MB. Your file is ${(selectedFile.size / 1024 / 1024).toFixed(2)}MB.`)
+        setIsUploading(false)
+        return
+      }
 
-      const response = await fetch('/api/admin/music/upload', {
+      // Upload directly to Supabase Storage (bypasses Vercel 4.5MB limit)
+      const bucketName = 'music'
+      const fileExt = selectedFile.name.split('.').pop()
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+      const filePath = fileName
+
+      // Upload to Supabase Storage with progress tracking
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, selectedFile, {
+          contentType: selectedFile.type,
+          upsert: false,
+          cacheControl: '3600',
+        })
+
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError)
+        throw new Error(`Failed to upload file: ${uploadError.message}`)
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage.from(bucketName).getPublicUrl(filePath)
+      const publicUrl = urlData.publicUrl
+
+      // Save song metadata to database via API
+      const { data: { session: sessionForAPI } } = await supabase.auth.getSession()
+      const response = await fetch('/api/admin/music/save-metadata', {
         method: 'POST',
-        body: formData,
-        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          // Don't set Content-Type header - browser will set it with boundary for FormData
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionForAPI?.access_token}`,
         },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: uploadForm.title,
+          artist: uploadForm.artist || null,
+          album: uploadForm.album || null,
+          genre: uploadForm.genre || null,
+          description: uploadForm.description || null,
+          file_url: publicUrl,
+          file_path: filePath,
+          file_size: selectedFile.size,
+        }),
       })
 
       if (!response.ok) {
-        let errorMessage = 'Upload failed'
+        // If metadata save fails, try to delete uploaded file
+        await supabase.storage.from(bucketName).remove([filePath])
+        
+        let errorMessage = 'Failed to save song metadata'
         try {
           const error = await response.json()
           errorMessage = error.error || errorMessage
-          
-          // Handle specific error codes
-          if (response.status === 413) {
-            errorMessage = `File too large: ${errorMessage}. Maximum size is 50MB.`
-          } else if (response.status === 401) {
-            errorMessage = 'Authentication failed. Please log in again.'
-          } else if (response.status === 403) {
-            errorMessage = 'You do not have permission to upload songs.'
-          }
         } catch (e) {
-          // If response is not JSON, use status text
           errorMessage = response.statusText || errorMessage
         }
         throw new Error(errorMessage)
@@ -177,9 +205,7 @@ export default function MusicUploadManager() {
 
       const data = await response.json()
       
-      // Check for both 'song' and 'data' fields (API returns both)
-      const songData = data.song || data.data
-      if (!data.success || !songData) {
+      if (!data.success || !data.song) {
         throw new Error(data.error || 'Upload succeeded but song data not returned')
       }
 
