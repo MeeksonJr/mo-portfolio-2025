@@ -20,6 +20,7 @@ import EnhancedFilters from '@/components/filters/enhanced-filters'
 import SocialShareButton from '@/components/sharing/social-share-button'
 import { EnhancedScrollReveal } from '@/components/animations/enhanced-scroll-reveal'
 import { isContentNew, formatRelativeTime } from '@/lib/content-freshness'
+import SeriesBadge from '@/components/content/series-badge'
 
 interface BlogPost {
   id: string
@@ -33,6 +34,8 @@ interface BlogPost {
   reading_time: number | null
   views: number
   created_at: string
+  series?: string | null
+  series_order?: number | null
 }
 
 interface BlogListingProps {
@@ -204,6 +207,9 @@ export default function BlogListing({ posts }: BlogListingProps) {
                     <Badge variant="outline">
                       {post.category}
                     </Badge>
+                  )}
+                  {post.series && (
+                    <SeriesBadge seriesName={post.series} />
                   )}
                   {post.published_at && isContentNew(post.published_at) && (
                     <Badge className="bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30">
