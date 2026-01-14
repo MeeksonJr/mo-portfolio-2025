@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/admin/newsletter/scheduled",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
