@@ -181,6 +181,7 @@ export async function POST(request: NextRequest) {
 
       content_text = `${title}\n\nHi there! I wanted to share some exciting updates with you...\n\nVisit: ${siteUrl}`
       preview_text = `Updates from Mohamed Datt`
+      }
     }
 
     return NextResponse.json({
