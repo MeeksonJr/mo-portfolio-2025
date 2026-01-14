@@ -19,7 +19,7 @@ export async function GET(request: Request) {
 
     const adminClient = createAdminClient()
 
-    // Fetch blog posts
+    // Fetch blog posts - no cache
     const { data, error } = await adminClient
       .from('blog_posts')
       .select('*')

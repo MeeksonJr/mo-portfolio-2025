@@ -12,6 +12,8 @@ export const metadata: Metadata = genMeta({
   tags: ['blog', 'web development', 'AI', 'Next.js', 'TypeScript', 'tutorials'],
 })
 
+export const revalidate = 0 // Disable caching for this page
+
 export default async function BlogPage() {
   const supabase = createAdminClient()
 

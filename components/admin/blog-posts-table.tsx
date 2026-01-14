@@ -102,16 +102,21 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
     setIsRefreshing(true)
     try {
       const { data: { session } } = await supabase.auth.getSession()
-      const headers: HeadersInit = {}
+      const headers: HeadersInit = {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      }
       
       if (session?.access_token) {
         headers['Authorization'] = `Bearer ${session.access_token}`
       }
 
-      const response = await fetch('/api/admin/content/blog', {
+      // Add timestamp to bust cache
+      const response = await fetch(`/api/admin/content/blog?t=${Date.now()}`, {
         method: 'GET',
         headers,
         credentials: 'include',
+        cache: 'no-store',
       })
 
       if (!response.ok) {
@@ -121,6 +126,7 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
       const result = await response.json()
       if (result.data) {
         setPosts(result.data)
+        console.log('Posts refetched:', result.data.length, 'posts')
       }
       
       // Also refresh server component data

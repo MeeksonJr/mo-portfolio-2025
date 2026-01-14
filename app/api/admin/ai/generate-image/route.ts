@@ -108,13 +108,13 @@ Return only the image description text, nothing else.`
       throw new Error(`All Groq models failed. Last error: ${lastError?.message || 'Unknown error'}`)
     }
 
-    // Generate image using Hugging Face Router API
-    // Try multiple models in case one fails - using models from user's list
+    // Generate image using Hugging Face Inference API
+    // Updated to use working models (2025)
     const hfModels = [
       { id: 'stabilityai/stable-diffusion-xl-base-1.0', params: { num_inference_steps: 50, guidance_scale: 7.5 } },
+      { id: 'runwayml/stable-diffusion-v1-5', params: { num_inference_steps: 50, guidance_scale: 7.5 } },
       { id: 'CompVis/stable-diffusion-v1-4', params: { num_inference_steps: 50, guidance_scale: 7.5 } },
       { id: 'stabilityai/sdxl-turbo', params: { num_inference_steps: 4, guidance_scale: 0 } },
-      { id: 'stabilityai/stable-diffusion-3-medium', params: { num_inference_steps: 50, guidance_scale: 7.5 } },
     ]
 
     let imageBlob = null
@@ -124,89 +124,65 @@ Return only the image description text, nothing else.`
       try {
         console.log(`🔄 Trying Hugging Face model: ${model.id}`)
         
-        // Try different router endpoint formats
-        // Based on Hugging Face documentation, the router might use different paths
-        const routerEndpoints = [
-          `https://router.huggingface.co/hf-inference/models/${model.id}`, // hf-inference format
-          `https://router.huggingface.co/models/${model.id}`, // Direct model path
-          `https://router.huggingface.co/v1/models/${model.id}`, // V1 API format
-          `https://router.huggingface.co/inference/models/${model.id}`, // Alternative inference path
+        // Use Hugging Face Inference API (standard endpoint)
+        const inferenceEndpoints = [
+          `https://api-inference.huggingface.co/models/${model.id}`, // Standard Inference API
+          `https://api-inference.huggingface.co/pipeline/text-to-image/${model.id}`, // Pipeline format
         ]
         
         let hfResponse = null
         let retryCount = 0
         const maxRetries = 2
         
-        for (const endpoint of routerEndpoints) {
+        for (const endpoint of inferenceEndpoints) {
           try {
-            console.log(`  Trying router endpoint: ${endpoint}`)
+            console.log(`  Trying inference endpoint: ${endpoint}`)
             
             while (retryCount <= maxRetries) {
               try {
                 if (retryCount > 0) {
                   console.log(`  Retry attempt ${retryCount} for ${model.id}...`)
-                  await new Promise(resolve => setTimeout(resolve, 15000)) // Wait 15 seconds
+                  await new Promise(resolve => setTimeout(resolve, 10000)) // Wait 10 seconds
                 }
                 
-                // Try different request body formats for router API
-                const requestBodies = [
-                  // Standard format
-                  {
-                    inputs: imageDescription,
-                    parameters: model.params,
-                  },
-                  // Router API might expect different format
-                  {
-                    prompt: imageDescription,
-                    ...model.params,
-                  },
-                  // Alternative format
-                  {
-                    text: imageDescription,
-                    parameters: model.params,
-                  },
-                ]
+                // Standard Hugging Face Inference API format
+                const requestBody = {
+                  inputs: imageDescription,
+                  parameters: model.params,
+                }
                 
-                let lastBodyError = null
-                let foundWorkingBody = false
+                const testResponse = await fetch(endpoint, {
+                  headers: {
+                    Authorization: `Bearer ${hfToken}`,
+                    'Content-Type': 'application/json',
+                  },
+                  method: 'POST',
+                  body: JSON.stringify(requestBody),
+                })
                 
-                for (const requestBody of requestBodies) {
-                  try {
-                    const testResponse = await fetch(endpoint, {
-                      headers: {
-                        Authorization: `Bearer ${hfToken}`,
-                        'Content-Type': 'application/json',
-                      },
-                      method: 'POST',
-                      body: JSON.stringify(requestBody),
-                    })
-                    
-                    if (testResponse.ok) {
-                      hfResponse = testResponse
-                      foundWorkingBody = true
-                      console.log(`  ✅ Router endpoint ${endpoint} succeeded with body format!`)
-                      break // Success with this body format
-                    }
-                    
-                    const errorText = await testResponse.text()
-                    lastBodyError = errorText
-                    console.log(`  ❌ Body format failed: ${testResponse.status} - ${errorText.substring(0, 100)}`)
-                    
-                    // If 404, try next body format
-                    if (testResponse.status === 404) {
-                      continue
-                    }
-                    
-                    // If 503, might need to retry
-                    if (testResponse.status === 503 && retryCount < maxRetries) {
-                      hfResponse = testResponse
-                      break // Will retry in outer loop
-                    }
-                    
-                    // Other errors, try next body format
-                    hfResponse = testResponse
-                    continue
-                  } catch (bodyError: any) {
+                if (testResponse.ok) {
+                  hfResponse = testResponse
+                  console.log(`  ✅ Inference endpoint ${endpoint} succeeded!`)
+                  break // Success
+                }
+                
+                const errorText = await testResponse.text()
+                console.log(`  ❌ Endpoint failed: ${testResponse.status} - ${errorText.substring(0, 100)}`)
+                
+                // If 503 (model loading), retry
+                if (testResponse.status === 503 && retryCount < maxRetries) {
+                  retryCount++
+                  continue
+                }
+                
+                // If 401/404, try next endpoint
+                if (testResponse.status === 401 || testResponse.status === 404) {
+                  break // Try next endpoint
+                }
+                
+                hfResponse = testResponse
+                break
+              } catch (bodyError: any) {
                     lastBodyError = bodyError.message
                     continue
                   }
