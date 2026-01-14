@@ -640,9 +640,9 @@ export default function ContentCreationModal({
     onSave: handleAutoSave,
     interval: 30000, // 30 seconds
     enabled: open && (isEditing || isDraft), // Only enable for drafts
-    onSaveError: (error) => {
+    onSaveError: (error: unknown) => {
       console.error('Auto-save failed:', error)
-      setSaveError(error instanceof Error ? error : new Error(error?.message || 'Auto-save failed'))
+      setSaveError(error instanceof Error ? error : new Error(String(error || 'Auto-save failed')))
     },
   })
 
