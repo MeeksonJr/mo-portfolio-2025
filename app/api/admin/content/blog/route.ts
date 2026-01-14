@@ -3,6 +3,9 @@ import { getAuthenticatedUser, isAdminUser } from '@/lib/supabase/api-helpers'
 import { createAdminClient } from '@/lib/supabase/server'
 import { createSlug, generateUniqueSlug } from '@/lib/slug-utils'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET(request: Request) {
   try {
     const user = await getAuthenticatedUser(request)
