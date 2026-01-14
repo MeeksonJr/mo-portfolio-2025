@@ -1,41 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient, createServerClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
+import { getAuthenticatedUser, isAdminUser } from '@/lib/supabase/api-helpers'
 
 export async function GET(request: NextRequest) {
   try {
-    // Check for Authorization header first
-    const authHeader = request.headers.get('authorization')
-    let session = null
+    const user = await getAuthenticatedUser(request)
 
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '')
-      const supabase = await createServerClient()
-      const { data: { session: sessionData } } = await supabase.auth.getSession()
-      // Verify token matches session
-      if (sessionData?.access_token === token) {
-        session = sessionData
-      }
-    } else {
-      const supabase = await createServerClient()
-      const { data: { session: sessionData } } = await supabase.auth.getSession()
-      session = sessionData
-    }
-
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user is admin
-    const adminClient = createAdminClient()
-    const { data: userRole } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', session.user.id)
-      .single()
-
-    if (!userRole || userRole.role !== 'admin') {
+    const isAdmin = await isAdminUser(user.id)
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
+
+    const adminClient = createAdminClient()
 
     const { data: campaigns, error } = await adminClient
       .from('newsletter_campaigns')
@@ -57,39 +38,19 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check for Authorization header first
-    const authHeader = request.headers.get('authorization')
-    let session = null
+    const user = await getAuthenticatedUser(request)
 
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '')
-      const supabase = await createServerClient()
-      const { data: { session: sessionData } } = await supabase.auth.getSession()
-      // Verify token matches session
-      if (sessionData?.access_token === token) {
-        session = sessionData
-      }
-    } else {
-      const supabase = await createServerClient()
-      const { data: { session: sessionData } } = await supabase.auth.getSession()
-      session = sessionData
-    }
-
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user is admin
-    const adminClient = createAdminClient()
-    const { data: userRole } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', session.user.id)
-      .single()
-
-    if (!userRole || userRole.role !== 'admin') {
+    const isAdmin = await isAdminUser(user.id)
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
+
+    const adminClient = createAdminClient()
 
     const body = await request.json()
     const {
@@ -127,7 +88,7 @@ export async function POST(request: NextRequest) {
         content_id: content_id || null,
         status: scheduled_at ? 'scheduled' : status,
         scheduled_at: scheduled_at ? new Date(scheduled_at).toISOString() : null,
-        created_by: session.user.id,
+        created_by: user.id,
       })
       .select()
       .single()

@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     const adminClient = createAdminClient()
     const body = await request.json()
-    const { title, subject, content_type, content_id } = body
+    const { title, subject, content_type, content_id, user_input, user_content } = body
 
     if (!title) {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 })
@@ -67,7 +67,24 @@ export async function POST(request: NextRequest) {
 
         let prompt = `Create a professional newsletter email for a full-stack developer portfolio. `
         
-        if (contentData) {
+        // If user provided input/content, use it as the foundation
+        if (user_input || user_content) {
+          prompt += `The user has provided the following content as a foundation:\n\n`
+          if (user_input) {
+            prompt += `User's input/instructions: "${user_input}"\n\n`
+          }
+          if (user_content) {
+            prompt += `User's content to improve/expand: "${user_content}"\n\n`
+          }
+          prompt += `Please use this as a foundation to create, improve, expand, and enhance the newsletter content. `
+          prompt += `Take what the user provided and build upon it to create a professional, engaging newsletter. `
+          if (title) {
+            prompt += `The newsletter title is: "${title}". `
+          }
+          if (subject) {
+            prompt += `The subject line should be: "${subject}" or similar. `
+          }
+        } else if (contentData) {
           prompt += `The newsletter is about a new ${content_type}: "${contentData.title || contentData.name || title}". `
           if (contentData.description || contentData.excerpt) {
             prompt += `Description: ${contentData.description || contentData.excerpt}. `
@@ -81,7 +98,7 @@ export async function POST(request: NextRequest) {
           prompt += `Generate an engaging newsletter that showcases updates from a full-stack developer portfolio. `
         }
 
-        prompt += `Return a JSON object with:
+        prompt += `\n\nReturn a JSON object with:
         - subject: Email subject line (engaging, under 60 characters)
         - preview_text: Preview text for email clients (under 150 characters)
         - content_html: HTML content for the newsletter (professional, responsive, include a call-to-action button)
@@ -111,8 +128,33 @@ export async function POST(request: NextRequest) {
           console.error('Error parsing Gemini response:', parseError)
           // Fall through to default generation
         }
-      } catch (geminiError) {
+      } catch (geminiError: any) {
         console.error('Error using Gemini AI:', geminiError)
+        
+        // Check if it's a quota/rate limit error
+        if (geminiError?.status === 429 || geminiError?.message?.includes('quota') || geminiError?.message?.includes('rate limit')) {
+          console.log('Gemini quota exceeded, using fallback generation')
+          // Fall through to default generation with user input if provided
+          if (user_input || user_content) {
+            // Use user input as base for fallback
+            content_html = `
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h1 style="font-size: 28px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px;">
+                  ${title}
+                </h1>
+                <div style="font-size: 16px; line-height: 1.6; color: #484848; margin-bottom: 24px;">
+                  ${user_content ? user_content.replace(/\n/g, '<br>') : user_input || 'Newsletter content based on your input.'}
+                </div>
+                <a href="${siteUrl}" style="display: inline-block; background-color: #22c55e; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: 600; margin-top: 16px;">
+                  Visit My Portfolio →
+                </a>
+              </div>
+            `
+            content_text = `${title}\n\n${user_content || user_input || 'Newsletter content based on your input.'}\n\nVisit: ${siteUrl}`
+            preview_text = (user_input || user_content || `Updates from Mohamed Datt`).substring(0, 150)
+            generatedSubject = subject || title
+          }
+        }
         // Fall through to default generation
       }
     }

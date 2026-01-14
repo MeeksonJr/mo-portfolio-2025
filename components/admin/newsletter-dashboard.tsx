@@ -71,6 +71,8 @@ export default function NewsletterDashboard() {
     content_id: '',
     auto_send: false,
     scheduled_at: '',
+    user_input: '', // User's instructions/input for AI generation
+    user_content: '', // User's content to improve/expand
   })
   const [isSaving, setIsSaving] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -231,6 +233,8 @@ export default function NewsletterDashboard() {
           subject: formData.subject,
           content_type: formData.content_type,
           content_id: formData.content_id,
+          user_input: formData.user_input || undefined,
+          user_content: formData.user_content || undefined,
         }),
       })
 

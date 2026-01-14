@@ -6,6 +6,7 @@ import { cookies } from 'next/headers'
 // Configure route for large file uploads
 export const runtime = 'nodejs'
 export const maxDuration = 60
+export const maxBodySize = '50mb'
 
 // Handle GET requests (for debugging/preflight)
 export async function GET() {
