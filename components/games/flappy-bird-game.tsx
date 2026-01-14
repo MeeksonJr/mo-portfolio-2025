@@ -33,7 +33,7 @@ export default function FlappyBirdGame({ musicEnabled, musicVolume }: FlappyBird
   const gameStateRef = useRef({
     birdY: CANVAS_HEIGHT / 2,
     birdVelocity: 0,
-    pipes: [] as Array<{ x: number; topHeight: number }>,
+    pipes: [] as Array<{ x: number; topHeight: number; scored?: boolean }>,
     frameCount: 0,
   })
 

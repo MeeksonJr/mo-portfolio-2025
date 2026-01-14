@@ -246,25 +246,14 @@ Try asking me something like "Show me projects using React" or "What's your expe
             return updated
           })
         }
-        } catch (streamError) {
-          console.error('Error reading stream:', streamError)
-          // If streaming fails, try to show error message
-          setMessages(prev => {
-            const updated = [...prev]
-            const lastMsg = updated[updated.length - 1]
-            if (lastMsg && lastMsg.role === 'assistant') {
-              lastMsg.content = lastMsg.content || 'Sorry, I encountered an error while generating the response. Please try again.'
-            }
-            return updated
-          })
-        }
-      } else {
-        // No reader available
+      } catch (streamError) {
+        console.error('Error reading stream:', streamError)
+        // If streaming fails, try to show error message
         setMessages(prev => {
           const updated = [...prev]
           const lastMsg = updated[updated.length - 1]
           if (lastMsg && lastMsg.role === 'assistant') {
-            lastMsg.content = 'Sorry, I could not read the response stream. Please try again.'
+            lastMsg.content = lastMsg.content || 'Sorry, I encountered an error while generating the response. Please try again.'
           }
           return updated
         })

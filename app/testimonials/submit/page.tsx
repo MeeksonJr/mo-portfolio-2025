@@ -7,7 +7,6 @@ import { generateMetaDescription } from '@/lib/seo-descriptions'
 export const metadata: Metadata = generateMetadata({
   title: 'Submit Testimonial',
   description: generateMetaDescription('testimonials'),
-  url: '/testimonials/submit',
 })
 
 export default function TestimonialSubmitPage() {

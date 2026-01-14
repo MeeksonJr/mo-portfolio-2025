@@ -35,6 +35,8 @@ export default function PongGame({ musicEnabled, musicVolume }: PongGameProps) {
     ballY: CANVAS_HEIGHT / 2,
     ballSpeedX: 5,
     ballSpeedY: 3,
+    playerScore: 0,
+    aiScore: 0,
   })
 
   useEffect(() => {
@@ -90,8 +92,8 @@ export default function PongGame({ musicEnabled, musicVolume }: PongGameProps) {
     // Draw scores
     ctx.font = '32px Arial'
     ctx.textAlign = 'center'
-    ctx.fillText(state.playerY.toString(), CANVAS_WIDTH / 4, 50)
-    ctx.fillText(state.aiY.toString(), (3 * CANVAS_WIDTH) / 4, 50)
+    ctx.fillText(state.playerScore.toString(), CANVAS_WIDTH / 4, 50)
+    ctx.fillText(state.aiScore.toString(), (3 * CANVAS_WIDTH) / 4, 50)
   }, [])
 
   const update = useCallback(() => {
@@ -190,6 +192,8 @@ export default function PongGame({ musicEnabled, musicVolume }: PongGameProps) {
   const startGame = () => {
     setIsPlaying(true)
     setIsPaused(false)
+    gameStateRef.current.playerScore = 0
+    gameStateRef.current.aiScore = 0
     resetBall()
     setScore({ player: 0, ai: 0 })
     clearGameState('pong')
