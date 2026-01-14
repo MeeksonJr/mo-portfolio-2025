@@ -188,6 +188,8 @@ export default function MusicSubmissionForm() {
                 accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac"
                 onChange={handleFileSelect}
                 className="hidden"
+                aria-label="Select audio file to upload"
+                title="Select audio file to upload"
               />
               <Button
                 type="button"
