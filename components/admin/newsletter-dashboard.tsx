@@ -322,6 +322,8 @@ export default function NewsletterDashboard() {
       content_id: '',
       auto_send: false,
       scheduled_at: '',
+      user_input: '',
+      user_content: '',
     })
   }
 
