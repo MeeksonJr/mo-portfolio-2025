@@ -47,10 +47,26 @@ export function useAdminNotifications() {
   return {
     notifications,
     unreadCount,
-    markAsRead: (id: string) => adminNotificationManager.markAsRead(id),
-    markAllAsRead: () => adminNotificationManager.markAllAsRead(),
-    remove: (id: string) => adminNotificationManager.remove(id),
+    markAsRead: async (id: string) => {
+      await adminNotificationManager.markAsRead(id)
+      setNotifications(adminNotificationManager.getAll())
+      setUnreadCount(adminNotificationManager.getUnreadCount())
+    },
+    markAllAsRead: async () => {
+      await adminNotificationManager.markAllAsRead()
+      setNotifications(adminNotificationManager.getAll())
+      setUnreadCount(adminNotificationManager.getUnreadCount())
+    },
+    remove: async (id: string) => {
+      await adminNotificationManager.remove(id)
+      setNotifications(adminNotificationManager.getAll())
+      setUnreadCount(adminNotificationManager.getUnreadCount())
+    },
     clear: () => adminNotificationManager.clear(),
-    clearRead: () => adminNotificationManager.clearRead(),
+    clearRead: async () => {
+      await adminNotificationManager.clearRead()
+      setNotifications(adminNotificationManager.getAll())
+      setUnreadCount(adminNotificationManager.getUnreadCount())
+    },
   }
 }

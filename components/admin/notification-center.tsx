@@ -112,7 +112,13 @@ const NotificationItem = ({
               variant="outline"
               size="sm"
               className="mt-2 h-7 text-xs"
-              onClick={notification.action.onClick}
+              onClick={() => {
+                if (notification.action?.onClick) {
+                  notification.action.onClick()
+                } else if (notification.action?.url) {
+                  window.location.href = notification.action.url
+                }
+              }}
             >
               {notification.action.label}
             </Button>
@@ -149,6 +155,9 @@ export default function NotificationCenter() {
       },
     })
 
+    // Start database sync
+    adminNotificationManager.startSync()
+
     // Load initial notifications
     setNotifications(adminNotificationManager.getAll())
     setUnreadCount(adminNotificationManager.getUnreadCount())
@@ -157,25 +166,33 @@ export default function NotificationCenter() {
     const interval = setInterval(() => {
       setNotifications(adminNotificationManager.getAll())
       setUnreadCount(adminNotificationManager.getUnreadCount())
-    }, 1000)
+    }, 5000) // Reduced frequency since we have database sync
 
     return () => clearInterval(interval)
   }, [])
 
-  const handleRead = (id: string) => {
-    adminNotificationManager.markAsRead(id)
+  const handleRead = async (id: string) => {
+    await adminNotificationManager.markAsRead(id)
+    setNotifications(adminNotificationManager.getAll())
+    setUnreadCount(adminNotificationManager.getUnreadCount())
   }
 
-  const handleRemove = (id: string) => {
-    adminNotificationManager.remove(id)
+  const handleRemove = async (id: string) => {
+    await adminNotificationManager.remove(id)
+    setNotifications(adminNotificationManager.getAll())
+    setUnreadCount(adminNotificationManager.getUnreadCount())
   }
 
-  const handleReadAll = () => {
-    adminNotificationManager.markAllAsRead()
+  const handleReadAll = async () => {
+    await adminNotificationManager.markAllAsRead()
+    setNotifications(adminNotificationManager.getAll())
+    setUnreadCount(adminNotificationManager.getUnreadCount())
   }
 
-  const handleClearRead = () => {
-    adminNotificationManager.clearRead()
+  const handleClearRead = async () => {
+    await adminNotificationManager.clearRead()
+    setNotifications(adminNotificationManager.getAll())
+    setUnreadCount(adminNotificationManager.getUnreadCount())
   }
 
   return (
