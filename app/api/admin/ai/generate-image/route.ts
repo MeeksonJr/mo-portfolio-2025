@@ -180,44 +180,22 @@ Return only the image description text, nothing else.`
                   break // Try next endpoint
                 }
                 
-                hfResponse = testResponse
-                break
-              } catch (bodyError: any) {
-                    lastBodyError = bodyError.message
-                    continue
-                  }
-                }
-                
-                if (foundWorkingBody && hfResponse) {
-                  break // Success, exit retry loop
-                }
-                
-                if (!hfResponse) {
-                  hfError = lastBodyError || 'No response from any body format'
-                  break
-                }
-                
-                const errorText = lastBodyError || await hfResponse.text()
-                console.log(`  ❌ Router endpoint ${endpoint} failed: ${hfResponse.status} - ${errorText.substring(0, 200)}`)
-                
-                // If it's a 503 (model loading), retry
-                if (hfResponse.status === 503 && retryCount < maxRetries) {
-                  console.log(`  Model ${model.id} is loading, will retry...`)
+                // If 503 (model loading), retry
+                if (testResponse.status === 503 && retryCount < maxRetries) {
                   retryCount++
                   continue
                 }
                 
-                // If it's a 404 (not found), try next endpoint format
-                if (hfResponse.status === 404) {
-                  console.log(`  Endpoint format ${endpoint} not found, trying next format...`)
-                  break // Try next endpoint format
+                // If 401/404, try next endpoint
+                if (testResponse.status === 401 || testResponse.status === 404) {
+                  break // Try next endpoint
                 }
                 
-                // Other errors, try next endpoint format
+                // Other errors, try next endpoint
                 hfError = errorText
                 break
               } catch (fetchError: any) {
-                console.log(`  ❌ Fetch error for ${endpoint}:`, fetchError.message)
+                console.log(`  ❌ Fetch error:`, fetchError.message)
                 hfError = fetchError.message
                 if (retryCount < maxRetries) {
                   retryCount++
@@ -234,7 +212,7 @@ Return only the image description text, nothing else.`
           } catch (endpointError: any) {
             console.log(`  ❌ Endpoint ${endpoint} error:`, endpointError.message)
             hfError = endpointError.message
-            continue // Try next endpoint format
+            continue // Try next endpoint
           }
         }
         
