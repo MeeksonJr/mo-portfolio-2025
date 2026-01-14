@@ -33,6 +33,11 @@ function NewsletterConfirmContent() {
         if (response.ok) {
           setStatus('success')
           setMessage(data.message || 'Email confirmed successfully!')
+          
+          // Track achievement
+          if (typeof window !== 'undefined' && (window as any).unlockAchievement) {
+            ;(window as any).unlockAchievement('newsletter-signup')
+          }
         } else {
           setStatus('error')
           setMessage(data.error || 'Failed to confirm subscription')
