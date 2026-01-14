@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Upload, Music, X, Trash2, Search, Loader2 } from 'lucide-react'
+import { Upload, Music, X, Trash2, Search, Loader2, Check, XCircle, Clock } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useDropzone } from 'react-dropzone'
 import { supabase } from '@/lib/supabase/client'
+import { toast } from 'sonner'
 
 interface Song {
   id: string
@@ -17,6 +18,9 @@ interface Song {
   duration: number | null
   play_count: number
   created_at: string
+  status?: 'pending' | 'approved' | 'rejected'
+  submitter_name?: string | null
+  submitter_email?: string | null
 }
 
 export default function MusicUploadManager() {
@@ -25,6 +29,7 @@ export default function MusicUploadManager() {
   const [songs, setSongs] = useState<Song[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all')
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [uploadForm, setUploadForm] = useState({
     title: '',
@@ -50,7 +55,11 @@ export default function MusicUploadManager() {
         return
       }
 
-      const response = await fetch(`/api/admin/music/songs?search=${encodeURIComponent(searchQuery)}`, {
+      const params = new URLSearchParams()
+      if (searchQuery) params.append('search', searchQuery)
+      if (statusFilter !== 'all') params.append('status', statusFilter)
+
+      const response = await fetch(`/api/admin/music/songs?${params.toString()}`, {
         credentials: 'include',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -74,7 +83,7 @@ export default function MusicUploadManager() {
     } finally {
       setLoading(false)
     }
-  }, [searchQuery])
+  }, [searchQuery, statusFilter])
 
   // Load songs on mount and when search changes
   useEffect(() => {
@@ -236,6 +245,38 @@ export default function MusicUploadManager() {
     }
   }
 
+  const handleApprove = async (songId: string, status: 'approved' | 'rejected') => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        alert('You must be logged in')
+        return
+      }
+
+      const response = await fetch(`/api/admin/music/songs/${songId}/approve`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || `Failed to ${status} song`)
+      }
+
+      toast.success(`Song ${status} successfully!`)
+      loadSongs()
+    } catch (error: any) {
+      console.error('Approve error:', error)
+      toast.error(error.message || `Failed to ${status} song`)
+    }
+  }
+
   const handleDelete = async (songId: string) => {
     if (!confirm('Are you sure you want to delete this song?')) return
 
@@ -261,11 +302,11 @@ export default function MusicUploadManager() {
         throw new Error(error.error || 'Failed to delete song')
       }
 
-      alert('Song deleted successfully!')
+      toast.success('Song deleted successfully!')
       loadSongs()
     } catch (error: any) {
       console.error('Delete error:', error)
-      alert(`Delete failed: ${error.message}`)
+      toast.error(error.message || 'Failed to delete song')
     }
   }
 
@@ -319,8 +360,8 @@ export default function MusicUploadManager() {
         </div>
       </div>
 
-      {/* Search */}
-      <div className="glass rounded-xl p-4">
+      {/* Search and Filters */}
+      <div className="glass rounded-xl p-4 space-y-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
           <input
@@ -330,6 +371,51 @@ export default function MusicUploadManager() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+              statusFilter === 'all'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted hover:bg-muted/80'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setStatusFilter('pending')}
+            className={`px-3 py-1 rounded-lg text-sm transition-colors flex items-center gap-1 ${
+              statusFilter === 'pending'
+                ? 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border border-yellow-500/50'
+                : 'bg-muted hover:bg-muted/80'
+            }`}
+          >
+            <Clock size={14} />
+            Pending
+          </button>
+          <button
+            onClick={() => setStatusFilter('approved')}
+            className={`px-3 py-1 rounded-lg text-sm transition-colors flex items-center gap-1 ${
+              statusFilter === 'approved'
+                ? 'bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/50'
+                : 'bg-muted hover:bg-muted/80'
+            }`}
+          >
+            <Check size={14} />
+            Approved
+          </button>
+          <button
+            onClick={() => setStatusFilter('rejected')}
+            className={`px-3 py-1 rounded-lg text-sm transition-colors flex items-center gap-1 ${
+              statusFilter === 'rejected'
+                ? 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/50'
+                : 'bg-muted hover:bg-muted/80'
+            }`}
+          >
+            <XCircle size={14} />
+            Rejected
+          </button>
         </div>
       </div>
 
@@ -350,26 +436,73 @@ export default function MusicUploadManager() {
             {songs.map((song) => (
               <div
                 key={song.id}
-                className="flex items-center justify-between p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+                className={`flex items-center justify-between p-4 rounded-lg hover:bg-muted transition-colors ${
+                  song.status === 'pending' 
+                    ? 'bg-yellow-500/10 border border-yellow-500/30' 
+                    : song.status === 'rejected'
+                    ? 'bg-red-500/10 border border-red-500/30'
+                    : 'bg-muted/50'
+                }`}
               >
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold truncate">{song.title}</h3>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold truncate">{song.title}</h3>
+                    {song.status === 'pending' && (
+                      <span className="px-2 py-0.5 text-xs bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 rounded flex items-center gap-1">
+                        <Clock size={12} />
+                        Pending
+                      </span>
+                    )}
+                    {song.status === 'rejected' && (
+                      <span className="px-2 py-0.5 text-xs bg-red-500/20 text-red-600 dark:text-red-400 rounded flex items-center gap-1">
+                        <XCircle size={12} />
+                        Rejected
+                      </span>
+                    )}
+                  </div>
+                  {song.submitter_name && (
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Submitted by: {song.submitter_name} {song.submitter_email && `(${song.submitter_email})`}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     {song.artist && <span>{song.artist}</span>}
                     {song.album && <span>• {song.album}</span>}
                     {song.genre && <span>• {song.genre}</span>}
                     <span>• {formatFileSize(song.file_size)}</span>
-                    <span>• {song.play_count} plays</span>
+                    {song.status === 'approved' && <span>• {song.play_count} plays</span>}
                   </div>
                 </div>
-                <button
-                  onClick={() => handleDelete(song.id)}
-                  className="ml-4 p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                  aria-label={`Delete ${song.title}`}
-                  title={`Delete ${song.title}`}
-                >
-                  <Trash2 size={20} />
-                </button>
+                <div className="flex items-center gap-2 ml-4">
+                  {song.status === 'pending' && (
+                    <>
+                      <button
+                        onClick={() => handleApprove(song.id, 'approved')}
+                        className="p-2 text-green-500 hover:bg-green-500/10 rounded-lg transition-colors"
+                        aria-label={`Approve ${song.title}`}
+                        title={`Approve ${song.title}`}
+                      >
+                        <Check size={20} />
+                      </button>
+                      <button
+                        onClick={() => handleApprove(song.id, 'rejected')}
+                        className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                        aria-label={`Reject ${song.title}`}
+                        title={`Reject ${song.title}`}
+                      >
+                        <XCircle size={20} />
+                      </button>
+                    </>
+                  )}
+                  <button
+                    onClick={() => handleDelete(song.id)}
+                    className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                    aria-label={`Delete ${song.title}`}
+                    title={`Delete ${song.title}`}
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

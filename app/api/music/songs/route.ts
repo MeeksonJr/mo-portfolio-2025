@@ -14,6 +14,9 @@ export async function GET(request: NextRequest) {
 
     let query = adminClient.from('songs').select('*', { count: 'exact' })
 
+    // Only show approved songs to public
+    query = query.eq('status', 'approved')
+
     // Apply filters
     if (search) {
       query = query.or(`title.ilike.%${search}%,artist.ilike.%${search}%,album.ilike.%${search}%`)
