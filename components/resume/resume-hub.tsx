@@ -106,6 +106,11 @@ function ResumeHubContent() {
       window.URL.revokeObjectURL(url)
 
       showSuccessToast('Resume downloaded successfully!')
+      
+      // Track achievement
+      if (typeof window !== 'undefined' && (window as any).unlockAchievement) {
+        ;(window as any).unlockAchievement('download-resume')
+      }
     } catch (error) {
       console.error('Error downloading resume:', error)
       showErrorToast('Failed to download resume. Please try again.')

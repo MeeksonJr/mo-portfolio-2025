@@ -181,6 +181,11 @@ export default function HeroLight() {
                   rel="noopener noreferrer"
                   download="Mohamed-Datt-Resume-2025.pdf"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-primary/95 backdrop-blur-sm text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-all hover:scale-105 shadow-lg border-2 border-primary/20"
+                  onClick={() => {
+                    if (typeof window !== 'undefined' && (window as any).unlockAchievement) {
+                      ;(window as any).unlockAchievement('download-resume')
+                    }
+                  }}
                 >
                   <Download size={18} />
                   Download Resume

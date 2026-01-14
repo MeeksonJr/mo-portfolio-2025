@@ -197,6 +197,159 @@ export const ACHIEVEMENTS: Achievement[] = [
     rarity: 'legendary',
     points: 200,
   },
+  {
+    id: 'play-all-games',
+    title: 'Game Master',
+    description: 'Play all 6 games in the Games Hub',
+    icon: '🎮',
+    category: 'engagement',
+    rarity: 'rare',
+    points: 40,
+  },
+  {
+    id: 'high-score',
+    title: 'High Scorer',
+    description: 'Achieve a high score in any game',
+    icon: '🏆',
+    category: 'engagement',
+    rarity: 'common',
+    points: 15,
+  },
+  {
+    id: 'download-resume',
+    title: 'Resume Collector',
+    description: 'Download the resume',
+    icon: '📄',
+    category: 'engagement',
+    rarity: 'common',
+    points: 20,
+  },
+  {
+    id: 'use-tools',
+    title: 'Tool Explorer',
+    description: 'Use any tool in the Tools Hub',
+    icon: '🔧',
+    category: 'engagement',
+    rarity: 'common',
+    points: 15,
+  },
+  {
+    id: 'view-insights',
+    title: 'Data Analyst',
+    description: 'Visit the Insights Hub',
+    icon: '📊',
+    category: 'exploration',
+    rarity: 'common',
+    points: 15,
+  },
+  {
+    id: 'read-10-posts',
+    title: 'Blog Devotee',
+    description: 'Read 10 blog posts',
+    icon: '📖',
+    category: 'exploration',
+    rarity: 'epic',
+    points: 60,
+  },
+  {
+    id: 'share-content',
+    title: 'Content Sharer',
+    description: 'Share any content (blog post, project, etc.)',
+    icon: '📤',
+    category: 'social',
+    rarity: 'rare',
+    points: 30,
+  },
+  {
+    id: 'newsletter-signup',
+    title: 'Newsletter Subscriber',
+    description: 'Subscribe to the newsletter',
+    icon: '📧',
+    category: 'social',
+    rarity: 'rare',
+    points: 35,
+  },
+  {
+    id: 'feedback-given',
+    title: 'Feedback Provider',
+    description: 'Provide feedback on any content',
+    icon: '💬',
+    category: 'social',
+    rarity: 'common',
+    points: 20,
+  },
+  {
+    id: 'code-playground',
+    title: 'Code Explorer',
+    description: 'Use the Code Playground',
+    icon: '💻',
+    category: 'engagement',
+    rarity: 'common',
+    points: 15,
+  },
+  {
+    id: 'portfolio-comparison',
+    title: 'Portfolio Analyzer',
+    description: 'Use the Portfolio Comparison tool',
+    icon: '⚖️',
+    category: 'engagement',
+    rarity: 'rare',
+    points: 25,
+  },
+  {
+    id: 'skills-match',
+    title: 'Skills Matcher',
+    description: 'Use the Skills Matching tool',
+    icon: '🎯',
+    category: 'engagement',
+    rarity: 'rare',
+    points: 25,
+  },
+  {
+    id: 'roi-calculator',
+    title: 'ROI Analyst',
+    description: 'Use the ROI Calculator',
+    icon: '💰',
+    category: 'engagement',
+    rarity: 'rare',
+    points: 25,
+  },
+  {
+    id: 'view-timeline',
+    title: 'Timeline Explorer',
+    description: 'View the interactive timeline',
+    icon: '📅',
+    category: 'exploration',
+    rarity: 'common',
+    points: 15,
+  },
+  {
+    id: 'view-certifications',
+    title: 'Certification Viewer',
+    description: 'View the certifications section',
+    icon: '🏅',
+    category: 'exploration',
+    rarity: 'common',
+    points: 15,
+  },
+  {
+    id: 'view-skills-matrix',
+    title: 'Skills Analyst',
+    description: 'View the Skills Proficiency Matrix',
+    icon: '📈',
+    category: 'exploration',
+    rarity: 'common',
+    points: 15,
+  },
+  {
+    id: 'complete-all-achievements',
+    title: 'Achievement Master',
+    description: 'Unlock all achievements',
+    icon: '🌟',
+    category: 'milestone',
+    rarity: 'legendary',
+    points: 500,
+  },
 ]
 
 const STORAGE_KEY = 'portfolio_achievements'
@@ -393,5 +546,28 @@ export function getAllAchievementsWithProgress(): Array<Achievement & { progress
       ? new Date().toISOString()
       : undefined,
   }))
+}
+
+/**
+ * Check if all achievements are unlocked
+ */
+export function checkAllAchievementsUnlocked(): boolean {
+  const state = getAchievementState()
+  return state.unlocked.length === ACHIEVEMENTS.length
+}
+
+/**
+ * Check and unlock "complete-all-achievements" if all are unlocked
+ */
+export function checkCompleteAllAchievements(): void {
+  if (checkAllAchievementsUnlocked()) {
+    const state = getAchievementState()
+    if (!state.unlocked.includes('complete-all-achievements')) {
+      unlockAchievement('complete-all-achievements')
+      if (typeof window !== 'undefined' && (window as any).unlockAchievement) {
+        ;(window as any).unlockAchievement('complete-all-achievements')
+      }
+    }
+  }
 }
 

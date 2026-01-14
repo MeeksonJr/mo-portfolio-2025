@@ -82,6 +82,12 @@ export default function GuidedTour({ onComplete }: GuidedTourProps) {
   const completeTour = () => {
     markOnboardingComplete()
     setIsVisible(false)
+    
+    // Track achievement
+    if (typeof window !== 'undefined' && (window as any).unlockAchievement) {
+      ;(window as any).unlockAchievement('complete-onboarding')
+    }
+    
     if (onComplete) onComplete()
   }
 

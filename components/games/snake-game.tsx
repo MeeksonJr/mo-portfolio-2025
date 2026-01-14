@@ -182,6 +182,26 @@ export default function SnakeGame({ musicEnabled, musicVolume }: SnakeGameProps)
     if (score > 0) {
       saveScore('snake', score)
       toast.success(`Game Over! Score: ${score}`)
+      
+      // Track achievements
+      if (typeof window !== 'undefined') {
+        // Track high score achievement
+        if (score >= 50 && (window as any).unlockAchievement) {
+          ;(window as any).unlockAchievement('high-score')
+        }
+        
+        // Track games played
+        const gamesPlayed = JSON.parse(localStorage.getItem('games_played') || '[]')
+        if (!gamesPlayed.includes('snake')) {
+          gamesPlayed.push('snake')
+          localStorage.setItem('games_played', JSON.stringify(gamesPlayed))
+          
+          // Check if all games played
+          if (gamesPlayed.length >= 6 && (window as any).unlockAchievement) {
+            ;(window as any).unlockAchievement('play-all-games')
+          }
+        }
+      }
     }
   }
 

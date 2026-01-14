@@ -20,8 +20,10 @@ const DEFAULT_SECTIONS: HomepageSection[] = [
   { id: 'projects', name: 'Projects', component: 'ProjectsLight', visible: true, order: 4 },
   { id: 'experience', name: 'Experience', component: 'Experience', visible: true, order: 5 },
   { id: 'services', name: 'Services & Pricing', component: 'ServicesPricing', visible: true, order: 6 },
-  { id: 'courses', name: 'Courses', component: 'CoursesSection', visible: true, order: 7 },
-  { id: 'contact', name: 'Contact', component: 'Contact', visible: true, order: 8 },
+  { id: 'clients', name: 'Client Showcase', component: 'ClientShowcase', visible: true, order: 7 },
+  { id: 'testimonials', name: 'Testimonials', component: 'TestimonialsSection', visible: true, order: 8 },
+  { id: 'courses', name: 'Courses', component: 'CoursesSection', visible: true, order: 9 },
+  { id: 'contact', name: 'Contact', component: 'Contact', visible: true, order: 10 },
 ]
 
 /**

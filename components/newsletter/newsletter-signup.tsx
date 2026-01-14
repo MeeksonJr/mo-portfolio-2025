@@ -53,6 +53,9 @@ export function NewsletterSignup({ variant = 'default', source = 'website', clas
       setEmail('')
       setName('')
       toast.success('Please check your email to confirm your subscription!')
+      
+      // Track achievement (will be confirmed when email is confirmed)
+      // We'll track it on the confirmation page instead
 
       // Reset success state after 5 seconds
       setTimeout(() => setIsSuccess(false), 5000)

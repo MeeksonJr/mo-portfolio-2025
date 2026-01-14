@@ -86,6 +86,11 @@ export default function SocialShareButton({
         onShare(platform)
       }
 
+      // Track achievement
+      if (typeof window !== 'undefined' && (window as any).unlockAchievement) {
+        ;(window as any).unlockAchievement('share-content')
+      }
+
       window.open(shareLink, '_blank', 'width=600,height=400')
       toast.success(`Opening ${platform}...`)
     }
@@ -116,6 +121,11 @@ export default function SocialShareButton({
 
       if (onShare) {
         onShare('copy')
+      }
+
+      // Track achievement
+      if (typeof window !== 'undefined' && (window as any).unlockAchievement) {
+        ;(window as any).unlockAchievement('share-content')
       }
 
       toast.success('Link copied to clipboard!')

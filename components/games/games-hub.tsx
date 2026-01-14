@@ -47,6 +47,12 @@ export default function GamesHub() {
     if (tab && GAME_TABS.some(t => t.value === tab)) {
       setActiveTab(tab)
     }
+    
+    // Track games page visit for achievement
+    if (typeof window !== 'undefined') {
+      const gamesPlayed = JSON.parse(localStorage.getItem('games_played') || '[]')
+      // This will be updated when games are actually played
+    }
   }, [searchParams])
 
   const handleTabChange = (value: string) => {

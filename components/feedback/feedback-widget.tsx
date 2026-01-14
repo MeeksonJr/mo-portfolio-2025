@@ -95,6 +95,11 @@ export default function FeedbackWidget({
         localStorage.setItem(feedbackKey, JSON.stringify({ helpful: isHelpful }))
         toast.success('Thank you for your feedback!')
         fetchStats()
+        
+        // Track achievement
+        if (typeof window !== 'undefined' && (window as any).unlockAchievement) {
+          ;(window as any).unlockAchievement('feedback-given')
+        }
       } else {
         toast.error('Failed to submit feedback')
       }

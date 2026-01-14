@@ -13,6 +13,8 @@ import CaseStudyCard from '@/components/case-study-card'
 import CoursesSection from '@/components/courses-section-redesigned'
 import Contact from '@/components/contact-redesigned'
 import ClientShowcase from '@/components/clients/client-showcase'
+import TestimonialsSection from '@/components/testimonials/testimonials-section'
+import PersonalizedHomepage from '@/components/personalization/personalized-homepage'
 
 export default function FramedHomepageLayout() {
   const { scrollYProgress } = useScroll()
@@ -38,6 +40,9 @@ export default function FramedHomepageLayout() {
 
       {/* Main Content - Flowing Sections */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 space-y-16 md:space-y-24 pb-20 md:pb-32">
+        
+        {/* Personalized Section */}
+        <PersonalizedHomepage />
         
         {/* Quick Stats - Horizontal Frame Row */}
         <motion.section
@@ -132,6 +137,17 @@ export default function FramedHomepageLayout() {
           className="relative"
         >
           <ClientShowcase />
+        </motion.section>
+
+        {/* Testimonials - Full Width Frame */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6, delay: 0.575 }}
+          className="relative"
+        >
+          <TestimonialsSection />
         </motion.section>
 
         {/* Education - Full Width Frame */}
