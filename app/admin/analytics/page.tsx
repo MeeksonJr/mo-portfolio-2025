@@ -1,16 +1,20 @@
-import AnalyticsDashboard from '@/components/admin/analytics-dashboard'
+import { Metadata } from 'next'
+import ContentAnalytics from '@/components/admin/content-analytics'
+import EnhancedPageLayout from '@/components/layout/enhanced-page-layout'
 
-export default async function AnalyticsPage() {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-        <p className="text-muted-foreground mt-2">
-          View analytics and visitor insights
-        </p>
-      </div>
-      <AnalyticsDashboard />
-    </div>
-  )
+export const metadata: Metadata = {
+  title: 'Content Analytics | Admin',
+  description: 'Track your content performance and engagement',
 }
 
+export default function AnalyticsPage() {
+  return (
+    <EnhancedPageLayout
+      title="Content Analytics"
+      description="Track your content performance, engagement, and insights"
+      showBreadcrumbs={true}
+    >
+      <ContentAnalytics />
+    </EnhancedPageLayout>
+  )
+}
