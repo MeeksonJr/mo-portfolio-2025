@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Terminal, User, MessageCircle, Github, Mail, FileText, Eye } from "lucide-react"
+import { Terminal, User, MessageCircle, Github, Mail, FileText, Eye, Gamepad2 } from "lucide-react"
 import { useInspectMode } from "./inspect-mode-context"
 
 export default function CommandHub() {
@@ -60,6 +60,14 @@ export default function CommandHub() {
       label: "Contact",
       action: () => {
         document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })
+        setIsOpen(false)
+      },
+    },
+    {
+      icon: Gamepad2,
+      label: "Games",
+      action: () => {
+        window.location.href = "/games"
         setIsOpen(false)
       },
     },

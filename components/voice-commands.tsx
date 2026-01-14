@@ -166,6 +166,21 @@ export default function VoiceCommands() {
       action: () => router.push('/achievements'),
       description: 'Navigate to achievements',
     },
+    {
+      command: 'go to games',
+      action: () => router.push('/games'),
+      description: 'Navigate to games hub',
+    },
+    {
+      command: 'go to games hub',
+      action: () => router.push('/games'),
+      description: 'Navigate to games hub',
+    },
+    {
+      command: 'play games',
+      action: () => router.push('/games'),
+      description: 'Navigate to games hub',
+    },
     // Tools
     {
       command: 'open ai assistant',
@@ -325,6 +340,8 @@ export default function VoiceCommands() {
         matchedCommand = commands.find((cmd) => cmd.command === 'download resume')
       } else if (lowerText.includes('analyze') && lowerText.includes('project')) {
         matchedCommand = commands.find((cmd) => cmd.command === 'analyze project')
+      } else if (lowerText.includes('games') || lowerText.includes('play games') || lowerText.includes('game')) {
+        matchedCommand = commands.find((cmd) => cmd.command === 'go to games')
       }
     }
     
