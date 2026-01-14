@@ -143,7 +143,6 @@ export default function GamesHub() {
         <div className="mt-12">
           <Leaderboard />
         </div>
-      </div>
     </div>
   )
 }
