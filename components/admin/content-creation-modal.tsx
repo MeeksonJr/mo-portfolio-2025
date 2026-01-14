@@ -624,7 +624,7 @@ export default function ContentCreationModal({
       setSaveError(null)
     } catch (error: any) {
       console.error('Auto-save error:', error)
-      setSaveError(error)
+      setSaveError(error?.message || 'Auto-save failed')
       throw error
     }
   }
@@ -642,7 +642,7 @@ export default function ContentCreationModal({
     enabled: open && (isEditing || isDraft), // Only enable for drafts
     onSaveError: (error) => {
       console.error('Auto-save failed:', error)
-      setSaveError(error)
+      setSaveError(error?.message || 'Auto-save failed')
     },
   })
 
