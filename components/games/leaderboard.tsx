@@ -5,7 +5,7 @@ import { Trophy, Medal, Award, Crown } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { loadHighScore } from '@/lib/games/game-storage'
+import { loadHighScore, type HighScoreData } from '@/lib/games/game-storage'
 
 interface LeaderboardEntry {
   game: string

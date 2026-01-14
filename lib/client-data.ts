@@ -13,15 +13,13 @@ export interface Client {
 }
 
 export const clients: Client[] = [
-  // Add your clients here with their logos
-  // Example:
-  // {
-  //   name: 'Client Name',
-  //   logo: '/images/clients/client-logo.png',
-  //   website: 'https://client-website.com',
-  //   description: 'Worked on X project',
-  //   project: 'Project Name',
-  //   year: '2024',
-  // },
+  {
+    name: 'Humanora Consulting',
+    logo: '/images/clients/humanora-logo.png', // You'll need to add this logo
+    website: 'https://www.humanoraconsulting.com',
+    description: 'AI-powered interview prep platform - Full Stack Developer & Lead Developer',
+    project: 'InterviewPrep AI (Sold & Ongoing Development)',
+    year: '2024-2025',
+  },
 ]
 

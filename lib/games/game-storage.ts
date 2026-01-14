@@ -54,6 +54,24 @@ export function getHighScore(game: string): number {
   return scores.length > 0 ? scores[0].score : 0
 }
 
+export interface HighScoreData {
+  score: number
+  player?: string
+  date?: string
+}
+
+export function loadHighScore(game: string): HighScoreData | null {
+  const scores = getScores(game)
+  if (scores.length === 0) return null
+  
+  const topScore = scores[0]
+  return {
+    score: topScore.score,
+    player: 'You', // Could be enhanced to store player name
+    date: new Date(topScore.timestamp).toISOString(),
+  }
+}
+
 export function saveGameState(game: string, state: any): void {
   if (typeof window === 'undefined') return
 

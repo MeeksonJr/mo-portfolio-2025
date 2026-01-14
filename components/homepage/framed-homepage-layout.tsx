@@ -12,6 +12,7 @@ import PricingScattered from '@/components/pricing-scattered'
 import CaseStudyCard from '@/components/case-study-card'
 import CoursesSection from '@/components/courses-section-redesigned'
 import Contact from '@/components/contact-redesigned'
+import ClientShowcase from '@/components/clients/client-showcase'
 
 export default function FramedHomepageLayout() {
   const { scrollYProgress } = useScroll()
@@ -120,6 +121,17 @@ export default function FramedHomepageLayout() {
           <div className="frame-container">
             <ProjectsLight />
           </div>
+        </motion.section>
+
+        {/* Client Showcase */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6, delay: 0.55 }}
+          className="relative"
+        >
+          <ClientShowcase />
         </motion.section>
 
         {/* Education - Full Width Frame */}
