@@ -104,9 +104,9 @@ export default function HomepageCustomizer({ onClose }: HomepageCustomizerProps)
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
-      className="fixed bottom-24 right-6 z-50 w-96 max-h-[80vh] bg-background border-2 border-border rounded-lg shadow-2xl overflow-hidden"
+      className="fixed bottom-24 right-6 z-50 w-96 max-h-[80vh] bg-background/95 backdrop-blur-md border-2 border-border rounded-lg shadow-2xl overflow-hidden"
     >
-      <Card className="border-0 shadow-none">
+      <Card className="border-0 shadow-none bg-background/95 backdrop-blur-md">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>

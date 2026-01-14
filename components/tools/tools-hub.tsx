@@ -132,32 +132,34 @@ function ToolsHubContent() {
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tab Navigation */}
-          <div className="sticky top-20 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6">
-            <TabsList 
-              className="grid w-full grid-cols-3 md:grid-cols-6 h-auto p-1 bg-muted/50 overflow-x-auto"
-              aria-label="Tools Hub navigation tabs"
-            >
-              {TAB_OPTIONS.map((tab) => {
-                const Icon = tab.icon
-                const isActive = activeTab === tab.value
-                return (
-                  <TabsTrigger
-                    key={tab.value}
-                    value={tab.value}
-                    className="flex flex-col md:flex-row items-center gap-2 py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm min-w-[100px]"
-                    aria-label={`${tab.label} tab, ${tab.description}. ${isActive ? 'Currently active' : ''} Press Enter or Space to activate.`}
-                    aria-selected={isActive}
-                    aria-controls={`tools-tabpanel-${tab.value}`}
-                    id={`tools-tab-${tab.value}`}
-                    role="tab"
-                    tabIndex={isActive ? 0 : -1}
-                  >
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                    <span className="text-xs md:text-sm font-medium text-center">{tab.label}</span>
-                  </TabsTrigger>
-                )
-              })}
-            </TabsList>
+          <div className="sticky top-20 z-40 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 border-b mb-6">
+            <div className="overflow-x-auto scrollbar-hide">
+              <TabsList 
+                className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 h-auto p-1 bg-muted/60 backdrop-blur-sm min-w-max"
+                aria-label="Tools Hub navigation tabs"
+              >
+                {TAB_OPTIONS.map((tab) => {
+                  const Icon = tab.icon
+                  const isActive = activeTab === tab.value
+                  return (
+                    <TabsTrigger
+                      key={tab.value}
+                      value={tab.value}
+                      className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-3 px-2 sm:px-3 data-[state=active]:bg-background/95 data-[state=active]:backdrop-blur-sm data-[state=active]:shadow-md data-[state=active]:border data-[state=active]:border-border/50 min-w-[80px] sm:min-w-[90px] md:min-w-[100px] transition-all"
+                      aria-label={`${tab.label} tab, ${tab.description}. ${isActive ? 'Currently active' : ''} Press Enter or Space to activate.`}
+                      aria-selected={isActive}
+                      aria-controls={`tools-tabpanel-${tab.value}`}
+                      id={`tools-tab-${tab.value}`}
+                      role="tab"
+                      tabIndex={isActive ? 0 : -1}
+                    >
+                      <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" aria-hidden="true" />
+                      <span className="text-[10px] xs:text-xs sm:text-sm font-medium text-center leading-tight">{tab.label}</span>
+                    </TabsTrigger>
+                  )
+                })}
+              </TabsList>
+            </div>
           </div>
 
           {/* Tab Content */}

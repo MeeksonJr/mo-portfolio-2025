@@ -24,6 +24,19 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     if (typeof document !== 'undefined') {
       document.documentElement.lang = detected
     }
+
+    // Listen for locale changes from other components
+    const handleLocaleChange = (event: CustomEvent<Locale>) => {
+      setLocaleState(event.detail)
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = event.detail
+      }
+    }
+
+    window.addEventListener('locale-changed', handleLocaleChange as EventListener)
+    return () => {
+      window.removeEventListener('locale-changed', handleLocaleChange as EventListener)
+    }
   }, [])
 
   const setLocale = (newLocale: Locale) => {
@@ -31,8 +44,10 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined') {
       localStorage.setItem('locale', newLocale)
       document.documentElement.lang = newLocale
-      // Trigger a re-render by updating state
+      // Trigger a re-render by updating state and dispatching event
       window.dispatchEvent(new CustomEvent('locale-changed', { detail: newLocale }))
+      // Force a re-render by updating state
+      setLocaleState(newLocale)
     }
   }
 

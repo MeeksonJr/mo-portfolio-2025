@@ -21,6 +21,11 @@ export default function LanguageSwitcher() {
 
   const handleLocaleChange = (locale: Locale) => {
     setLocale(locale)
+    // Force page refresh to update all content
+    // Using a small delay to ensure state updates first
+    setTimeout(() => {
+      window.location.reload()
+    }, 100)
   }
 
   if (!mounted) {

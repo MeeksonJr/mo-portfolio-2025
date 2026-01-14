@@ -158,6 +158,45 @@ Comprehensive plan for redesigning and enhancing the portfolio's UI/UX, covering
 - Applying enhanced filters to remaining pages (Projects, Case Studies)
 - Expanding social sharing to all content pages
 
+### Recently Completed ✅ (Jan 2025)
+- **Transparency & Visibility Improvements**
+  - Added background blur and opacity to homepage customizer for better visibility
+  - Enhanced user preferences dialog with backdrop blur
+  - Improved navbar dropdown menus with background blur and better readability
+  - Added background blur to all button variants for better visibility
+  - Enhanced clickable elements with backdrop blur throughout the site
+
+- **Language Switcher Fix**
+  - Fixed language switcher to properly update all pages when language changes
+  - Added page refresh on language change to ensure all content updates
+  - Improved translation provider to listen for locale changes
+
+- **Theme Switcher Fix**
+  - Fixed navbar theme switcher to sync with user preferences
+  - Theme changes now properly save to user preferences
+  - Improved theme toggle button with background blur
+
+- **Responsive Hub Pages Redesign**
+  - Redesigned all hub pages tabs (Resume, About, Code, Tools, Insights) for responsive design
+  - Improved mobile experience with horizontal scrolling and better breakpoints
+  - Enhanced tab styling with better active states and backdrop blur
+  - Added scrollbar-hide utility for cleaner mobile experience
+
+- **Games Hub**
+  - Created comprehensive games hub with 6 playable games:
+    1. Snake Game - Classic snake with score tracking
+    2. Tetris - Block stacking puzzle game
+    3. Memory Game - Card matching game
+    4. Tic-Tac-Toe - Classic 3x3 game
+    5. Breakout - Brick breaking game
+    6. Word Puzzle - Word finding game
+  - All games feature:
+    - Score tracking with high score persistence
+    - Background music support (toggleable)
+    - Save/load game state functionality
+    - Responsive design
+    - LocalStorage integration for persistence
+
 ### Planned 📋
 - Loading animations
 - Page redesigns
