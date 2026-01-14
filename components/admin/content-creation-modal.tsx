@@ -797,12 +797,9 @@ export default function ContentCreationModal({
 
       // Success - close modal and refresh
       console.log('Save successful!')
-      onOpenChange(false)
       form.reset()
-      // Use router refresh instead of window.reload
-      if (typeof window !== 'undefined') {
-        window.location.reload()
-      }
+      onOpenChange(false)
+      // Don't reload - let the parent component handle refresh via onOpenChange callback
     } catch (error: any) {
       console.error('Error saving content:', error)
       const errorMessage = error.message || 'Unknown error occurred'

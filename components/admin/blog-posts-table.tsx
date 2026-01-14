@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { Search, Plus, Edit, Trash2, Eye, Calendar, FileText, CheckSquare, Square, Download, ExternalLink } from 'lucide-react'
+import { useState, useMemo, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { Search, Plus, Edit, Trash2, Eye, Calendar, FileText, CheckSquare, Square, Download, ExternalLink, RefreshCw } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -76,6 +77,7 @@ interface BlogPostsTableProps {
 type ItemsPerPage = 12 | 24 | 48 | 96
 
 export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
+  const router = useRouter()
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>('all')
@@ -93,6 +95,43 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set())
   const [isBulkOperating, setIsBulkOperating] = useState(false)
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  // Refetch posts from server
+  const refetchPosts = useCallback(async () => {
+    setIsRefreshing(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const headers: HeadersInit = {}
+      
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+
+      const response = await fetch('/api/admin/content/blog', {
+        method: 'GET',
+        headers,
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch posts')
+      }
+
+      const result = await response.json()
+      if (result.data) {
+        setPosts(result.data)
+      }
+      
+      // Also refresh server component data
+      router.refresh()
+    } catch (error) {
+      console.error('Error refetching posts:', error)
+      toast.error('Failed to refresh posts')
+    } finally {
+      setIsRefreshing(false)
+    }
+  }, [router])
 
   // Get unique categories
   const categories = useMemo(
@@ -184,8 +223,8 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
       }
 
       const count = selectedPosts.size
-      // Remove from local state
-      setPosts(posts.filter((post) => !selectedPosts.has(post.id)))
+      // Refetch posts to get fresh data
+      await refetchPosts()
       setSelectedPosts(new Set())
       setBulkDeleteDialogOpen(false)
       toast.success(`Deleted ${count} post(s) successfully`)
@@ -225,12 +264,8 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
         throw new Error('Failed to update posts')
       }
 
-      // Update local state
-      setPosts(
-        posts.map((post) =>
-          selectedPosts.has(post.id) ? { ...post, status } : post
-        )
-      )
+      // Refetch posts to get fresh data
+      await refetchPosts()
       setSelectedPosts(new Set())
       const count = selectedPosts.size
       toast.success(`Updated ${count} post(s) to ${status}`)
@@ -264,11 +299,11 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
         throw new Error('Failed to delete post')
       }
 
-      // Remove from local state
-      setPosts(posts.filter((post) => post.id !== postToDelete.id))
-      setDeleteDialogOpen(false)
+      // Refetch posts to get fresh data
       const deletedTitle = postToDelete.title
       setPostToDelete(null)
+      setDeleteDialogOpen(false)
+      await refetchPosts()
       toast.success('Post deleted successfully')
       adminNotificationManager.success(
         'Blog Post Deleted',
@@ -440,6 +475,15 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button 
+            onClick={refetchPosts} 
+            variant="outline" 
+            className="flex-shrink-0"
+            disabled={isRefreshing}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
           <Button onClick={() => setCreateModalOpen(true)} className="flex-shrink-0">
             <Plus className="h-4 w-4 mr-2" />
             New Post
@@ -679,7 +723,13 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
       {/* Create Modal */}
       <ContentCreationModal
         open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
+        onOpenChange={(open) => {
+          setCreateModalOpen(open)
+          if (!open) {
+            // Refetch after modal closes (in case content was saved)
+            refetchPosts()
+          }
+        }}
         contentType="blog"
       />
 
@@ -689,7 +739,11 @@ export default function BlogPostsTable({ initialPosts }: BlogPostsTableProps) {
           open={editModalOpen}
           onOpenChange={(open) => {
             setEditModalOpen(open)
-            if (!open) setPostToEdit(null)
+            if (!open) {
+              setPostToEdit(null)
+              // Refetch after modal closes (in case content was updated)
+              refetchPosts()
+            }
           }}
           contentType="blog"
           initialData={postToEdit}
