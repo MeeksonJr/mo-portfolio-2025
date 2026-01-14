@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { ArrowRight, Download, Sparkles } from "lucide-react"
 import Image from "next/image"
 import { useState, useEffect } from "react"
+import AvailabilityBadge from "@/components/availability-badge"
 
 export default function HeroLight() {
   const [isClient, setIsClient] = useState(false)
@@ -108,9 +109,12 @@ export default function HeroLight() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
               >
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="text-primary" size={20} />
-                  <span className="text-sm font-medium text-muted-foreground">Full-Stack Developer</span>
+                <div className="flex items-center gap-3 mb-3 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="text-primary" size={20} />
+                    <span className="text-sm font-medium text-muted-foreground">Full-Stack Developer</span>
+                  </div>
+                  <AvailabilityBadge variant="compact" />
                 </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
                   Mohamed Datt
@@ -175,10 +179,11 @@ export default function HeroLight() {
                   href="/resume-Mohamed-Datt-Full Stack Developer-2025.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 glass rounded-xl font-medium hover:shadow-lg transition-all"
+                  download="Mohamed-Datt-Resume-2025.pdf"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary/95 backdrop-blur-sm text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-all hover:scale-105 shadow-lg border-2 border-primary/20"
                 >
                   <Download size={18} />
-                  Resume
+                  Download Resume
                 </a>
               </motion.div>
             </div>

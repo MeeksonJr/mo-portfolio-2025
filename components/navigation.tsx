@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { UserPreferencesDialog } from "@/components/preferences/user-preferences-dialog"
 import LanguageSwitcher from "@/components/i18n/language-switcher"
 import NotificationCenter from "@/components/notifications/notification-center"
+import AvailabilityBadge from "@/components/availability-badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -230,6 +231,7 @@ export default function Navigation() {
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
+            <AvailabilityBadge variant="compact" />
             <NotificationCenter />
             <LanguageSwitcher />
             <UserPreferencesDialog />

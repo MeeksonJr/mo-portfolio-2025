@@ -19,6 +19,7 @@ import { trackClick } from '@/lib/analytics'
 import EnhancedFilters from '@/components/filters/enhanced-filters'
 import SocialShareButton from '@/components/sharing/social-share-button'
 import { EnhancedScrollReveal } from '@/components/animations/enhanced-scroll-reveal'
+import { isContentNew, formatRelativeTime } from '@/lib/content-freshness'
 
 interface BlogPost {
   id: string
@@ -198,11 +199,18 @@ export default function BlogListing({ posts }: BlogListingProps) {
                 </div>
               )}
               <div className="p-6">
-                {post.category && (
-                  <Badge variant="outline" className="mb-2">
-                    {post.category}
-                  </Badge>
-                )}
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  {post.category && (
+                    <Badge variant="outline">
+                      {post.category}
+                    </Badge>
+                  )}
+                  {post.published_at && isContentNew(post.published_at) && (
+                    <Badge className="bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30">
+                      New
+                    </Badge>
+                  )}
+                </div>
                 <h2 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2">
                   {post.title}
                 </h2>
@@ -212,11 +220,11 @@ export default function BlogListing({ posts }: BlogListingProps) {
                   </p>
                 )}
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 flex-wrap">
                     {post.published_at && (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1" title={`Published ${format(new Date(post.published_at), 'MMM d, yyyy')}`}>
                         <Calendar className="h-3 w-3" />
-                        {format(new Date(post.published_at), 'MMM d, yyyy')}
+                        <span>{formatRelativeTime(post.published_at)}</span>
                       </div>
                     )}
                     {post.reading_time && (

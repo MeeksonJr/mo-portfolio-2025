@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { Search, Eye, ExternalLink, Github, Star, FolderGit2 } from 'lucide-react'
+import { Search, Eye, ExternalLink, Github, Star, FolderGit2, Calendar } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select'
 import Link from 'next/link'
 import { trackClick } from '@/lib/analytics'
+import { isContentNew, formatRelativeTime } from '@/lib/content-freshness'
 
 interface Project {
   id: string
@@ -229,9 +230,16 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
                     </div>
                   )}
                   <div className="p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <FolderGit2 className="h-4 w-4 text-primary" />
-                      <span className="text-sm text-muted-foreground">Project</span>
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <FolderGit2 className="h-4 w-4 text-primary" />
+                        <span className="text-sm text-muted-foreground">Project</span>
+                      </div>
+                      {project.created_at && isContentNew(project.created_at) && (
+                        <Badge className="bg-green-500/20 text-green-600 dark:text-green-400 border border-green-500/30">
+                          New
+                        </Badge>
+                      )}
                     </div>
                     <h2 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2">
                       {project.name}
@@ -255,10 +263,18 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
                         )}
                       </div>
                     )}
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Eye className="h-3 w-3" />
-                        {project.views || 0}
+                    <div className="flex items-center justify-between text-sm text-muted-foreground flex-wrap gap-2">
+                      <div className="flex items-center gap-4">
+                        {project.created_at && (
+                          <div className="flex items-center gap-1" title={`Created ${new Date(project.created_at).toLocaleDateString()}`}>
+                            <Calendar className="h-3 w-3" />
+                            <span>{formatRelativeTime(project.created_at)}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Eye className="h-3 w-3" />
+                          {project.views || 0}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {project.homepage_url && (

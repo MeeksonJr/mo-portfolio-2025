@@ -70,6 +70,7 @@ const interests = [
 
 import { ImageLightbox, useImageLightbox } from '@/components/image-lightbox/image-lightbox'
 import InteractiveTimeline from '@/components/timeline/interactive-timeline'
+import CertificationsSection from '@/components/certifications/certifications-section'
 
 export default function AboutPageContent() {
   const { isOpen, images, initialIndex, openLightbox, closeLightbox } = useImageLightbox()
@@ -240,6 +241,9 @@ export default function AboutPageContent() {
           Click on any photo to view full size
         </p>
       </motion.section>
+
+      {/* Certifications */}
+      <CertificationsSection />
 
       {/* Interests */}
       <motion.section
