@@ -42,7 +42,7 @@ export default function EnhancedPageLayout({
       >
         {(title || description || headerContent) && (
           <EnhancedScrollReveal variant="fade" delay={0.1}>
-            <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
               {headerContent || (
                 <>
                   {title && (
@@ -71,7 +71,7 @@ export default function EnhancedPageLayout({
           </EnhancedScrollReveal>
         )}
         
-        <div className="max-w-6xl mx-auto px-4 pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
           {children}
         </div>
         

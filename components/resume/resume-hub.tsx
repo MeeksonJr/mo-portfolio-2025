@@ -138,7 +138,7 @@ function ResumeHubContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="w-full">
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

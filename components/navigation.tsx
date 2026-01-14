@@ -40,13 +40,11 @@ export default function Navigation() {
     { name: "Contact", href: "#contact" },
   ]
 
-  // Content dropdown - Main content pages
+  // Content dropdown - Main content pages (consolidated)
   const contentLinks = [
     { name: "Projects", href: "/projects" },
     { name: "Blog", href: "/blog" },
     { name: "Case Studies", href: "/case-studies" },
-    { name: "Architecture", href: "/architecture" },
-    { name: "Collaboration", href: "/collaboration" },
     { name: "Resources", href: "/resources" },
     { name: "Testimonials", href: "/testimonials" },
     { name: "Timeline", href: "/timeline" },
@@ -54,29 +52,20 @@ export default function Navigation() {
     { name: "Achievements", href: "/achievements" },
   ]
 
-  // Tools dropdown - Interactive tools and utilities
+  // Tools & Hubs dropdown - Interactive tools and utilities (consolidated)
   const toolsLinks = [
-    { name: "AI Assistant", href: "/portfolio-assistant" },
-    { name: "Tools Hub", href: "/tools" },
-    { name: "Code Hub", href: "/code" },
     { name: "Resume Hub", href: "/resume" },
+    { name: "Code Hub", href: "/code" },
+    { name: "Tools Hub", href: "/tools" },
+    { name: "Insights Hub", href: "/insights" },
+    { name: "Games", href: "/games" },
+    { name: "AI Assistant", href: "/portfolio-assistant" },
     { name: "Live Demos", href: "/demos" },
   ]
 
-  // Analytics & Data dropdown - Data visualization and insights
-  const analyticsLinks = [
-    { name: "Insights Hub", href: "/insights" },
-  ]
-
-  // Developer dropdown - Code and technical content
-  const developerLinks = [
-    { name: "About Hub", href: "/about" },
-    { name: "Calendar", href: "/calendar" },
-  ]
-
-  // For Agents & Recruiters
-  const agentLinks = [
-    { name: "Resume Hub", href: "/resume" },
+  // For Recruiters (consolidated)
+  const recruiterLinks = [
+    { name: "For Recruiters", href: "/for-recruiters" },
     { name: "Portfolio Comparison", href: "/portfolio-comparison" },
     { name: "Agent Dashboard", href: "/agent-dashboard" },
   ]
@@ -86,9 +75,7 @@ export default function Navigation() {
     ...(isHomePage ? homePageLinks : []),
     ...contentLinks,
     ...toolsLinks,
-    ...analyticsLinks,
-    ...developerLinks,
-    ...agentLinks,
+    ...recruiterLinks,
   ]
 
   return (
@@ -102,8 +89,8 @@ export default function Navigation() {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between gap-2">
           {/* Logo */}
           <Link 
             href="/" 
@@ -114,7 +101,7 @@ export default function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-2 xl:gap-4 flex-1 justify-center max-w-4xl mx-4">
             {/* Home page specific links - only show on home page */}
             {isHomePage && homePageLinks.map((link) => {
               const isExternal = link.href.startsWith('#')
@@ -124,7 +111,7 @@ export default function Navigation() {
                 <Component
                   key={link.name}
                   {...props}
-                  className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors"
+                  className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors whitespace-nowrap"
                 >
                   {link.name}
                 </Component>
@@ -133,9 +120,9 @@ export default function Navigation() {
             
             {/* Content Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors flex items-center gap-1 outline-none">
+              <DropdownMenuTrigger className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors flex items-center gap-1 outline-none whitespace-nowrap px-2">
                 Content
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="h-3.5 w-3.5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 {contentLinks.map((link) => (
@@ -148,11 +135,11 @@ export default function Navigation() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Tools Dropdown */}
+            {/* Tools & Hubs Dropdown (consolidated) */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors flex items-center gap-1 outline-none">
+              <DropdownMenuTrigger className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors flex items-center gap-1 outline-none whitespace-nowrap px-2">
                 Tools
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="h-3.5 w-3.5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 {toolsLinks.map((link) => (
@@ -161,14 +148,6 @@ export default function Navigation() {
                       href={link.href} 
                       className="cursor-pointer" 
                       prefetch={true}
-                      onMouseEnter={() => {
-                        // Prefetch hub pages on hover for faster navigation
-                        if (link.href.startsWith('/code') || link.href.startsWith('/resume') || 
-                            link.href.startsWith('/tools') || link.href.startsWith('/insights') || 
-                            link.href.startsWith('/about')) {
-                          // Next.js Link already prefetches, but we can ensure it happens
-                        }
-                      }}
                     >
                       {link.name}
                     </Link>
@@ -177,48 +156,14 @@ export default function Navigation() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Analytics & Data Dropdown */}
+            {/* For Recruiters Dropdown (consolidated) */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors flex items-center gap-1 outline-none">
-                Analytics
-                <ChevronDown className="h-4 w-4" />
+              <DropdownMenuTrigger className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors flex items-center gap-1 outline-none whitespace-nowrap px-2">
+                Recruiters
+                <ChevronDown className="h-3.5 w-3.5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                {analyticsLinks.map((link) => (
-                  <DropdownMenuItem key={link.name} asChild>
-                    <Link href={link.href} className="cursor-pointer" prefetch={true}>
-                      {link.name}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Developer Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors flex items-center gap-1 outline-none">
-                Developer
-                <ChevronDown className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                {developerLinks.map((link) => (
-                  <DropdownMenuItem key={link.name} asChild>
-                    <Link href={link.href} className="cursor-pointer" prefetch={true}>
-                      {link.name}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Agents & Recruiters Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors flex items-center gap-1 outline-none">
-                For Agents
-                <ChevronDown className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                {agentLinks.map((link) => (
+                {recruiterLinks.map((link) => (
                   <DropdownMenuItem key={link.name} asChild>
                     <Link href={link.href} className="cursor-pointer" prefetch={true}>
                       {link.name}
@@ -229,33 +174,36 @@ export default function Navigation() {
             </DropdownMenu>
           </div>
 
-          {/* CTA Buttons */}
-          <div className="hidden lg:flex items-center gap-3">
-            <AvailabilityBadge variant="compact" />
+          {/* CTA Buttons - Compact design */}
+          <div className="hidden lg:flex items-center gap-2 xl:gap-3 flex-shrink-0">
+            <AvailabilityBadge variant="compact" className="hidden xl:flex" />
             <NotificationCenter />
-            <LanguageSwitcher />
-            <UserPreferencesDialog />
+            <div className="hidden xl:flex items-center gap-2">
+              <LanguageSwitcher />
+              <UserPreferencesDialog />
+            </div>
             <ThemeToggle />
             <a
               href="/resume"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground/70 hover:text-primary transition-colors"
+              className="flex items-center gap-1.5 px-3 xl:px-4 py-2 text-sm font-medium text-foreground/70 hover:text-primary transition-colors"
+              title="Download Resume"
             >
               <Download size={16} />
-              <span className="hidden xl:inline">Resume</span>
+              <span className="hidden 2xl:inline">Resume</span>
             </a>
             {isHomePage ? (
               <a
                 href="#contact"
-                className="px-5 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                className="px-4 xl:px-5 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"
               >
                 Hire Me
               </a>
             ) : (
               <Link
                 href="/#contact"
-                className="px-5 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                className="px-4 xl:px-5 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors whitespace-nowrap"
               >
                 Contact
               </Link>
@@ -322,10 +270,10 @@ export default function Navigation() {
                 ))}
               </div>
 
-              {/* Tools */}
+              {/* Tools & Hubs */}
               <div>
                 <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                  Tools
+                  Tools & Hubs
                 </div>
                 {toolsLinks.map((link) => (
                   <Link
@@ -339,29 +287,12 @@ export default function Navigation() {
                 ))}
               </div>
 
-              {/* Analytics */}
+              {/* For Recruiters */}
               <div>
                 <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                  Analytics
+                  For Recruiters
                 </div>
-                {analyticsLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className="block text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-              </div>
-
-              {/* Developer */}
-              <div>
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                  Developer
-                </div>
-                {developerLinks.map((link) => (
+                {recruiterLinks.map((link) => (
                   <Link
                     key={link.name}
                     href={link.href}
