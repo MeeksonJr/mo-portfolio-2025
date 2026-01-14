@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getAuthenticatedUser } from '@/lib/supabase/api-helpers'
 import { uploadImageToStorage, base64ToArrayBuffer } from '@/lib/supabase/storage'
+import { logAIGeneration, estimateGroqCost, estimateHuggingFaceCost } from '@/lib/ai-logging'
 
 // Groq models to try in order (using current production models)
 const GROQ_MODELS = [
@@ -95,6 +96,28 @@ Return only the image description text, nothing else.`
 
         if (imageDescription) {
           console.log(`✅ Groq model ${modelName} succeeded!`)
+          
+          // Extract token usage if available
+          const tokensUsed = data.usage?.total_tokens || null
+          const estimatedCost = tokensUsed ? estimateGroqCost(tokensUsed, modelName) : null
+          
+          // Log Groq generation (image description)
+          await logAIGeneration({
+            type: 'image',
+            model: `groq:${modelName}`,
+            prompt: prompt.substring(0, 5000),
+            result: imageDescription.substring(0, 10000),
+            metadata: {
+              contentType,
+              repoName,
+              repoDescription,
+              stage: 'description',
+            },
+            tokens_used: tokensUsed || undefined,
+            cost: estimatedCost || undefined,
+            user_id: user.id,
+          })
+          
           break // Success, exit loop
         }
       } catch (modelError: any) {
@@ -222,6 +245,26 @@ Return only the image description text, nothing else.`
 
         imageBlob = await hfResponse.blob()
         console.log(`✅ Hugging Face model ${model.id} succeeded!`)
+        
+        // Log Hugging Face generation (image)
+        await logAIGeneration({
+          type: 'image',
+          model: `huggingface:${model.id}`,
+          prompt: imageDescription?.substring(0, 5000) || '',
+          result: `Image generated successfully. Size: ${imageBlob.size} bytes`,
+          metadata: {
+            contentType,
+            repoName,
+            repoDescription,
+            stage: 'generation',
+            imageSize: imageBlob.size,
+            mimeType: imageBlob.type,
+            modelParams: model.params,
+          },
+          cost: estimateHuggingFaceCost(),
+          user_id: user.id,
+        })
+        
         break // Success, exit model loop
       } catch (modelError: any) {
         console.error(`❌ Hugging Face model ${model.id} failed:`, modelError.message)

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getAuthenticatedUser } from '@/lib/supabase/api-helpers'
+import { logAIGeneration, estimateGroqCost } from '@/lib/ai-logging'
 
 // Groq models to try in order (using current production models)
 const GROQ_MODELS = [
@@ -135,6 +136,10 @@ ${getFieldPrompt(fieldType, 'project')}`
           throw new Error('No content in Groq response')
         }
 
+        // Extract token usage if available
+        const tokensUsed = data.usage?.total_tokens || null
+        const estimatedCost = tokensUsed ? estimateGroqCost(tokensUsed, modelName) : null
+
         // Try to parse JSON from response
         try {
           // Clean the text - remove markdown code blocks if present
@@ -150,6 +155,26 @@ ${getFieldPrompt(fieldType, 'project')}`
           try {
             generatedData = JSON.parse(cleanedText)
             console.log(`✅ Groq model ${modelName} succeeded!`)
+            
+            // Log successful generation
+            await logAIGeneration({
+              type: 'content',
+              model: modelName,
+              prompt: prompt.substring(0, 5000), // Truncate in logging function too
+              result: JSON.stringify(generatedData).substring(0, 10000), // Store as JSON string
+              metadata: {
+                contentType,
+                fieldType,
+                repoName,
+                repoDescription,
+                techStack,
+                tokens_used: tokensUsed,
+              },
+              tokens_used: tokensUsed || undefined,
+              cost: estimatedCost || undefined,
+              user_id: user.id,
+            })
+            
             break // Success, exit loop
           } catch {
             // If that fails, try to extract JSON object from text
@@ -157,6 +182,27 @@ ${getFieldPrompt(fieldType, 'project')}`
             if (jsonObjectMatch) {
               generatedData = JSON.parse(jsonObjectMatch[0])
               console.log(`✅ Groq model ${modelName} succeeded (extracted JSON)!`)
+              
+              // Log successful generation
+              await logAIGeneration({
+                type: 'content',
+                model: modelName,
+                prompt: prompt.substring(0, 5000),
+                result: JSON.stringify(generatedData).substring(0, 10000),
+                metadata: {
+                  contentType,
+                  fieldType,
+                  repoName,
+                  repoDescription,
+                  techStack,
+                  tokens_used: tokensUsed,
+                  extracted: true, // Flag that JSON was extracted
+                },
+                tokens_used: tokensUsed || undefined,
+                cost: estimatedCost || undefined,
+                user_id: user.id,
+              })
+              
               break
             }
             throw new Error('No valid JSON found in response')

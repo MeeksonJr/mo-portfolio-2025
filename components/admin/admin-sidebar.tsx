@@ -21,6 +21,7 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
+  Activity,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -51,6 +52,7 @@ const navGroups = [
     items: [
       { href: '/admin/github', label: 'GitHub Repos', icon: FolderGit2 },
       { href: '/admin/ai', label: 'AI Tools', icon: Image },
+      { href: '/admin/ai/generations', label: 'AI Generations', icon: Activity },
       { href: '/admin/pages', label: 'Page CMS', icon: Globe },
       { href: '/admin/music', label: 'Music', icon: Music },
     ],
