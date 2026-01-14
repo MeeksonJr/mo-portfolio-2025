@@ -1,5 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/server'
-import { BookOpen, Briefcase, Package, FolderGit2 } from 'lucide-react'
+import { BookOpen, Briefcase, Package, FolderGit2, Calendar } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function ContentPage() {
@@ -88,6 +88,31 @@ export default async function ContentPage() {
             </Link>
           )
         })}
+      </div>
+
+      {/* Content Calendar Link */}
+      <div className="mt-8">
+        <Link
+          href="/admin/content/calendar"
+          className="glass rounded-xl p-6 hover:shadow-lg transition-all group block"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                <Calendar className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-1">Content Calendar</h3>
+                <p className="text-sm text-muted-foreground">
+                  Plan and schedule your content across all types
+                </p>
+              </div>
+            </div>
+            <div className="text-primary group-hover:translate-x-1 transition-transform">
+              →
+            </div>
+          </div>
+        </Link>
       </div>
     </div>
   )
