@@ -127,7 +127,7 @@ export default function ContentCreationModal({
   const [generatingField, setGeneratingField] = useState<string | null>(null)
   const [readmeContent, setReadmeContent] = useState<string | null>(null)
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null)
-  const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<Error | null>(null)
   
   const isEditing = !!initialData
 
@@ -624,7 +624,7 @@ export default function ContentCreationModal({
       setSaveError(null)
     } catch (error: any) {
       console.error('Auto-save error:', error)
-      setSaveError(error?.message || 'Auto-save failed')
+      setSaveError(error instanceof Error ? error : new Error(error?.message || 'Auto-save failed'))
       throw error
     }
   }
@@ -642,7 +642,7 @@ export default function ContentCreationModal({
     enabled: open && (isEditing || isDraft), // Only enable for drafts
     onSaveError: (error) => {
       console.error('Auto-save failed:', error)
-      setSaveError(error?.message || 'Auto-save failed')
+      setSaveError(error instanceof Error ? error : new Error(error?.message || 'Auto-save failed'))
     },
   })
 
