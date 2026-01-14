@@ -146,6 +146,7 @@ export default function RootLayout({
         <Analytics />
         <SpeedInsights />
         <ConversionTracker />
+        <GuidedTour />
         <Toaster />
       </body>
     </html>
