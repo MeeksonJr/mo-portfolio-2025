@@ -29,6 +29,9 @@ import KeyboardShortcutsModal from "@/components/keyboard-shortcuts-modal"
 import EnhancedKeyboardNavigation from "@/components/accessibility/enhanced-keyboard-navigation"
 import ClientLayoutWrapper from "@/components/layout/client-layout-wrapper"
 import AccessibilityAudit from "@/components/accessibility/accessibility-audit"
+import OrganizationSchema from "@/components/structured-data/organization-schema"
+import WebsiteSchema from "@/components/structured-data/website-schema"
+import ConversionTracker from "@/components/analytics/conversion-tracker"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -96,6 +99,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={inter.className}>
+        <OrganizationSchema />
+        <WebsiteSchema />
         <SkipToContent />
         <div
           id="screen-reader-announcements"
@@ -140,6 +145,7 @@ export default function RootLayout({
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
+        <ConversionTracker />
         <Toaster />
       </body>
     </html>

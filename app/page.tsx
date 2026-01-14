@@ -8,6 +8,7 @@ import CustomizableHomepage from "@/components/homepage/customizable-homepage"
 import HomepageCustomizer from "@/components/homepage/homepage-customizer"
 import TouchGestures from "@/components/mobile/touch-gestures"
 import MetaTags from "@/components/seo/meta-tags"
+import ResourcePreloader from "@/components/seo/resource-preloader"
 
 export default function Home() {
   return (
@@ -24,6 +25,12 @@ export default function Home() {
         title="Mohamed Datt - Full Stack Developer"
         description="Creative Full Stack Developer specializing in AI-powered web applications, Next.js, TypeScript, and modern web technologies"
         url="/"
+      />
+      <ResourcePreloader
+        images={['/og-image.png', '/images/Photo.jpg']}
+        resources={[
+          { href: '/fonts/inter.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+        ]}
       />
       <TouchGestures>
         <div className="min-h-screen bg-background relative">
