@@ -52,13 +52,6 @@ const timeline = [
   },
 ]
 
-const skills = [
-  { name: 'Frontend Development', level: 95, icon: Code },
-  { name: 'Backend Development', level: 90, icon: Code },
-  { name: 'AI Integration', level: 85, icon: Rocket },
-  { name: 'UI/UX Design', level: 80, icon: Award },
-]
-
 const interests = [
   { name: 'Building SaaS Products', icon: Rocket },
   { name: 'AI & Machine Learning', icon: Sparkles },
@@ -71,6 +64,7 @@ const interests = [
 import { ImageLightbox, useImageLightbox } from '@/components/image-lightbox/image-lightbox'
 import InteractiveTimeline from '@/components/timeline/interactive-timeline'
 import CertificationsSection from '@/components/certifications/certifications-section'
+import SkillsProficiencyMatrix from '@/components/skills/skills-proficiency-matrix'
 
 export default function AboutPageContent() {
   const { isOpen, images, initialIndex, openLightbox, closeLightbox } = useImageLightbox()
@@ -158,47 +152,8 @@ export default function AboutPageContent() {
         <InteractiveTimeline />
       </motion.section>
 
-      {/* Skills */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.6 }}
-        className="glass rounded-2xl p-8 md:p-12 mb-16"
-      >
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">Skills & Expertise</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          {skills.map((skill, index) => {
-            const Icon = skill.icon
-            return (
-              <motion.div
-                key={skill.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="space-y-2"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <Icon className="text-primary" size={20} />
-                    <span className="font-semibold">{skill.name}</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground">{skill.level}%</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <motion.div
-                    className="bg-primary h-2 rounded-full"
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${skill.level}%` }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: index * 0.1 + 0.3 }}
-                  />
-                </div>
-              </motion.div>
-            )
-          })}
-        </div>
-      </motion.section>
+      {/* Skills Proficiency Matrix */}
+      <SkillsProficiencyMatrix />
 
       {/* Photo Gallery */}
       <motion.section
