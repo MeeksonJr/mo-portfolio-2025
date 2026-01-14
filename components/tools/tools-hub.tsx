@@ -78,7 +78,7 @@ function ToolsHubContent() {
         transition={{ duration: 0.5 }}
         className="border-b bg-gradient-to-b from-background to-muted/20"
       >
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           <div className="text-center mb-8">
             <motion.div
               initial={{ scale: 0.9 }}
