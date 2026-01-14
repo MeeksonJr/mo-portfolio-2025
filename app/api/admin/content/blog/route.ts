@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getAuthenticatedUser, isAdminUser } from '@/lib/supabase/api-helpers'
 import { createAdminClient } from '@/lib/supabase/server'
+import { createSlug, generateUniqueSlug } from '@/lib/slug-utils'
 
 export async function POST(request: Request) {
   try {
@@ -33,6 +34,21 @@ export async function POST(request: Request) {
       github_repo_id,
     } = body
 
+    // Generate unique slug if not provided or if it already exists
+    let finalSlug = slug || createSlug(title)
+    
+    // Check if slug exists and generate unique one
+    const checkSlugExists = async (slugToCheck: string) => {
+      const { data } = await adminClient
+        .from('blog_posts')
+        .select('id')
+        .eq('slug', slugToCheck)
+        .single()
+      return !!data
+    }
+    
+    finalSlug = await generateUniqueSlug(finalSlug, checkSlugExists)
+
     // Calculate reading time (average 200 words per minute)
     const wordCount = content.split(/\s+/).length
     const reading_time = Math.ceil(wordCount / 200)
@@ -46,7 +62,7 @@ export async function POST(request: Request) {
 
     const { data, error } = await adminClient.from('blog_posts').insert({
       title,
-      slug,
+      slug: finalSlug,
       excerpt,
       content,
       category,

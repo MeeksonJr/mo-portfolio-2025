@@ -4,40 +4,20 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export async function POST(request: NextRequest) {
   try {
-    // Check for Authorization header first
-    const authHeader = request.headers.get('authorization')
-    let session = null
+    const { getAuthenticatedUser, isAdminUser } = await import('@/lib/supabase/api-helpers')
+    const user = await getAuthenticatedUser(request)
 
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '')
-      const supabase = await createServerClient()
-      const { data: { session: sessionData } } = await supabase.auth.getSession()
-      // Verify token matches session
-      if (sessionData?.access_token === token) {
-        session = sessionData
-      }
-    } else {
-      const supabase = await createServerClient()
-      const { data: { session: sessionData } } = await supabase.auth.getSession()
-      session = sessionData
-    }
-
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user is admin
-    const adminClient = createAdminClient()
-    const { data: userRole } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', session.user.id)
-      .single()
-
-    if (!userRole || userRole.role !== 'admin') {
+    const isAdmin = await isAdminUser(user.id)
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    const adminClient = createAdminClient()
     const body = await request.json()
     const { title, subject, content_type, content_id } = body
 

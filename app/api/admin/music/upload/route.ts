@@ -17,134 +17,21 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    // Try to get auth token from Authorization header first (most reliable for FormData)
-    const authHeader = request.headers.get('authorization')
-    let userId: string | null = null
-    
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '')
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      
-      console.log('Upload API - Authorization header found, validating token...')
-      
-      const tempClient = createClient(supabaseUrl, supabaseAnonKey, {
-        global: {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      })
-      const { data: userData, error: userError } = await tempClient.auth.getUser()
-      
-      if (userData?.user) {
-        userId = userData.user.id
-        console.log('Upload API - User ID from Authorization header:', userId)
-      } else {
-        console.log('Upload API - getUser() from header failed:', userError?.message)
-      }
-    }
-    
-    // Fallback: Try cookies using Next.js cookies()
-    if (!userId) {
-      try {
-        const cookieStore = await cookies()
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || ''
-        const authCookieName = `sb-${projectRef}-auth-token`
-        
-        // Get all cookies
-        const allCookies = cookieStore.getAll()
-        console.log('Upload API - Total cookies:', allCookies.length)
-        
-        // Try to find auth token cookie
-        let authCookieValue: string | null = null
-        for (const cookie of allCookies) {
-          if (cookie.name === authCookieName || 
-              cookie.name.startsWith(`${authCookieName}.`)) {
-            authCookieValue = cookie.value
-            console.log('Upload API - Found auth cookie:', cookie.name)
-            break
-          }
-        }
-        
-        if (authCookieValue) {
-          try {
-            const parsed = JSON.parse(authCookieValue)
-            
-            if (parsed?.access_token) {
-              const tempClient = createClient(supabaseUrl, supabaseAnonKey, {
-                global: {
-                  headers: {
-                    Authorization: `Bearer ${parsed.access_token}`,
-                  },
-                },
-              })
-              const { data: userData } = await tempClient.auth.getUser()
-              if (userData?.user) {
-                userId = userData.user.id
-                console.log('Upload API - User ID from cookie access_token:', userId)
-              }
-            } else if (parsed?.user?.id) {
-              userId = parsed.user.id
-              console.log('Upload API - User ID from cookie user object:', userId)
-            }
-          } catch (e) {
-            console.log('Upload API - Error parsing cookie:', e)
-          }
-        } else {
-          console.log('Upload API - No auth cookie found in cookieStore')
-        }
-      } catch (error) {
-        console.log('Upload API - Cookie reading failed:', error)
-      }
-    }
-    
-    // Last resort: Try createServerClient
-    if (!userId) {
-      try {
-        const supabase = await createServerClient()
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
+    const { getAuthenticatedUser, isAdminUser } = await import('@/lib/supabase/api-helpers')
+    const user = await getAuthenticatedUser(request)
 
-        if (session?.user) {
-          userId = session.user.id
-          console.log('Upload API - User ID from createServerClient:', userId)
-        } else {
-          const {
-            data: { user },
-          } = await supabase.auth.getUser()
-          if (user) {
-            userId = user.id
-            console.log('Upload API - User ID from createServerClient.getUser():', userId)
-          }
-        }
-      } catch (error) {
-        console.log('Upload API - createServerClient failed:', error)
-      }
-    }
-
-    if (!userId) {
-      console.log('Upload API - No user ID found after all attempts, returning 401')
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user is admin
-    const adminClient = createAdminClient()
-    const { data: userRole } = await adminClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .single()
-
-    console.log('Upload API - User role:', userRole?.role)
-
-    if (!userRole || userRole.role !== 'admin') {
-      console.log('Upload API - User is not admin, returning 403')
+    const isAdmin = await isAdminUser(user.id)
+    if (!isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
+
+    const userId = user.id
+    const adminClient = createAdminClient()
 
     // Get form data with better error handling
     let formData: FormData

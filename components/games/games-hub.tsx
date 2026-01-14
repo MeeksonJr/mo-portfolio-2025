@@ -23,6 +23,10 @@ import MemoryGame from './memory-game'
 import TicTacToeGame from './tic-tac-toe-game'
 import BreakoutGame from './breakout-game'
 import WordPuzzleGame from './word-puzzle-game'
+import PongGame from './pong-game'
+import FlappyBirdGame from './flappy-bird-game'
+import SpaceInvadersGame from './space-invaders-game'
+import Game2048 from './2048-game'
 import Leaderboard from './leaderboard'
 import { toast } from 'sonner'
 
@@ -33,6 +37,10 @@ const GAME_TABS = [
   { value: 'tic-tac-toe', label: 'Tic-Tac-Toe', icon: Gamepad2, description: 'Classic 3x3 game' },
   { value: 'breakout', label: 'Breakout', icon: Gamepad2, description: 'Brick breaking game' },
   { value: 'word-puzzle', label: 'Word Puzzle', icon: Gamepad2, description: 'Word finding game' },
+  { value: 'pong', label: 'Pong', icon: Gamepad2, description: 'Classic paddle game' },
+  { value: 'flappy-bird', label: 'Flappy Bird', icon: Gamepad2, description: 'Tap to fly' },
+  { value: 'space-invaders', label: 'Space Invaders', icon: Gamepad2, description: 'Defend Earth' },
+  { value: '2048', label: '2048', icon: Gamepad2, description: 'Number puzzle' },
 ]
 
 export default function GamesHub() {
@@ -101,7 +109,7 @@ export default function GamesHub() {
           <div className="sticky top-20 z-40 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 border-b mb-6">
             <div className="overflow-x-auto scrollbar-hide">
               <TabsList 
-                className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6 h-auto p-1 bg-muted/60 backdrop-blur-sm min-w-max"
+                className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 h-auto p-1 bg-muted/60 backdrop-blur-sm min-w-max"
                 aria-label="Games navigation tabs"
               >
                 {GAME_TABS.map((tab) => {
@@ -141,6 +149,18 @@ export default function GamesHub() {
             </TabsContent>
             <TabsContent value="word-puzzle" className="mt-6">
               <WordPuzzleGame musicEnabled={musicEnabled} musicVolume={musicVolume} />
+            </TabsContent>
+            <TabsContent value="pong" className="mt-6">
+              <PongGame musicEnabled={musicEnabled} musicVolume={musicVolume} />
+            </TabsContent>
+            <TabsContent value="flappy-bird" className="mt-6">
+              <FlappyBirdGame musicEnabled={musicEnabled} musicVolume={musicVolume} />
+            </TabsContent>
+            <TabsContent value="space-invaders" className="mt-6">
+              <SpaceInvadersGame musicEnabled={musicEnabled} musicVolume={musicVolume} />
+            </TabsContent>
+            <TabsContent value="2048" className="mt-6">
+              <Game2048 musicEnabled={musicEnabled} musicVolume={musicVolume} />
             </TabsContent>
           </AnimatePresence>
         </Tabs>

@@ -134,10 +134,24 @@ Try asking me something like "Show me projects using React" or "What's your expe
         throw new Error('Failed to get response')
       }
 
+      // Check if response is JSON (error response) or streaming
+      const contentType = response.headers.get('content-type') || ''
+      
+      if (contentType.includes('application/json')) {
+        // Handle JSON error response
+        const errorData = await response.json()
+        throw new Error(errorData.error || errorData.message || 'Failed to get response')
+      }
+
       const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error('No response body available')
+      }
+
       const decoder = new TextDecoder()
       let assistantContent = ''
       let buffer = ''
+      let hasReceivedData = false
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -148,41 +162,14 @@ Try asking me something like "Show me projects using React" or "What's your expe
 
       setMessages(prev => [...prev, assistantMessage])
 
-      if (reader) {
-        try {
-          while (true) {
-            const { done, value } = await reader.read()
-            if (done) {
-              // Process any remaining buffer
-              if (buffer.trim()) {
-                assistantContent += buffer
-                setMessages(prev => {
-                  const updated = [...prev]
-                  const lastMsg = updated[updated.length - 1]
-                  if (lastMsg && lastMsg.role === 'assistant') {
-                    lastMsg.content = assistantContent.trim()
-                  }
-                  return updated
-                })
-              }
-              break
-            }
-
-            buffer += decoder.decode(value, { stream: true })
-            const lines = buffer.split('\n')
-            
-            // Keep the last incomplete line in buffer
-            buffer = lines.pop() || ''
-
-            // Process complete lines
-            for (const line of lines) {
-              if (!line.trim()) continue
-              
-              // toTextStreamResponse returns plain text chunks
-              // Each chunk is just the text content, no JSON formatting
-              assistantContent += line + '\n'
-              
-              // Update the message content in real-time
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) {
+            // Process any remaining buffer
+            if (buffer.trim()) {
+              assistantContent += buffer
+              hasReceivedData = true
               setMessages(prev => {
                 const updated = [...prev]
                 const lastMsg = updated[updated.length - 1]
@@ -192,29 +179,73 @@ Try asking me something like "Show me projects using React" or "What's your expe
                 return updated
               })
             }
+            break
           }
+
+          hasReceivedData = true
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split('\n')
           
-          // Ensure final content is set
-          if (assistantContent) {
-            setMessages(prev => {
-              const updated = [...prev]
-              const lastMsg = updated[updated.length - 1]
-              if (lastMsg && lastMsg.role === 'assistant') {
-                lastMsg.content = assistantContent
+          // Keep the last incomplete line in buffer
+          buffer = lines.pop() || ''
+
+          // Process complete lines
+          for (const line of lines) {
+            if (!line.trim()) continue
+            
+            // Handle different streaming formats
+            // Try to parse as JSON first (some formats use JSON)
+            try {
+              const jsonMatch = line.match(/^data: (.+)$/)
+              if (jsonMatch) {
+                const jsonData = JSON.parse(jsonMatch[1])
+                if (jsonData.content || jsonData.text) {
+                  assistantContent += (jsonData.content || jsonData.text) + '\n'
+                } else if (jsonData.delta?.content) {
+                  assistantContent += jsonData.delta.content
+                }
+              } else {
+                // Plain text chunk
+                assistantContent += line + '\n'
               }
-              return updated
-            })
-          } else {
-            // If no content was received, show an error
+            } catch {
+              // Not JSON, treat as plain text
+              assistantContent += line + '\n'
+            }
+            
+            // Update the message content in real-time
             setMessages(prev => {
               const updated = [...prev]
               const lastMsg = updated[updated.length - 1]
               if (lastMsg && lastMsg.role === 'assistant') {
-                lastMsg.content = 'Sorry, I received an empty response. Please try again.'
+                lastMsg.content = assistantContent.trim()
               }
               return updated
             })
           }
+        }
+        
+        // Ensure final content is set
+        if (assistantContent.trim()) {
+          setMessages(prev => {
+            const updated = [...prev]
+            const lastMsg = updated[updated.length - 1]
+            if (lastMsg && lastMsg.role === 'assistant') {
+              lastMsg.content = assistantContent.trim()
+            }
+            return updated
+          })
+        } else if (!hasReceivedData) {
+          // If no content was received at all, show an error
+          setMessages(prev => {
+            const updated = [...prev]
+            const lastMsg = updated[updated.length - 1]
+            if (lastMsg && lastMsg.role === 'assistant') {
+              lastMsg.content = 'Sorry, I received an empty response. Please try again.'
+            }
+            return updated
+          })
+        }
         } catch (streamError) {
           console.error('Error reading stream:', streamError)
           // If streaming fails, try to show error message

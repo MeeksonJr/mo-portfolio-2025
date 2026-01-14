@@ -177,7 +177,9 @@ export default function MusicUploadManager() {
 
       const data = await response.json()
       
-      if (!data.success || !data.song) {
+      // Check for both 'song' and 'data' fields (API returns both)
+      const songData = data.song || data.data
+      if (!data.success || !songData) {
         throw new Error(data.error || 'Upload succeeded but song data not returned')
       }
 

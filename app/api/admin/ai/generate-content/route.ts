@@ -18,6 +18,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Check if user is admin
+    const { isAdminUser } = await import('@/lib/supabase/api-helpers')
+    const isAdmin = await isAdminUser(user.id)
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const { readmeContent, contentType, repoName, repoDescription, techStack, fieldType = 'all' } = await request.json()
 
     if (!readmeContent) {
