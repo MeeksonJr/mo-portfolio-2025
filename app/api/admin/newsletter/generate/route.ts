@@ -137,9 +137,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-      // Fallback to default generation if AI failed or not configured
-    }
-    
+    // Fallback to default generation if AI failed or not configured
     if (!content_html) {
       if (contentData) {
       // Generate based on content
