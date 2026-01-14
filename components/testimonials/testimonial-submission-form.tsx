@@ -158,6 +158,8 @@ export default function TestimonialSubmissionForm() {
                   key={rating}
                   type="button"
                   onClick={() => setFormData({ ...formData, rating })}
+                  aria-label={`Rate ${rating} out of 5 stars`}
+                  title={`Rate ${rating} out of 5 stars`}
                   className={`transition-colors ${
                     formData.rating >= rating ? 'text-yellow-400' : 'text-gray-300'
                   }`}
