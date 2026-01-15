@@ -57,6 +57,7 @@ const navGroups = [
       { href: '/admin/ai/generations', label: 'AI Generations', icon: Activity },
       { href: '/admin/pages', label: 'Page CMS', icon: Globe },
       { href: '/admin/music', label: 'Music', icon: Music },
+      { href: '/admin/playlists', label: 'Playlists', icon: Music },
     ],
   },
   {

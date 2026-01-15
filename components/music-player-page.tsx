@@ -34,11 +34,44 @@ export default function MusicPlayerPage() {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
 
-  // Load songs
+  // Load songs (check for playlist first)
   useEffect(() => {
     const loadSongs = async () => {
       try {
         setLoading(true)
+        
+        // Check if there's a playlist in localStorage
+        if (typeof window !== 'undefined') {
+          const storedPlaylist = localStorage.getItem('currentPlaylist')
+          if (storedPlaylist) {
+            try {
+              const playlist = JSON.parse(storedPlaylist)
+              // Convert playlist songs to the format expected by the player
+              const playlistSongs = playlist.songs.map((song: any) => ({
+                id: `playlist-${playlist.id}-${song.title}`,
+                title: song.title,
+                artist: null,
+                album: null,
+                genre: null,
+                file_url: song.file,
+                duration: null,
+                play_count: 0,
+                cover_image_url: null,
+              }))
+              setSongs(playlistSongs)
+              setFilteredSongs(playlistSongs)
+              // Clear the stored playlist after loading
+              localStorage.removeItem('currentPlaylist')
+              setLoading(false)
+              return
+            } catch (e) {
+              console.error('Error parsing stored playlist:', e)
+              localStorage.removeItem('currentPlaylist')
+            }
+          }
+        }
+        
+        // Load all songs if no playlist
         const response = await fetch('/api/music/songs')
         if (!response.ok) throw new Error('Failed to fetch songs')
         const data = await response.json()
@@ -197,7 +230,16 @@ export default function MusicPlayerPage() {
         <h1 className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
           Music Library
         </h1>
-        <p className="text-muted-foreground">Discover and play music</p>
+        <p className="text-muted-foreground mb-4">Discover and play music</p>
+        <div className="flex justify-center gap-4">
+          <a
+            href="/playlists"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors text-sm font-medium"
+          >
+            <Music2 className="h-4 w-4" />
+            Browse Playlists
+          </a>
+        </div>
       </div>
 
       {/* Search and Filters */}

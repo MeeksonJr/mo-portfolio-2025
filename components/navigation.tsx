@@ -49,6 +49,7 @@ export default function Navigation() {
     { name: "Testimonials", href: "/testimonials" },
     { name: "Timeline", href: "/timeline" },
     { name: "Music", href: "/music" },
+    { name: "Playlists", href: "/playlists" },
     { name: "Games", href: "/games" },
     { name: "Achievements", href: "/achievements" },
   ]
