@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { 
   Play, Pause, SkipForward, SkipBack, Search, Music2, Shuffle, Repeat, 
   Volume2, VolumeX, Heart, MoreVertical, Clock, ListMusic, Lock,
-  PlayCircle
+  PlayCircle, Upload, X, Sparkles
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getProxyAudioUrl } from '@/lib/music-helpers'
@@ -76,6 +76,10 @@ export default function MusicHub() {
   const [duration, setDuration] = useState(0)
   const [currentPlaylist, setCurrentPlaylist] = useState<Playlist | null>(null)
   const [filteredSongs, setFilteredSongs] = useState<Song[]>([])
+  const [mood, setMood] = useState<string>('')
+  const [aiRecommendations, setAiRecommendations] = useState<Song[]>([])
+  const [showRecommendations, setShowRecommendations] = useState(false)
+  const [recommendationQuery, setRecommendationQuery] = useState('')
 
   // Initialize tab from URL
   useEffect(() => {
@@ -328,8 +332,81 @@ export default function MusicHub() {
     (playlist.description && playlist.description.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
+  // Generate mood-based background gradient
+  const getBackgroundGradient = () => {
+    if (!isPlaying || !currentSong) {
+      return 'from-background via-background to-muted/20'
+    }
+    
+    // Dynamic gradient based on genre or mood
+    const genreColors: Record<string, string> = {
+      'electronic': 'from-purple-900/20 via-blue-900/20 to-pink-900/20',
+      'rock': 'from-red-900/20 via-orange-900/20 to-yellow-900/20',
+      'jazz': 'from-amber-900/20 via-yellow-900/20 to-orange-900/20',
+      'classical': 'from-indigo-900/20 via-purple-900/20 to-blue-900/20',
+      'hip-hop': 'from-gray-900/20 via-slate-900/20 to-zinc-900/20',
+    }
+    
+    return genreColors[currentSong.genre?.toLowerCase() || ''] || 'from-primary/10 via-primary/5 to-primary/20'
+  }
+
+  // Get AI recommendations
+  const fetchRecommendations = async (query?: string, moodFilter?: string) => {
+    try {
+      const response = await fetch('/api/music/recommendations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userQuery: query || recommendationQuery,
+          currentSongs: filteredSongs.map(s => s.id),
+          mood: moodFilter || mood,
+          genre: selectedGenre,
+        }),
+      })
+
+      if (!response.ok) throw new Error('Failed to get recommendations')
+
+      const data = await response.json()
+      setAiRecommendations(data.recommendations || [])
+      setShowRecommendations(true)
+    } catch (error) {
+      console.error('Error fetching recommendations:', error)
+      toast.error('Failed to load recommendations')
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
+    <div className={`min-h-screen bg-gradient-to-b ${getBackgroundGradient()} transition-all duration-1000`}>
+      {/* Animated background particles when playing */}
+      {isPlaying && currentSong && typeof window !== 'undefined' && (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+          <AnimatePresence>
+            {[...Array(20)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-2 h-2 bg-primary/20 rounded-full"
+                initial={{
+                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1920),
+                  y: (typeof window !== 'undefined' ? window.innerHeight : 1080) + 100,
+                  opacity: 0,
+                }}
+                animate={{
+                  y: -100,
+                  opacity: [0, 0.5, 0],
+                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1920),
+                }}
+                transition={{
+                  duration: Math.random() * 3 + 2,
+                  repeat: Infinity,
+                  delay: Math.random() * 2,
+                }}
+              />
+            ))}
+          </AnimatePresence>
+        </div>
+      )}
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -362,13 +439,13 @@ export default function MusicHub() {
             </div>
           </div>
 
-          {/* Genre Filter */}
-          {genres.length > 0 && (
-            <div className="max-w-2xl mx-auto mb-6">
+          {/* Genre Filter & Mood Selector */}
+          <div className="max-w-2xl mx-auto mb-6 flex gap-4">
+            {genres.length > 0 && (
               <select
                 value={selectedGenre || ''}
                 onChange={(e) => setSelectedGenre(e.target.value || null)}
-                className="w-full px-4 py-2 bg-background/95 backdrop-blur-sm border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="flex-1 px-4 py-2 bg-background/95 backdrop-blur-sm border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 aria-label="Filter by genre"
               >
                 <option value="">All Genres</option>
@@ -378,8 +455,118 @@ export default function MusicHub() {
                   </option>
                 ))}
               </select>
-            </div>
+            )}
+            <select
+              value={mood}
+              onChange={(e) => setMood(e.target.value)}
+              className="px-4 py-2 bg-background/95 backdrop-blur-sm border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Select mood"
+            >
+              <option value="">All Moods</option>
+              <option value="energetic">Energetic</option>
+              <option value="relaxed">Relaxed</option>
+              <option value="focused">Focused</option>
+              <option value="happy">Happy</option>
+              <option value="melancholic">Melancholic</option>
+            </select>
+            <Button
+              onClick={() => fetchRecommendations()}
+              variant="outline"
+              className="whitespace-nowrap"
+            >
+              <Music2 className="h-4 w-4 mr-2" />
+              Get Recommendations
+            </Button>
+          </div>
+
+          {/* AI Recommendations Section */}
+          {showRecommendations && aiRecommendations.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-2xl mx-auto mb-6"
+            >
+              <Card className="bg-background/95 backdrop-blur-sm border-primary/20">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <Music2 className="h-4 w-4 text-primary" />
+                      AI Recommendations
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowRecommendations(false)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {aiRecommendations.map((song) => {
+                      const songIndex = filteredSongs.findIndex(s => s.id === song.id)
+                      return (
+                        <motion.button
+                          key={song.id}
+                          onClick={() => {
+                            if (songIndex >= 0) {
+                              handleSongSelect(songIndex)
+                            } else {
+                              // Add to queue
+                              const newSongs = [...songs, song]
+                              const newFiltered = [...filteredSongs, song]
+                              setSongs(newSongs)
+                              setFilteredSongs(newFiltered)
+                              handleSongSelect(newFiltered.length - 1)
+                            }
+                          }}
+                          className="w-full text-left p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                          whileHover={{ scale: 1.02 }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Play className="h-3 w-3 text-primary" />
+                            <span className="text-sm">{song.title}</span>
+                            {song.artist && (
+                              <span className="text-xs text-muted-foreground">by {song.artist}</span>
+                            )}
+                          </div>
+                        </motion.button>
+                      )
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           )}
+
+          {/* Music Submission Link Box */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="max-w-2xl mx-auto mb-6"
+          >
+            <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 backdrop-blur-sm border-primary/20">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                      <Music className="h-5 w-5 text-primary" />
+                      Share Your Music
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Have a song you'd like to share? Submit it for review and it might be added to the library!
+                    </p>
+                    <Link href="/music/submit">
+                      <Button className="w-full sm:w-auto">
+                        <Upload className="h-4 w-4 mr-2" />
+                        Submit Your Music
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </motion.div>
 

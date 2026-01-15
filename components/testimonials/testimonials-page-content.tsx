@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Filter, Search, Quote, Video, Linkedin, Twitter, Globe, BarChart3, SlidersHorizontal } from 'lucide-react'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -242,9 +243,39 @@ export default function TestimonialsPageContent() {
         className="text-center mb-12"
       >
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Testimonials</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
           What clients, colleagues, and collaborators say about working with me
         </p>
+        
+        {/* Testimonial Submission Link Box */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="max-w-2xl mx-auto mb-8"
+        >
+          <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 backdrop-blur-sm border-primary/20">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                    <Quote className="h-5 w-5 text-primary" />
+                    Share Your Experience
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Worked with me on a project? Share your testimonial! It will be reviewed and may be featured on this page.
+                  </p>
+                  <Link href="/testimonials/submit">
+                    <Button className="w-full sm:w-auto">
+                      <Quote className="h-4 w-4 mr-2" />
+                      Submit Testimonial
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </motion.div>
 
       {/* Statistics */}

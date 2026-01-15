@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
     const adminClient = createAdminClient()
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
+    const status = searchParams.get('status') // Filter by status (pending, approved, rejected)
     const limit = parseInt(searchParams.get('limit') || '100')
     const offset = parseInt(searchParams.get('offset') || '0')
 
@@ -28,6 +29,11 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       query = query.or(`title.ilike.%${search}%,artist.ilike.%${search}%`)
+    }
+
+    // Filter by status if provided
+    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
+      query = query.eq('status', status)
     }
 
     query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1)

@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Music, Play, Lock, ArrowLeft, Clock } from 'lucide-react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
-import { getProxyAudioUrl } from '@/lib/utils'
+import { getProxyAudioUrl } from '@/lib/music-helpers'
 import { toast } from 'sonner'
 
 interface Playlist {

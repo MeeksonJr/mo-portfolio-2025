@@ -160,11 +160,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Ensure content_type is lowercase and matches constraint
+    const normalizedContentType = content_type.toLowerCase().trim()
+    if (!['blog_post', 'case_study', 'project', 'resource'].includes(normalizedContentType)) {
+      console.error('Invalid content_type received:', content_type, 'Normalized:', normalizedContentType)
+      return NextResponse.json(
+        { error: `Invalid content_type: ${content_type}. Must be one of: blog_post, case_study, project, resource` },
+        { status: 400 }
+      )
+    }
+
     // Insert comment with status 'pending' for review
     const { data: comment, error: insertError } = await supabase
       .from('comments')
       .insert({
-        content_type,
+        content_type: normalizedContentType,
         content_id,
         parent_id: parent_id || null,
         author_name: author_name.trim(),
