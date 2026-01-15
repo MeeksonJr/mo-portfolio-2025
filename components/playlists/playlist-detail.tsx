@@ -90,8 +90,8 @@ export default function PlaylistDetail({ playlistId }: PlaylistDetailProps) {
         })),
       }))
       
-      // Navigate to music page or trigger player
-      window.location.href = '/music'
+      // Navigate to music page with playlist loaded
+      window.location.href = '/music?tab=songs'
     }
   }
 
