@@ -146,7 +146,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { id, alt_text, caption, display_order, is_featured, is_active } = body
+    const { id, alt_text, caption, display_order, is_featured, is_active, image_url, storage_path } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Missing id' }, { status: 400 })
@@ -154,12 +154,52 @@ export async function PUT(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+    // Get current image data before updating (to save to versions if URL changes)
+    const { data: currentImage } = await supabase
+      .from('page_images')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (!currentImage) {
+      return NextResponse.json({ error: 'Image not found' }, { status: 404 })
+    }
+
+    // If image_url or storage_path is being changed, save current version to versions table
+    const imageUrlChanged = image_url !== undefined && image_url !== currentImage.image_url
+    const storagePathChanged = storage_path !== undefined && storage_path !== currentImage.storage_path
+
+    if (imageUrlChanged || storagePathChanged) {
+      // Get current max version for this image
+      const { data: existingVersions } = await supabase
+        .from('image_versions')
+        .select('version')
+        .eq('page_image_id', id)
+        .order('version', { ascending: false })
+        .limit(1)
+
+      const nextVersion = existingVersions && existingVersions.length > 0
+        ? (existingVersions[0].version || 0) + 1
+        : 1
+
+      // Save current version before updating
+      await supabase.from('image_versions').insert({
+        page_image_id: id,
+        image_url: currentImage.image_url,
+        storage_path: currentImage.storage_path,
+        version: nextVersion,
+        replaced_by: user.id,
+      })
+    }
+
     const updateData: any = {}
     if (alt_text !== undefined) updateData.alt_text = alt_text
     if (caption !== undefined) updateData.caption = caption
     if (display_order !== undefined) updateData.display_order = display_order
     if (is_featured !== undefined) updateData.is_featured = is_featured
     if (is_active !== undefined) updateData.is_active = is_active
+    if (image_url !== undefined) updateData.image_url = image_url
+    if (storage_path !== undefined) updateData.storage_path = storage_path
 
     const { data, error } = await supabase
       .from('page_images')
@@ -211,12 +251,24 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Image not found' }, { status: 404 })
     }
 
+    // Get current max version for this image
+    const { data: existingVersions } = await supabase
+      .from('image_versions')
+      .select('version')
+      .eq('page_image_id', id)
+      .order('version', { ascending: false })
+      .limit(1)
+
+    const nextVersion = existingVersions && existingVersions.length > 0
+      ? (existingVersions[0].version || 0) + 1
+      : 1
+
     // Save to versions table
     await supabase.from('image_versions').insert({
       page_image_id: id,
       image_url: image.image_url,
       storage_path: image.storage_path,
-      version: 1,
+      version: nextVersion,
       replaced_by: user.id,
     })
 

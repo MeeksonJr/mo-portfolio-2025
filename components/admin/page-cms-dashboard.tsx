@@ -10,10 +10,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
-import { Upload, X, Check, Wand2, Loader2, Image as ImageIcon, FileText, Save, RefreshCw } from 'lucide-react'
+import { Upload, X, Check, Wand2, Loader2, Image as ImageIcon, FileText, Save, RefreshCw, History } from 'lucide-react'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase/client'
 import MDXEditor from '@/components/admin/mdx-editor'
+import ImageVersionHistoryDialog from '@/components/admin/image-version-history-dialog'
 
 const PAGES = [
   { 
@@ -73,6 +74,8 @@ export default function PageCMSDashboard() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [imageAltText, setImageAltText] = useState('')
   const [imageCaption, setImageCaption] = useState('')
+  const [versionHistoryImageId, setVersionHistoryImageId] = useState<string | null>(null)
+  const [versionHistoryOpen, setVersionHistoryOpen] = useState(false)
   
   const [aiImproving, setAiImproving] = useState(false)
   const [aiContext, setAiContext] = useState('')
@@ -665,6 +668,17 @@ export default function PageCMSDashboard() {
                           <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => {
+                              setVersionHistoryImageId(image.id)
+                              setVersionHistoryOpen(true)
+                            }}
+                            title="View version history"
+                          >
+                            <History className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => handleToggleImageActive(image.id, image.is_active)}
                           >
                             {image.is_active ? 'Deactivate' : 'Activate'}
@@ -685,6 +699,20 @@ export default function PageCMSDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
+      )}
+
+      {/* Image Version History Dialog */}
+      {versionHistoryImageId && (
+        <ImageVersionHistoryDialog
+          open={versionHistoryOpen}
+          onOpenChange={setVersionHistoryOpen}
+          pageImageId={versionHistoryImageId}
+          currentImageUrl={images.find(img => img.id === versionHistoryImageId)?.image_url}
+          onVersionRestore={() => {
+            loadImages()
+            setVersionHistoryOpen(false)
+          }}
+        />
       )}
     </div>
   )
