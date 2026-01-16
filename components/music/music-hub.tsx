@@ -469,14 +469,27 @@ export default function MusicHub() {
               <option value="happy">Happy</option>
               <option value="melancholic">Melancholic</option>
             </select>
-            <Button
-              onClick={() => fetchRecommendations()}
-              variant="outline"
-              className="whitespace-nowrap"
-            >
-              <Music2 className="h-4 w-4 mr-2" />
-              Get Recommendations
-            </Button>
+            <div className="flex gap-2 flex-1 sm:flex-initial">
+              <Input
+                placeholder="What are you in the mood for?"
+                value={recommendationQuery}
+                onChange={(e) => setRecommendationQuery(e.target.value)}
+                className="flex-1 min-w-0 bg-background/95 backdrop-blur-sm border-border/50"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    fetchRecommendations()
+                  }
+                }}
+              />
+              <Button
+                onClick={() => fetchRecommendations()}
+                variant="outline"
+                className="whitespace-nowrap"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Get Recommendations
+              </Button>
+            </div>
           </div>
 
           {/* AI Recommendations Section */}
@@ -550,7 +563,7 @@ export default function MusicHub() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                      <Music className="h-5 w-5 text-primary" />
+                      <Music2 className="h-5 w-5 text-primary" />
                       Share Your Music
                     </h3>
                     <p className="text-sm text-muted-foreground mb-4">
@@ -692,7 +705,7 @@ export default function MusicHub() {
                                 <img src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center">
-                                  <Music className="h-8 w-8 text-primary/30" />
+                                  <Music2 className="h-8 w-8 text-primary/30" />
                                 </div>
                               )}
                             </div>
@@ -756,18 +769,44 @@ export default function MusicHub() {
                       <motion.button
                         key={song.id}
                         onClick={() => handleSongSelect(index)}
-                        className={`w-full text-left p-4 rounded-lg transition-all ${
+                        className={`w-full text-left p-4 rounded-lg transition-all relative overflow-hidden ${
                           index === currentTrack
-                            ? 'bg-primary/20 border-2 border-primary'
+                            ? 'bg-primary/20 border-2 border-primary shadow-lg'
                             : 'bg-muted/50 hover:bg-muted border-2 border-transparent'
                         }`}
-                        whileHover={{ scale: 1.01 }}
+                        whileHover={{ scale: 1.01, x: 4 }}
                         whileTap={{ scale: 0.99 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        {/* Playing animation background */}
+                        {index === currentTrack && isPlaying && (
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent"
+                            animate={{
+                              opacity: [0.3, 0.6, 0.3],
+                            }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              ease: "easeInOut"
+                            }}
+                          />
+                        )}
+                        <div className="flex items-center gap-4 relative z-10">
+                          <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
+                            index === currentTrack && isPlaying 
+                              ? 'bg-primary shadow-lg shadow-primary/50' 
+                              : 'bg-primary/10'
+                          }`}>
                             {index === currentTrack && isPlaying ? (
-                              <Pause className="text-primary" size={20} />
+                              <motion.div
+                                animate={{ scale: [1, 1.1, 1] }}
+                                transition={{ duration: 0.6, repeat: Infinity }}
+                              >
+                                <Pause className="text-primary-foreground" size={20} />
+                              </motion.div>
                             ) : (
                               <Play className="text-primary" size={20} />
                             )}
@@ -827,7 +866,7 @@ export default function MusicHub() {
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
-                                <Music className="h-16 w-16 text-primary/30" />
+                                <Music2 className="h-16 w-16 text-primary/30" />
                               </div>
                             )}
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">

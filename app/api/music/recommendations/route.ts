@@ -113,8 +113,8 @@ IMPORTANT: Return ONLY the JSON array, no explanations, no markdown.`
         // Parse JSON array from response
         let songTitles: string[] = []
         try {
-          // Try to extract JSON array
-          const jsonMatch = text.match(/\[.*?\]/s)
+          // Try to extract JSON array (using [\s\S] instead of . with s flag for compatibility)
+          const jsonMatch = text.match(/\[[\s\S]*?\]/)
           if (jsonMatch) {
             songTitles = JSON.parse(jsonMatch[0])
           } else {
@@ -122,10 +122,10 @@ IMPORTANT: Return ONLY the JSON array, no explanations, no markdown.`
           }
         } catch (parseError) {
           // Fallback: extract song titles from text
-          const lines = text.split('\n').filter(line => line.trim())
+          const lines = text.split('\n').filter((line: string) => line.trim())
           songTitles = lines
-            .map(line => line.replace(/^[-•*]\s*/, '').replace(/"/g, '').trim())
-            .filter(title => title.length > 0)
+            .map((line: string) => line.replace(/^[-•*]\s*/, '').replace(/"/g, '').trim())
+            .filter((title: string) => title.length > 0)
             .slice(0, 10)
         }
 
