@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+import { getContainerClasses } from "@/components/layout/page-container"
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -87,7 +88,7 @@ export default function Navigation() {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="max-w-7xl mx-auto px-4">
+      <div className={getContainerClasses('wide', 'default')}>
         <div className="flex items-center justify-between gap-2">
           {/* Logo */}
           <Link 

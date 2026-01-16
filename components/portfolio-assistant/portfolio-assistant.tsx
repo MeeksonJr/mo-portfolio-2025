@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
+import PageContainer from '@/components/layout/page-container'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import Link from 'next/link'
@@ -313,7 +314,7 @@ Try asking me something like "Show me projects using React" or "What's your expe
     <>
       <Navigation />
       <div className="min-h-screen bg-background pt-20 pb-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer width="standard" padding="default">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -513,7 +514,7 @@ Try asking me something like "Show me projects using React" or "What's your expe
               </Card>
             </div>
           </div>
-        </div>
+        </PageContainer>
       </div>
       <FooterLight />
     </>

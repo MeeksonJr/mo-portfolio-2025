@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Play, Pause, SkipForward, SkipBack, Search, Music2, Shuffle, Repeat, Volume2, VolumeX } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getProxyAudioUrl } from '@/lib/music-helpers'
+import PageContainer from '@/components/layout/page-container'
 
 interface Song {
   id: string
@@ -224,7 +225,7 @@ export default function MusicPlayerPage() {
   const currentSong = filteredSongs[currentTrack]
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
+    <PageContainer width="wide" padding="tight">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
@@ -459,7 +460,7 @@ export default function MusicPlayerPage() {
           }
         }}
       />
-    </div>
+    </PageContainer>
   )
 }
 

@@ -7,6 +7,9 @@ import FooterLight from '@/components/footer-light'
 import BreadcrumbNavigation from '@/components/navigation/breadcrumb-navigation'
 import { EnhancedScrollReveal } from '@/components/animations/enhanced-scroll-reveal'
 import ScrollProgressIndicator from '@/components/animations/scroll-progress-indicator'
+import PageContainer, { getContainerClasses } from '@/components/layout/page-container'
+import { CONTAINER_WIDTHS, SPACING, TYPOGRAPHY, type ContainerWidth } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface EnhancedPageLayoutProps {
   children: ReactNode
@@ -16,6 +19,8 @@ interface EnhancedPageLayoutProps {
   className?: string
   headerContent?: ReactNode
   footerContent?: ReactNode
+  containerWidth?: ContainerWidth
+  containerPadding?: 'default' | 'tight' | 'wide'
 }
 
 export default function EnhancedPageLayout({
@@ -26,9 +31,11 @@ export default function EnhancedPageLayout({
   className = '',
   headerContent,
   footerContent,
+  containerWidth = 'standard',
+  containerPadding = 'default',
 }: EnhancedPageLayoutProps) {
   return (
-    <div className={`min-h-screen bg-background relative ${className}`}>
+    <div className={cn('min-h-screen bg-background relative', className)}>
       <ScrollProgressIndicator />
       <Navigation />
       
@@ -42,43 +49,49 @@ export default function EnhancedPageLayout({
       >
         {(title || description || headerContent) && (
           <EnhancedScrollReveal variant="fade" delay={0.1}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
-              {headerContent || (
-                <>
-                  {title && (
-                    <motion.h1
-                      className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      {title}
-                    </motion.h1>
-                  )}
-                  {description && (
-                    <motion.p
-                      className="text-lg md:text-xl text-muted-foreground max-w-3xl"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.1 }}
-                    >
-                      {description}
-                    </motion.p>
-                  )}
-                </>
-              )}
-            </div>
+            <PageContainer width={containerWidth} padding={containerPadding}>
+              <div className={cn('py-6 sm:py-8 md:py-12')}>
+                {headerContent || (
+                  <>
+                    {title && (
+                      <motion.h1
+                        className={cn(TYPOGRAPHY.h1, 'mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent')}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        {title}
+                      </motion.h1>
+                    )}
+                    {description && (
+                      <motion.p
+                        className={cn(TYPOGRAPHY.lead, 'text-muted-foreground max-w-3xl')}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                      >
+                        {description}
+                      </motion.p>
+                    )}
+                  </>
+                )}
+              </div>
+            </PageContainer>
           </EnhancedScrollReveal>
         )}
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
-          {children}
-        </div>
+        <PageContainer width={containerWidth} padding={containerPadding}>
+          <div className={cn('pb-12 sm:pb-16')}>
+            {children}
+          </div>
+        </PageContainer>
         
         {footerContent && (
-          <div className="max-w-6xl mx-auto px-4 pb-8">
-            {footerContent}
-          </div>
+          <PageContainer width="standard" padding="default">
+            <div className="pb-8">
+              {footerContent}
+            </div>
+          </PageContainer>
         )}
       </main>
       

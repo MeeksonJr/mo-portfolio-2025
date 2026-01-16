@@ -13,6 +13,7 @@ import { ContentPerformanceInsights } from '@/components/analytics/content-perfo
 import SmartRecommendations from '@/components/recommendations/smart-recommendations'
 import FeedbackWidget from '@/components/feedback/feedback-widget'
 import CommentsSection from '@/components/comments/comments-section'
+import { getContainerClasses } from '@/components/layout/page-container'
 
 interface BlogPost {
   id: string
@@ -52,7 +53,7 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
 
 
   return (
-    <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <article className={getContainerClasses('narrow', 'default')}>
       {/* Back Button */}
       <Link
         href="/blog"

@@ -16,6 +16,7 @@ import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import Link from 'next/link'
 import Image from 'next/image'
+import PageContainer from '@/components/layout/page-container'
 
 interface Project {
   id: string
@@ -179,7 +180,7 @@ export default function LiveProjectShowcase() {
     <>
       <Navigation />
       <div className="min-h-screen bg-background pt-20 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <PageContainer width="wide" padding="default">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -194,7 +195,9 @@ export default function LiveProjectShowcase() {
               See my projects in action. Interactive live demos of real working applications.
             </p>
           </motion.div>
+        </PageContainer>
 
+        <PageContainer width="wide" padding="default">
           {/* Projects Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {displayProjects.map((project, idx) => (
@@ -328,7 +331,7 @@ export default function LiveProjectShowcase() {
               </CardContent>
             </Card>
           </motion.div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* Fullscreen Demo Modal */}
