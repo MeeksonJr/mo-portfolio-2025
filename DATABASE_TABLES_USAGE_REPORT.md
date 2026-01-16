@@ -548,6 +548,66 @@ All major database tables have been fully implemented. Remaining items are minor
 
 ---
 
+## Recent Bug Fixes & UI Improvements (January 2025)
+
+### Comments System Fixes:
+1. ✅ **Content Type Validation** - Fixed `comments_content_type_check` constraint error
+   - Added proper normalization and mapping for content type variations
+   - Handles: "blog" → "blog_post", "case-study" → "case_study", etc.
+   - Improved error messages and validation logic
+
+### Live Demos Improvements:
+1. ✅ **Iframe Error Handling** - Fixed "connection refused" errors
+   - Added timeout-based detection for X-Frame-Options blocking
+   - Clear error messages when sites block iframe embedding
+   - "Open in New Tab" fallback button
+   - Improved loading states and user feedback
+
+### UI/UX Enhancements:
+1. ✅ **Dark/Light Mode Transparency** - Fixed visibility issues
+   - Updated `.glass` and `.glass-enhanced` CSS classes
+   - Improved backdrop blur and opacity for better readability
+   - Enhanced dialog and alert dialog backgrounds
+   - Better contrast in both light and dark modes
+
+2. ✅ **Navigation Cleanup** - Streamlined navbar
+   - Removed "About", "Work", and "Services" from navbar (home page only)
+   - Added "Learn More" button to About section → `/about`
+   - Added "View All Projects" button to Projects section → `/projects`
+   - Added "View My Work" button to Services section → `/projects`
+   - Cleaner, more focused navigation experience
+
+3. ✅ **Tour Guide Enhancements** - Improved onboarding
+   - Better visibility with enhanced backdrop and card backgrounds
+   - Improved contrast for readability
+   - Enhanced user experience for new visitors
+
+---
+
+---
+
+## Design System Review
+
+A comprehensive design system review has been completed. See `DESIGN_SYSTEM_REVIEW.md` for detailed analysis.
+
+### Key Findings:
+1. **🔴 Critical:** Duplicate CSS files (`app/globals.css` vs `styles/globals.css`) - needs consolidation
+2. **🟡 High Priority:** Inconsistent container widths (5 different sizes used)
+3. **🟡 High Priority:** Inconsistent padding patterns (8+ different patterns)
+4. **🟡 Medium Priority:** Missing standardized layout components
+5. **🟢 Low Priority:** Documentation improvements needed
+
+### Recommendations:
+- Consolidate CSS files (remove duplicate)
+- Create standardized container component
+- Standardize spacing utilities
+- Enhance page layout component
+- Create design tokens documentation
+
+**Full Report:** See `DESIGN_SYSTEM_REVIEW.md`
+
+---
+
 **Report Generated:** January 14, 2025  
-**Last Updated:** January 14, 2025 (Major Update - Playlists System Completed)
+**Last Updated:** January 14, 2025 (Latest Update - Bug Fixes, UI Improvements & Design System Review)
 
