@@ -112,8 +112,25 @@ export default function PlaylistsManager() {
   const loadAvailableSongs = async () => {
     setLoadingSongs(true)
     try {
-      const response = await fetch('/api/admin/music/songs?status=approved')
-      if (!response.ok) throw new Error('Failed to load songs')
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast.error('Please log in')
+        return
+      }
+
+      const response = await fetch('/api/admin/music/songs?status=approved', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      })
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          toast.error('Session expired. Please log in again.')
+          return
+        }
+        throw new Error('Failed to load songs')
+      }
 
       const data = await response.json()
       setAvailableSongs(data.songs || [])
