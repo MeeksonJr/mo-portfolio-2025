@@ -65,6 +65,7 @@ import { ImageLightbox, useImageLightbox } from '@/components/image-lightbox/ima
 import InteractiveTimeline from '@/components/timeline/interactive-timeline'
 import CertificationsSection from '@/components/certifications/certifications-section'
 import SkillsProficiencyMatrix from '@/components/skills/skills-proficiency-matrix'
+import PageContainer from '@/components/layout/page-container'
 
 export default function AboutPageContent() {
   const { isOpen, images, initialIndex, openLightbox, closeLightbox } = useImageLightbox()
@@ -81,7 +82,7 @@ export default function AboutPageContent() {
   const { images: photos, isLoading: imagesLoading } = usePageImages('about', 'gallery', fallbackPhotos)
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageContainer width="wide" padding="default">
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -235,7 +236,7 @@ export default function AboutPageContent() {
         isOpen={isOpen}
         onClose={closeLightbox}
       />
-    </div>
+    </PageContainer>
   )
 }
 

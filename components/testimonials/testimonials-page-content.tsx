@@ -20,6 +20,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Progress } from '@/components/ui/progress'
+import PageContainer from '@/components/layout/page-container'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -235,7 +236,8 @@ export default function TestimonialsPageContent() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
+    <PageContainer width="wide" padding="default">
+      <div className="py-12">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -604,7 +606,8 @@ export default function TestimonialsPageContent() {
           </DialogContent>
         )}
       </Dialog>
-    </div>
+      </div>
+    </PageContainer>
   )
 }
 

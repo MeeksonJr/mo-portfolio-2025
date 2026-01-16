@@ -15,6 +15,7 @@ import {
 import Link from 'next/link'
 import { trackClick } from '@/lib/analytics'
 import { isContentNew, formatRelativeTime } from '@/lib/content-freshness'
+import PageContainer from '@/components/layout/page-container'
 
 interface Project {
   id: string
@@ -85,7 +86,7 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
   const regularProjects = filteredProjects.filter((p) => !p.is_featured)
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageContainer width="wide" padding="default">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Projects</h1>
@@ -297,7 +298,7 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
           <p className="text-muted-foreground text-lg">No projects found</p>
         </div>
       )}
-    </div>
+    </PageContainer>
   )
 }
 

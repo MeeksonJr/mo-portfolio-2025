@@ -21,6 +21,7 @@ import SocialShareButton from '@/components/sharing/social-share-button'
 import { EnhancedScrollReveal } from '@/components/animations/enhanced-scroll-reveal'
 import { isContentNew, formatRelativeTime } from '@/lib/content-freshness'
 import SeriesBadge from '@/components/content/series-badge'
+import PageContainer from '@/components/layout/page-container'
 
 interface BlogPost {
   id: string
@@ -129,7 +130,7 @@ export default function BlogListing({ posts }: BlogListingProps) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageContainer width="wide" padding="default">
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Blog</h1>
@@ -274,7 +275,7 @@ export default function BlogListing({ posts }: BlogListingProps) {
           ))}
         </div>
       )}
-    </div>
+    </PageContainer>
   )
 }
 

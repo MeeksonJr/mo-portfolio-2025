@@ -85,6 +85,8 @@ export const CARD_VARIANTS = {
   enhanced: 'glass-enhanced rounded-xl',
   elevated: 'bg-card border rounded-xl shadow-lg',
   outlined: 'bg-card border-2 rounded-lg',
+  interactive: 'glass rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 border-2 border-primary/20 cursor-pointer',
+  featured: 'glass rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 border-2 border-primary',
 } as const
 
 export type CardVariant = keyof typeof CARD_VARIANTS
