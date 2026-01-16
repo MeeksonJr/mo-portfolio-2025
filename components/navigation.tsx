@@ -32,11 +32,8 @@ export default function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Home page specific links (only show on home page)
+  // Home page specific links (only show on home page) - Removed About, Work, Services per user request
   const homePageLinks = [
-    { name: "About", href: "/about" },
-    { name: "Work", href: "#projects" },
-    { name: "Services", href: "#services" },
     { name: "Contact", href: "#contact" },
   ]
 

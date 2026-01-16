@@ -1,8 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ExternalLink, Github, DollarSign, CheckCircle, ChevronRight } from 'lucide-react'
+import { ExternalLink, Github, DollarSign, CheckCircle, ChevronRight, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 const projects = [
   {
@@ -188,6 +190,16 @@ export default function ProjectsLight() {
               </motion.div>
             )
           })}
+        </div>
+
+        {/* View All Projects Button */}
+        <div className="mt-6 pt-4 border-t border-border/50">
+          <Link href="/projects">
+            <Button variant="outline" className="w-full group">
+              View All Projects
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

@@ -1,7 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Zap, Rocket, Sparkles, Check } from 'lucide-react'
+import { Zap, Rocket, Sparkles, Check, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 const services = [
   {
@@ -64,6 +66,16 @@ export default function ServicesScattered() {
             </motion.div>
           )
         })}
+      </div>
+
+      {/* View Work Button */}
+      <div className="mt-4 pt-4 border-t border-border/50">
+        <Link href="/projects">
+          <Button variant="outline" className="w-full group">
+            View My Work
+            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Button>
+        </Link>
       </div>
     </div>
   )

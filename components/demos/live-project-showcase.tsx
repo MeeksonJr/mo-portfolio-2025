@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ExternalLink, Github, Monitor, Maximize2, Minimize2, X, 
@@ -38,10 +38,46 @@ export default function LiveProjectShowcase() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [iframeError, setIframeError] = useState(false)
+  const [iframeLoading, setIframeLoading] = useState(true)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     fetchProjects()
   }, [])
+
+  // Handle iframe load timeout - detect X-Frame-Options blocking
+  useEffect(() => {
+    if (selectedProject?.homepage_url && !iframeError) {
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+
+      // Set new timeout to detect if iframe fails to load after 10 seconds
+      timeoutRef.current = setTimeout(() => {
+        if (iframeLoading) {
+          // Still loading after 10 seconds - likely blocked by X-Frame-Options
+          setIframeError(true)
+          setIframeLoading(false)
+        }
+      }, 10000)
+
+      return () => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+        }
+      }
+    }
+  }, [selectedProject?.homepage_url, iframeLoading, iframeError])
+
+  // Reset states when project changes
+  useEffect(() => {
+    if (selectedProject?.homepage_url) {
+      setIframeError(false)
+      setIframeLoading(true)
+    }
+  }, [selectedProject?.id])
 
   const fetchProjects = async () => {
     try {
@@ -373,16 +409,72 @@ export default function LiveProjectShowcase() {
                   {selectedProject.homepage_url && (
                     <TabsContent value="demo" className="flex-1 m-0 p-0">
                       <div className="h-full relative">
-                        <iframe
-                          src={selectedProject.homepage_url}
-                          className="w-full h-full border-0"
-                          title={`${selectedProject.name} Live Demo`}
-                          allow="camera; microphone; geolocation; encrypted-media; autoplay; fullscreen"
-                          sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-top-navigation allow-downloads"
-                          referrerPolicy="no-referrer-when-downgrade"
-                        />
+                        {iframeError ? (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm p-8 border border-border rounded-lg">
+                            <div className="text-center max-w-md">
+                              <Monitor className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                              <h3 className="text-lg font-semibold mb-2">Unable to Load Demo</h3>
+                              <p className="text-sm text-muted-foreground mb-4">
+                                This website does not allow embedding in iframes for security reasons (X-Frame-Options). 
+                                You can still visit it directly using the button below.
+                              </p>
+                              <div className="flex gap-2 justify-center">
+                                <Button
+                                  variant="default"
+                                  onClick={() => window.open(selectedProject.homepage_url || '', '_blank', 'noopener,noreferrer')}
+                                >
+                                  <ExternalLink className="h-4 w-4 mr-2" />
+                                  Open in New Tab
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => {
+                                    setIframeError(false)
+                                    setIframeLoading(true)
+                                  }}
+                                >
+                                  Try Again
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            {iframeLoading && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-background/95 backdrop-blur-sm z-10 border border-border rounded-lg">
+                                <div className="text-center">
+                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                                  <p className="text-sm text-muted-foreground">Loading demo...</p>
+                                </div>
+                              </div>
+                            )}
+                            <iframe
+                              key={selectedProject.homepage_url} // Force re-render on project change
+                              src={selectedProject.homepage_url}
+                              className="w-full h-full border-0 rounded-lg"
+                              title={`${selectedProject.name} Live Demo`}
+                              allow="camera; microphone; geolocation; encrypted-media; autoplay; fullscreen"
+                              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-top-navigation allow-downloads"
+                              referrerPolicy="no-referrer-when-downgrade"
+                              onLoad={() => {
+                                // Clear the error timeout since iframe loaded
+                                if (timeoutRef.current) {
+                                  clearTimeout(timeoutRef.current)
+                                }
+                                // Hide loading after a short delay
+                                setTimeout(() => {
+                                  setIframeLoading(false)
+                                }, 1500)
+                              }}
+                              onError={() => {
+                                setIframeError(true)
+                                setIframeLoading(false)
+                              }}
+                            />
+                          </>
+                        )}
                         {!selectedProject.homepage_url.startsWith('http') && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                          <div className="absolute inset-0 flex items-center justify-center bg-background/95 backdrop-blur-sm border border-border rounded-lg">
                             <p className="text-muted-foreground">
                               Invalid URL. Please provide a valid HTTP/HTTPS URL.
                             </p>

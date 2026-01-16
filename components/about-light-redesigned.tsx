@@ -1,7 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Heart, Sparkles, MapPin, Calendar } from 'lucide-react'
+import { Heart, Sparkles, MapPin, Calendar, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 export default function AboutLight() {
   return (
@@ -77,6 +79,16 @@ export default function AboutLight() {
           <Sparkles className="text-primary" size={14} />
           <span>"From Guinea to Norfolk, from cartoons to code — the journey continues..."</span>
         </motion.div>
+
+        {/* Learn More Button */}
+        <div className="mt-6 pt-4 border-t border-border/50">
+          <Link href="/about">
+            <Button variant="outline" className="w-full group">
+              Learn More
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   )

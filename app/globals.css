@@ -302,55 +302,55 @@ p {
 
 /* Glass Morphism Enhancement */
 .glass {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .dark .glass {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 /* Enhanced Glass Morphism for Homepage Cards */
 .glass-enhanced {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .dark .glass-enhanced {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.3),
-    0 2px 4px -1px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+    0 4px 6px -1px rgba(0, 0, 0, 0.5),
+    0 2px 4px -1px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
 }
 
 .glass-enhanced:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    0 20px 25px -5px rgba(0, 0, 0, 0.15),
+    0 10px 10px -5px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
 }
 
 .dark .glass-enhanced:hover {
-  background: rgba(0, 0, 0, 0.5);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.85);
+  border-color: rgba(255, 255, 255, 0.25);
   box-shadow: 
-    0 20px 25px -5px rgba(0, 0, 0, 0.4),
-    0 10px 10px -5px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    0 20px 25px -5px rgba(0, 0, 0, 0.6),
+    0 10px 10px -5px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
 }
 
 /* Smooth Transitions */

@@ -152,7 +152,11 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      if (parentComment.content_type !== content_type || parentComment.content_id !== content_id) {
+      // Normalize parent content type for comparison
+      const normalizedParentType = parentComment.content_type.toLowerCase().trim()
+      const normalizedChildType = (content_type || '').toLowerCase().trim()
+      
+      if (normalizedParentType !== normalizedChildType || parentComment.content_id !== content_id) {
         return NextResponse.json(
           { error: 'Parent comment does not belong to this content' },
           { status: 400 }
@@ -160,10 +164,24 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Ensure content_type is lowercase and matches constraint
-    const normalizedContentType = content_type.toLowerCase().trim()
-    if (!['blog_post', 'case_study', 'project', 'resource'].includes(normalizedContentType)) {
-      console.error('Invalid content_type received:', content_type, 'Normalized:', normalizedContentType)
+    // Ensure content_type is lowercase, trimmed, and matches constraint
+    const normalizedContentType = (content_type || '').toLowerCase().trim()
+    
+    // Map common variations to valid types
+    const contentTypeMap: Record<string, string> = {
+      'blog': 'blog_post',
+      'blogpost': 'blog_post',
+      'case-study': 'case_study',
+      'casestudy': 'case_study',
+      'project': 'project',
+      'resource': 'resource',
+    }
+    
+    // Check mapped types first, then exact match
+    const finalContentType = contentTypeMap[normalizedContentType] || normalizedContentType
+    
+    if (!['blog_post', 'case_study', 'project', 'resource'].includes(finalContentType)) {
+      console.error('Invalid content_type received:', content_type, 'Normalized:', normalizedContentType, 'Final:', finalContentType)
       return NextResponse.json(
         { error: `Invalid content_type: ${content_type}. Must be one of: blog_post, case_study, project, resource` },
         { status: 400 }
@@ -174,7 +192,7 @@ export async function POST(request: NextRequest) {
     const { data: comment, error: insertError } = await supabase
       .from('comments')
       .insert({
-        content_type: normalizedContentType,
+        content_type: finalContentType,
         content_id,
         parent_id: parent_id || null,
         author_name: author_name.trim(),

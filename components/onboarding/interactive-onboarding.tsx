@@ -235,7 +235,7 @@ export default function InteractiveOnboarding() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <Card className="shadow-2xl border-2">
+            <Card className="shadow-2xl border-2 bg-background/98 backdrop-blur-md">
               <CardHeader>
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-3">

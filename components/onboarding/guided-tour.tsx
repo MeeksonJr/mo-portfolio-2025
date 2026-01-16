@@ -109,7 +109,7 @@ export default function GuidedTour({ onComplete }: GuidedTourProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-[9998]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
             onClick={nextStep}
           />
 
@@ -130,7 +130,7 @@ export default function GuidedTour({ onComplete }: GuidedTourProps) {
                 transform: targetElement === document.body ? 'translate(-50%, -50%)' : 'none',
               }}
             >
-              <Card className="w-80 md:w-96 bg-background/95 backdrop-blur-md shadow-2xl border-2 border-primary">
+              <Card className="w-80 md:w-96 bg-background/98 backdrop-blur-md shadow-2xl border-2 border-primary">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
