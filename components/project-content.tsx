@@ -7,6 +7,9 @@ import Link from 'next/link'
 import SocialShareButton from '@/components/social-share/social-share-button'
 import { ContentPerformanceInsights } from '@/components/analytics/content-performance-insights'
 import SmartRecommendations from '@/components/recommendations/smart-recommendations'
+import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface Project {
   id: string
@@ -47,7 +50,8 @@ const createSlug = (name: string): string => {
 export default function ProjectContent({ project, relatedProjects }: ProjectContentProps) {
 
   return (
-    <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <article>
+      <PageContainer width="narrow" padding="default">
       {/* Back Button */}
       <Link
         href="/projects"
@@ -69,9 +73,9 @@ export default function ProjectContent({ project, relatedProjects }: ProjectCont
             </Badge>
           )}
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">{project.name}</h1>
+        <h1 className={cn(TYPOGRAPHY.h1, "mb-4")}>{project.name}</h1>
         {project.description && (
-          <p className="text-xl text-muted-foreground mb-6">{project.description}</p>
+          <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground mb-6")}>{project.description}</p>
         )}
 
         {/* Meta Information */}
@@ -215,6 +219,7 @@ export default function ProjectContent({ project, relatedProjects }: ProjectCont
           contentTitle={project.name}
         />
       </div>
+      </PageContainer>
     </article>
   )
 }

@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import ReactMarkdown from 'react-markdown'
+import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface CaseStudy {
   id: string
@@ -58,7 +61,8 @@ interface CaseStudyContentProps {
 export default function CaseStudyContent({ caseStudy, relatedCaseStudies }: CaseStudyContentProps) {
 
   return (
-    <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <article>
+      <PageContainer width="narrow" padding="default">
       {/* Back Button */}
       <Link
         href="/case-studies"
@@ -76,9 +80,9 @@ export default function CaseStudyContent({ caseStudy, relatedCaseStudies }: Case
             Case Study
           </Badge>
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">{caseStudy.title}</h1>
+        <h1 className={cn(TYPOGRAPHY.h1, "mb-4")}>{caseStudy.title}</h1>
         {caseStudy.description && (
-          <p className="text-xl text-muted-foreground mb-6">{caseStudy.description}</p>
+          <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground mb-6")}>{caseStudy.description}</p>
         )}
 
         {/* Meta Information */}
@@ -424,6 +428,7 @@ export default function CaseStudyContent({ caseStudy, relatedCaseStudies }: Case
         contentType="case-study"
         limit={3}
       />
+      </PageContainer>
     </article>
   )
 }
