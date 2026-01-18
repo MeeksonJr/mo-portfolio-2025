@@ -2,6 +2,9 @@ import { Metadata } from 'next'
 import GuestbookForm from '@/components/guestbook/guestbook-form'
 import GuestbookMessages from '@/components/guestbook/guestbook-messages'
 import { createAdminClient } from '@/lib/supabase/server'
+import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 export const metadata: Metadata = {
   title: 'Guestbook | Mohamed Datt',
@@ -72,11 +75,11 @@ export default async function GuestbookPage() {
   const messages = await getGuestbookMessages()
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="space-y-8">
+    <PageContainer width="narrow" padding="default">
+      <div className="py-8 space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Guestbook</h1>
-          <p className="text-muted-foreground text-lg">
+          <h1 className={cn(TYPOGRAPHY.h1)}>Guestbook</h1>
+          <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground")}>
             Leave a message, share your thoughts, or just say hello!
           </p>
         </div>
@@ -84,11 +87,11 @@ export default async function GuestbookPage() {
         <GuestbookForm />
 
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Messages</h2>
+          <h2 className={cn(TYPOGRAPHY.h3)}>Messages</h2>
           <GuestbookMessages initialMessages={messages} />
         </div>
       </div>
-    </div>
+    </PageContainer>
   )
 }
 

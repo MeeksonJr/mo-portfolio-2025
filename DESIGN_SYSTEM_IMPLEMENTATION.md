@@ -89,8 +89,9 @@ Updated key components to use new system:
 - ✅ `app/admin/comments/page.tsx` - Uses `wide` container
 - ✅ `app/admin/pages/page.tsx` - Uses `wide` container
 - ✅ Admin pages with typography tokens (`/admin/music`, `/admin/testimonials`, `/admin/ai/generations`, `/admin/content/*`, `/admin/github`, `/admin/settings`, `/admin/ai`)
+- ✅ `app/guestbook/page.tsx` - Uses `narrow` container + typography tokens
 
-**Total Components Using Design System:** 35+ components
+**Total Components Using Design System:** 36+ components
 
 ### 5. Card Variants System ✅
 **File:** `components/ui/card-variants.tsx`
