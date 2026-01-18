@@ -281,6 +281,79 @@ Colors are defined in CSS variables in `app/globals.css` using HSL format. Use T
 
 ## Components
 
+### Utility Components
+
+**Files:** 
+- `components/ui/stat-card.tsx`
+- `components/ui/animated-section.tsx`
+- `components/ui/section-header.tsx`
+
+Reusable components for common patterns across the application.
+
+#### StatCard & StatCardsGrid
+
+Display statistics with icons in a standardized format:
+
+```tsx
+import { StatCard, StatCardsGrid } from '@/components/ui/stat-card'
+
+// Single stat card
+<StatCard
+  label="Tools"
+  value="6"
+  icon={Wrench}
+  index={0}
+  delay={0.4}
+/>
+
+// Grid of stat cards
+<StatCardsGrid
+  stats={[
+    { label: 'Tools', value: '6', icon: Wrench },
+    { label: 'AI-Powered', value: '2', icon: Sparkles },
+  ]}
+  columns={4}
+  delay={0.3}
+/>
+```
+
+#### AnimatedSection & AnimatedDiv
+
+Standardized animation wrappers:
+
+```tsx
+import { AnimatedSection, AnimatedDiv } from '@/components/ui/animated-section'
+
+// Animated section with fade-up
+<AnimatedSection variant="fade-up" delay={0.2} duration={0.6}>
+  {content}
+</AnimatedSection>
+
+// Animated div (for inline content)
+<AnimatedDiv variant="fade-in" delay={0.1}>
+  {content}
+</AnimatedDiv>
+```
+
+**Variants:** `fade-up`, `fade-down`, `fade-in`, `scale`
+
+#### SectionHeader
+
+Standardized section headers:
+
+```tsx
+import { SectionHeader } from '@/components/ui/section-header'
+
+<SectionHeader
+  title="Section Title"
+  description="Section description text"
+  icon={IconComponent}
+  align="center"
+  variant="default"
+  spacing="normal"
+/>
+```
+
 ### Card Variants
 
 **File:** `components/ui/card-variants.tsx`
