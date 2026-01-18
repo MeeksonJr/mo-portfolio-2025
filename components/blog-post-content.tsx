@@ -14,6 +14,8 @@ import SmartRecommendations from '@/components/recommendations/smart-recommendat
 import FeedbackWidget from '@/components/feedback/feedback-widget'
 import CommentsSection from '@/components/comments/comments-section'
 import { getContainerClasses } from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface BlogPost {
   id: string
@@ -150,13 +152,13 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
             },
             // Custom styling for headings
             h1: ({ children }) => (
-              <h1 className="text-3xl font-bold mt-8 mb-4 first:mt-0">{children}</h1>
+              <h1 className={cn(TYPOGRAPHY.h3, "mt-8 mb-4 first:mt-0")}>{children}</h1>
             ),
             h2: ({ children }) => (
-              <h2 className="text-2xl font-semibold mt-6 mb-3">{children}</h2>
+              <h2 className={cn(TYPOGRAPHY.h4, "mt-6 mb-3")}>{children}</h2>
             ),
             h3: ({ children }) => (
-              <h3 className="text-xl font-semibold mt-4 mb-2">{children}</h3>
+              <h3 className={cn(TYPOGRAPHY.h5, "mt-4 mb-2")}>{children}</h3>
             ),
             // Custom styling for links
             a: ({ href, children }) => (

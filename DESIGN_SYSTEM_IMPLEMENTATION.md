@@ -177,6 +177,12 @@ Typography tokens already defined:
 - ✅ `components/projects-listing.tsx` - Migrated h1 and lead text
 - ✅ `components/about-page-content.tsx` - Migrated h1 and lead text
 - ✅ `components/layout/enhanced-page-layout.tsx` - Already uses TYPOGRAPHY tokens
+- ✅ `components/portfolio-assistant/portfolio-assistant.tsx` - Migrated h1 and lead text
+- ✅ `components/music/music-hub.tsx` - Migrated h1 and lead text
+- ✅ `components/blog-post-content.tsx` - Migrated markdown headings (h1, h2, h3)
+- ✅ `components/games/games-hub.tsx` - Migrated h1 and body text
+- ✅ `components/demos/live-project-showcase.tsx` - Migrated h1 and lead text
+- ✅ `components/about-light-redesigned.tsx` - Migrated h2
 
 **Usage:**
 ```tsx

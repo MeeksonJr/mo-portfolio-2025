@@ -29,6 +29,8 @@ import SpaceInvadersGame from './space-invaders-game'
 import Game2048 from './2048-game'
 import Leaderboard from './leaderboard'
 import { toast } from 'sonner'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 const GAME_TABS = [
   { value: 'snake', label: 'Snake', icon: Gamepad2, description: 'Classic snake game' },
@@ -80,11 +82,11 @@ export default function GamesHub() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
+          <h1 className={cn(TYPOGRAPHY.h1, "mb-2 flex items-center gap-3")}>
             <Gamepad2 className="h-8 w-8" />
             Games Hub
           </h1>
-          <p className="text-muted-foreground">
+          <p className={cn(TYPOGRAPHY.body, "text-muted-foreground")}>
             Play interactive games with score tracking, background music, and save functionality
           </p>
         </motion.div>

@@ -17,6 +17,8 @@ import FooterLight from '@/components/footer-light'
 import Link from 'next/link'
 import Image from 'next/image'
 import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface Project {
   id: string
@@ -187,11 +189,11 @@ export default function LiveProjectShowcase() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 flex items-center justify-center gap-3">
+            <h1 className={cn(TYPOGRAPHY.h1, "mb-4 flex items-center justify-center gap-3")}>
               <Play className="h-10 w-10 text-primary" />
               Live Project Demos
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
               See my projects in action. Interactive live demos of real working applications.
             </p>
           </motion.div>

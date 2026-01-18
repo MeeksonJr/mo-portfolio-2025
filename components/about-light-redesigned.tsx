@@ -14,7 +14,7 @@ export default function AboutLight() {
           <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
             <Heart className="text-primary" size={20} />
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold">About Me</h2>
+          <h2 className={TYPOGRAPHY.h3}>About Me</h2>
         </div>
       </div>
 

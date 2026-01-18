@@ -14,6 +14,8 @@ import { Badge } from '@/components/ui/badge'
 import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import Link from 'next/link'
@@ -321,11 +323,11 @@ Try asking me something like "Show me projects using React" or "What's your expe
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 flex items-center justify-center gap-3">
+            <h1 className={cn(TYPOGRAPHY.h1, "mb-4 flex items-center justify-center gap-3")}>
               <Bot className="h-10 w-10 text-primary" />
               AI Portfolio Assistant
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
               Ask questions about my portfolio, projects, experience, and skills in natural language. 
               Get instant answers powered by AI.
             </p>

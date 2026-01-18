@@ -17,6 +17,8 @@ import { getProxyAudioUrl } from '@/lib/music-helpers'
 import { formatDistanceToNow } from 'date-fns'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface Song {
   id: string
@@ -417,10 +419,10 @@ export default function MusicHub() {
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent" />
         <div className="container mx-auto px-4 py-12 sm:py-16 relative z-10">
           <div className="text-center mb-8">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+            <h1 className={cn(TYPOGRAPHY.h1, "mb-4 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent")}>
               Music Library
             </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
               Discover, play, and organize your favorite music
             </p>
           </div>
