@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { StatCardsGrid } from '@/components/ui/stat-card'
 import { Badge } from '@/components/ui/badge'
 import {
   Wrench,
@@ -101,34 +102,16 @@ function ToolsHubContent() {
           </div>
 
           {/* Quick Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto"
-          >
-            {[
+          <StatCardsGrid
+            stats={[
               { label: 'Tools', value: '6', icon: Wrench },
               { label: 'AI-Powered', value: '2', icon: Sparkles },
               { label: 'For Recruiters', value: '4', icon: Users },
               { label: 'Free to Use', value: '100%', icon: CheckCircle2 },
-            ].map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4 + index * 0.1 }}
-              >
-                <Card className="text-center border-2 hover:border-primary/50 transition-colors">
-                  <CardContent className="pt-6">
-                    <stat.icon className="h-6 w-6 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
+            ]}
+            columns={4}
+            delay={0.3}
+          />
           </div>
         </PageContainer>
       </motion.div>
