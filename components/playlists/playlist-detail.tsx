@@ -9,6 +9,9 @@ import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { getProxyAudioUrl } from '@/lib/music-helpers'
 import { toast } from 'sonner'
+import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface Playlist {
   id: string
@@ -97,18 +100,18 @@ export default function PlaylistDetail({ playlistId }: PlaylistDetailProps) {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <PageContainer width="standard" padding="default">
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           <p className="mt-4 text-muted-foreground">Loading playlist...</p>
         </div>
-      </div>
+      </PageContainer>
     )
   }
 
   if (error || !playlist) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <PageContainer width="standard" padding="default">
         <div className="text-center py-12">
           <Music className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold mb-2">
@@ -121,12 +124,12 @@ export default function PlaylistDetail({ playlistId }: PlaylistDetailProps) {
             </Button>
           </Link>
         </div>
-      </div>
+      </PageContainer>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <PageContainer width="standard" padding="default">
       <Link href="/playlists">
         <Button variant="ghost" className="mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -168,9 +171,9 @@ export default function PlaylistDetail({ playlistId }: PlaylistDetailProps) {
                   </Badge>
                 )}
               </div>
-              <h1 className="text-4xl font-bold mb-2">{playlist.name}</h1>
+              <h1 className={cn(TYPOGRAPHY.h1, "mb-2")}>{playlist.name}</h1>
               {playlist.description && (
-                <p className="text-muted-foreground text-lg mb-4">
+                <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground mb-4")}>
                   {playlist.description}
                 </p>
               )}
@@ -193,7 +196,7 @@ export default function PlaylistDetail({ playlistId }: PlaylistDetailProps) {
       {/* Songs List */}
       <Card className="bg-background/95 backdrop-blur-sm">
         <CardContent className="p-6">
-          <h2 className="text-2xl font-semibold mb-6">Songs</h2>
+          <h2 className={cn(TYPOGRAPHY.h3, "mb-6")}>Songs</h2>
           {playlist.songs.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <Music className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -228,7 +231,7 @@ export default function PlaylistDetail({ playlistId }: PlaylistDetailProps) {
           )}
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   )
 }
 

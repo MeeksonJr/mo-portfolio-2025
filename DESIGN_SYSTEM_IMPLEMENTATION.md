@@ -69,6 +69,11 @@ Updated key components to use new system:
 - ✅ `components/blog-listing.tsx` - Uses `wide` container
 - ✅ `components/projects-listing.tsx` - Uses `wide` container
 - ✅ `components/about-page-content.tsx` - Uses `wide` container
+- ✅ `components/playlists/playlist-detail.tsx` - Uses `standard` container + typography tokens
+- ✅ `components/insights/insights-hub.tsx` - Uses `wide` container + typography tokens
+- ✅ `components/tools/tools-hub.tsx` - Uses `wide` container + typography tokens
+
+**Total Components Using Design System:** 18+ components
 
 ### 5. Card Variants System ✅
 **File:** `components/ui/card-variants.tsx`
@@ -183,6 +188,11 @@ Typography tokens already defined:
 - ✅ `components/games/games-hub.tsx` - Migrated h1 and body text
 - ✅ `components/demos/live-project-showcase.tsx` - Migrated h1 and lead text
 - ✅ `components/about-light-redesigned.tsx` - Migrated h2
+- ✅ `components/playlists/playlist-detail.tsx` - Migrated h1, h2, and lead text
+- ✅ `components/insights/insights-hub.tsx` - Migrated h1 and lead text
+- ✅ `components/tools/tools-hub.tsx` - Migrated h1 and lead text
+
+**Total Components Updated:** 16 components now use standardized typography tokens.
 
 **Usage:**
 ```tsx
