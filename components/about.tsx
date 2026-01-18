@@ -1,11 +1,14 @@
 "use client"
 
 import { motion } from "framer-motion"
+import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 export default function About() {
   return (
     <section id="about" className="py-20 px-4">
-      <div className="max-w-6xl mx-auto">
+      <PageContainer width="standard" padding="default">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -13,7 +16,7 @@ export default function About() {
           viewport={{ once: true }}
         >
           <div className="text-green-400 text-sm mb-4">$ cat about.md</div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-8">About Me</h2>
+          <h2 className={cn(TYPOGRAPHY.h2, "mb-8")}>About Me</h2>
 
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Professional Photo */}
@@ -92,7 +95,7 @@ export default function About() {
             </div>
           </div>
         </motion.div>
-      </div>
+      </PageContainer>
     </section>
   )
 }

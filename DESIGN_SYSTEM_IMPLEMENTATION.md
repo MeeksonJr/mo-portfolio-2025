@@ -83,8 +83,9 @@ Updated key components to use new system:
 - ✅ `components/resource-content.tsx` - Uses `narrow` container + typography tokens
 - ✅ `components/project-content.tsx` - Uses `narrow` container + typography tokens
 - ✅ `components/case-study-content.tsx` - Uses `narrow` container + typography tokens
+- ✅ `components/about.tsx` - Uses `standard` container + typography tokens
 
-**Total Components Using Design System:** 29+ components
+**Total Components Using Design System:** 30+ components
 
 ### 5. Card Variants System ✅
 **File:** `components/ui/card-variants.tsx`
@@ -212,8 +213,9 @@ Typography tokens already defined:
 - ✅ `components/resource-content.tsx` - Migrated h1 and lead text
 - ✅ `components/project-content.tsx` - Migrated h1 and lead text
 - ✅ `components/case-study-content.tsx` - Migrated h1 and lead text
+- ✅ `components/about.tsx` - Migrated h2
 
-**Total Components Updated:** 26 components now use standardized typography tokens.
+**Total Components Updated:** 27 components now use standardized typography tokens.
 
 **Usage:**
 ```tsx
