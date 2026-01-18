@@ -76,8 +76,12 @@ Updated key components to use new system:
 - ✅ `components/code/code-hub.tsx` - Uses `wide` container + typography tokens
 - ✅ `components/about/about-hub.tsx` - Uses `wide` container + typography tokens
 - ✅ `components/clients/client-showcase.tsx` - Uses `standard` container + typography tokens
+- ✅ `components/hero-light.tsx` - Uses `standard` container
+- ✅ `components/case-studies-listing.tsx` - Uses `wide` container + typography tokens
+- ✅ `components/uses/uses-page-content.tsx` - Uses `standard` container + typography tokens
+- ✅ `components/resources-listing.tsx` - Uses `wide` container + typography tokens
 
-**Total Components Using Design System:** 22+ components
+**Total Components Using Design System:** 26+ components
 
 ### 5. Card Variants System ✅
 **File:** `components/ui/card-variants.tsx`
@@ -199,8 +203,11 @@ Typography tokens already defined:
 - ✅ `components/code/code-hub.tsx` - Migrated h1 and lead text
 - ✅ `components/about/about-hub.tsx` - Migrated h1 and lead text
 - ✅ `components/clients/client-showcase.tsx` - Migrated h2 and lead text
+- ✅ `components/case-studies-listing.tsx` - Migrated h1 and lead text
+- ✅ `components/uses/uses-page-content.tsx` - Migrated h1 and lead text
+- ✅ `components/resources-listing.tsx` - Migrated h1 and lead text
 
-**Total Components Updated:** 20 components now use standardized typography tokens.
+**Total Components Updated:** 23 components now use standardized typography tokens.
 
 **Usage:**
 ```tsx

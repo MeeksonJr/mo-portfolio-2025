@@ -84,15 +84,16 @@ const deskSetup = {
 
 export default function UsesPageContent() {
   return (
-    <div className="max-w-6xl mx-auto px-4 py-16">
+    <PageContainer width="standard" padding="default">
+      <div className="py-16">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-16"
       >
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">What I Use</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <h1 className={cn(TYPOGRAPHY.h1, "mb-4")}>What I Use</h1>
+        <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
           My hardware, software, tools, and setup. Everything I use to build and create.
         </p>
       </motion.div>

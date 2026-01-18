@@ -8,6 +8,9 @@ import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { trackClick } from '@/lib/analytics'
+import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface CaseStudy {
   id: string
@@ -61,11 +64,11 @@ export default function CaseStudiesListing({ caseStudies }: CaseStudiesListingPr
   }, [caseStudies, searchQuery, selectedTechStack])
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageContainer width="wide" padding="default">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">Case Studies</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <h1 className={cn(TYPOGRAPHY.h1, "mb-4")}>Case Studies</h1>
+        <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
           In-depth explorations of projects, challenges, solutions, and outcomes
         </p>
       </div>
@@ -188,7 +191,7 @@ export default function CaseStudiesListing({ caseStudies }: CaseStudiesListingPr
           ))}
         </div>
       )}
-    </div>
+    </PageContainer>
   )
 }
 

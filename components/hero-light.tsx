@@ -5,6 +5,7 @@ import { ArrowRight, Download, Sparkles } from "lucide-react"
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import AvailabilityBadge from "@/components/availability-badge"
+import PageContainer from '@/components/layout/page-container'
 
 export default function HeroLight() {
   const [isClient, setIsClient] = useState(false)
@@ -63,7 +64,7 @@ export default function HeroLight() {
         ))}
       </div>
 
-      <div className="max-w-6xl mx-auto w-full relative z-10">
+      <PageContainer width="standard" className="w-full relative z-10">
         <motion.div
           className="glass rounded-2xl md:rounded-3xl p-6 md:p-8 lg:p-12 shadow-xl border border-border/50"
           initial={{ opacity: 0, y: 20 }}
@@ -194,7 +195,7 @@ export default function HeroLight() {
             </div>
           </div>
         </motion.div>
-      </div>
+      </PageContainer>
     </section>
   )
 }

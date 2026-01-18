@@ -14,6 +14,9 @@ import {
 } from '@/components/ui/select'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface Resource {
   id: string
@@ -91,11 +94,11 @@ export default function ResourcesListing({ resources }: ResourcesListingProps) {
   }, [resources, searchQuery, filterType, filterCategory])
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageContainer width="wide" padding="default">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">Resources</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <h1 className={cn(TYPOGRAPHY.h1, "mb-4")}>Resources</h1>
+        <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
           Curated collection of tools, courses, books, articles, and videos for developers
         </p>
       </div>
@@ -229,7 +232,7 @@ export default function ResourcesListing({ resources }: ResourcesListingProps) {
           })}
         </div>
       )}
-    </div>
+    </PageContainer>
   )
 }
 
