@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "postbuild": "next-sitemap",
+    "postbuild": "echo 'Sitemap generation temporarily disabled'",
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start"
