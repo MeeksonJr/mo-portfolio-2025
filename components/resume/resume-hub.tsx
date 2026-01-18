@@ -27,6 +27,9 @@ import CandidateSummaryContent from '@/components/candidate-summary/candidate-su
 import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
 import { useFocusManagement } from '@/hooks/use-focus-management'
 import { resumeData } from '@/lib/resume-data'
+import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 const TAB_OPTIONS = [
   { value: 'view', label: 'My Resume', icon: Eye, description: 'View and download resume' },
@@ -151,7 +154,8 @@ function ResumeHubContent() {
         transition={{ duration: 0.5 }}
         className="border-b bg-gradient-to-b from-background to-muted/20"
       >
-        <div className="container mx-auto px-4 py-12">
+        <PageContainer width="wide" padding="default">
+          <div className="py-12">
           <div className="text-center mb-8">
             <motion.div
               initial={{ scale: 0.9 }}
@@ -160,11 +164,11 @@ function ResumeHubContent() {
               className="inline-flex items-center gap-2 mb-4"
             >
               <FileText className="h-8 w-8 text-primary" />
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              <h1 className={cn(TYPOGRAPHY.h1, "bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent")}>
                 Resume Hub
               </h1>
             </motion.div>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
               View, generate, and share professional resumes. Multiple formats available for different use cases.
             </p>
           </div>
@@ -198,11 +202,12 @@ function ResumeHubContent() {
               </motion.div>
             ))}
           </motion.div>
-        </div>
+          </div>
+        </PageContainer>
       </motion.div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <PageContainer width="wide" padding="default">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tab Navigation */}
           <div className="sticky top-20 z-40 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 border-b mb-6">
@@ -401,7 +406,7 @@ function ResumeHubContent() {
             </motion.div>
           </AnimatePresence>
         </Tabs>
-      </div>
+      </PageContainer>
     </div>
   )
 }

@@ -20,13 +20,13 @@ export default function ClientShowcase() {
       transition={{ duration: 0.8 }}
       className="py-16"
     >
-      <div className="max-w-6xl mx-auto px-4">
+      <PageContainer width="standard" padding="default">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Building2 className="h-8 w-8 text-primary" />
-            <h2 className="text-3xl md:text-4xl font-bold">Trusted By</h2>
+            <h2 className={cn(TYPOGRAPHY.h2)}>Trusted By</h2>
           </div>
-          <p className="text-muted-foreground text-lg">
+          <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground")}>
             Companies and organizations I've had the pleasure of working with
           </p>
         </div>
@@ -85,7 +85,7 @@ export default function ClientShowcase() {
             </motion.div>
           ))}
         </div>
-      </div>
+      </PageContainer>
     </motion.section>
   )
 }

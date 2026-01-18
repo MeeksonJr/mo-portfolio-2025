@@ -30,6 +30,9 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { useScreenReaderAnnouncement } from '@/components/accessibility/live-region'
 import { useFocusManagement } from '@/hooks/use-focus-management'
+import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 // Lazy load tab components for better performance
 const CodePlayground = lazy(() => import('@/components/code-playground/code-playground'))
@@ -85,7 +88,8 @@ function CodeHubContent() {
         transition={{ duration: 0.5 }}
         className="border-b bg-gradient-to-b from-background to-muted/20"
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <PageContainer width="wide" padding="default">
+          <div className="py-8 sm:py-12">
           <div className="text-center mb-8">
             <motion.div
               initial={{ scale: 0.9 }}
@@ -94,11 +98,11 @@ function CodeHubContent() {
               className="inline-flex items-center gap-2 mb-4"
             >
               <Code2 className="h-8 w-8 text-primary" />
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              <h1 className={cn(TYPOGRAPHY.h1, "bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent")}>
                 Code Hub
               </h1>
             </motion.div>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
               Explore, learn, and interact with real production code. From interactive playgrounds to code reviews and portfolio source code.
             </p>
           </div>
@@ -132,11 +136,12 @@ function CodeHubContent() {
               </motion.div>
             ))}
           </motion.div>
-        </div>
+          </div>
+        </PageContainer>
       </motion.div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <PageContainer width="wide" padding="default">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tab Navigation */}
           <div className="sticky top-20 z-40 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 border-b mb-6">
@@ -364,7 +369,7 @@ function CodeHubContent() {
             </motion.div>
           </AnimatePresence>
         </Tabs>
-      </div>
+      </PageContainer>
     </div>
   )
 }
