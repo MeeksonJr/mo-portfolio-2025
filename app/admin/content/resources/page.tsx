@@ -1,5 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import ResourcesTable from '@/components/admin/resources-table'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 export default async function ResourcesPage() {
   let resources = []
@@ -27,7 +29,7 @@ export default async function ResourcesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Resources</h1>
+          <h1 className={cn(TYPOGRAPHY.h2)}>Resources</h1>
           <p className="text-muted-foreground mt-2">
             Manage your resources
           </p>

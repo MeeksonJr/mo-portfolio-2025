@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import PageCMSDashboard from '@/components/admin/page-cms-dashboard'
+import PageContainer from '@/components/layout/page-container'
 
 export const metadata: Metadata = {
   title: 'Page CMS | Admin Dashboard',
@@ -8,9 +9,11 @@ export const metadata: Metadata = {
 
 export default function PageCMSPage() {
   return (
-    <div className="container mx-auto py-8 px-4">
-      <PageCMSDashboard />
-    </div>
+    <PageContainer width="wide" padding="default">
+      <div className="py-8">
+        <PageCMSDashboard />
+      </div>
+    </PageContainer>
   )
 }
 

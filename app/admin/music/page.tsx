@@ -1,5 +1,7 @@
 import MusicUploadManager from '@/components/admin/music-upload-manager'
 import { Metadata } from 'next'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 export const metadata: Metadata = {
   title: 'Music Management | Admin',
@@ -11,7 +13,7 @@ export default async function MusicAdminPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Music Management</h1>
+          <h1 className={cn(TYPOGRAPHY.h2)}>Music Management</h1>
           <p className="text-muted-foreground mt-2">
             Upload and manage your music library
           </p>

@@ -1,5 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server'
 import BlogPostsTable from '@/components/admin/blog-posts-table'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 export default async function BlogPostsPage() {
   let blogPosts = []
@@ -28,7 +30,7 @@ export default async function BlogPostsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Blog Posts</h1>
+          <h1 className={cn(TYPOGRAPHY.h2)}>Blog Posts</h1>
           <p className="text-muted-foreground mt-2">
             Manage your blog posts
           </p>

@@ -84,8 +84,13 @@ Updated key components to use new system:
 - ✅ `components/project-content.tsx` - Uses `narrow` container + typography tokens
 - ✅ `components/case-study-content.tsx` - Uses `narrow` container + typography tokens
 - ✅ `components/about.tsx` - Uses `standard` container + typography tokens
+- ✅ `app/admin/guestbook/page.tsx` - Uses `wide` container
+- ✅ `app/admin/playlists/page.tsx` - Uses `wide` container
+- ✅ `app/admin/comments/page.tsx` - Uses `wide` container
+- ✅ `app/admin/pages/page.tsx` - Uses `wide` container
+- ✅ Admin pages with typography tokens (`/admin/music`, `/admin/testimonials`, `/admin/ai/generations`, `/admin/content/*`, `/admin/github`, `/admin/settings`, `/admin/ai`)
 
-**Total Components Using Design System:** 30+ components
+**Total Components Using Design System:** 35+ components
 
 ### 5. Card Variants System ✅
 **File:** `components/ui/card-variants.tsx`
@@ -214,8 +219,10 @@ Typography tokens already defined:
 - ✅ `components/project-content.tsx` - Migrated h1 and lead text
 - ✅ `components/case-study-content.tsx` - Migrated h1 and lead text
 - ✅ `components/about.tsx` - Migrated h2
+- ✅ `components/admin/page-cms-dashboard.tsx` - Migrated h2
+- ✅ Admin pages - Migrated h2 (`/admin/music`, `/admin/testimonials`, `/admin/ai/generations`, `/admin/content/*`, `/admin/github`, `/admin/settings`, `/admin/ai`)
 
-**Total Components Updated:** 27 components now use standardized typography tokens.
+**Total Components Updated:** 35+ components now use standardized typography tokens.
 
 **Usage:**
 ```tsx

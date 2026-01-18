@@ -15,6 +15,8 @@ import Image from 'next/image'
 import { supabase } from '@/lib/supabase/client'
 import MDXEditor from '@/components/admin/mdx-editor'
 import ImageVersionHistoryDialog from '@/components/admin/image-version-history-dialog'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 const PAGES = [
   { 
@@ -360,7 +362,7 @@ export default function PageCMSDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Page Content & Image Management</h1>
+        <h1 className={cn(TYPOGRAPHY.h2, "mb-2")}>Page Content & Image Management</h1>
         <p className="text-muted-foreground">
           Manage content and images across all public pages with AI assistance
         </p>

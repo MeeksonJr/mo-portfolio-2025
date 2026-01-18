@@ -1,5 +1,7 @@
 import { Metadata } from 'next'
 import TestimonialsTable from '@/components/admin/testimonials-table'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 export const metadata: Metadata = {
   title: 'Testimonials | Admin Dashboard',
@@ -11,7 +13,7 @@ export default function TestimonialsAdminPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Testimonials</h1>
+          <h1 className={cn(TYPOGRAPHY.h2)}>Testimonials</h1>
           <p className="text-muted-foreground mt-2">
             Manage client testimonials and reviews
           </p>

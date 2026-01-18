@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import GuestbookTable from '@/components/admin/guestbook-table'
+import PageContainer from '@/components/layout/page-container'
 
 export const metadata: Metadata = {
   title: 'Guestbook Management | Admin',
@@ -8,9 +9,11 @@ export const metadata: Metadata = {
 
 export default function AdminGuestbookPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <GuestbookTable />
-    </div>
+    <PageContainer width="wide" padding="default">
+      <div className="py-8">
+        <GuestbookTable />
+      </div>
+    </PageContainer>
   )
 }
 
