@@ -22,6 +22,8 @@ import { EnhancedScrollReveal } from '@/components/animations/enhanced-scroll-re
 import { isContentNew, formatRelativeTime } from '@/lib/content-freshness'
 import SeriesBadge from '@/components/content/series-badge'
 import PageContainer from '@/components/layout/page-container'
+import { SECTION_SPACING } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface BlogPost {
   id: string
@@ -132,7 +134,7 @@ export default function BlogListing({ posts }: BlogListingProps) {
   return (
     <PageContainer width="wide" padding="default">
       {/* Header */}
-      <div className="text-center mb-12">
+      <div className={cn("text-center", SECTION_SPACING.normal)}>
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Blog</h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Technical insights, tutorials, and thoughts on web development, AI, and software engineering
@@ -140,7 +142,7 @@ export default function BlogListing({ posts }: BlogListingProps) {
       </div>
 
       {/* Search and Filters */}
-      <div className="mb-8 space-y-4">
+      <div className={cn(SECTION_SPACING.mb8, "space-y-4")}>
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />

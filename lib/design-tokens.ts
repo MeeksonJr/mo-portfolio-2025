@@ -93,10 +93,28 @@ export type CardVariant = keyof typeof CARD_VARIANTS
 
 // Section Spacing (for vertical rhythm)
 export const SECTION_SPACING = {
+  // Margin bottom (for spacing between sections)
   tight: 'mb-6 sm:mb-8',
   normal: 'mb-12 sm:mb-16',
   large: 'mb-16 sm:mb-20 lg:mb-24',
   xlarge: 'mb-20 sm:mb-24 lg:mb-32',
+  
+  // Padding vertical (for section containers)
+  paddingTight: 'py-6 sm:py-8',
+  paddingNormal: 'py-12 sm:py-16',
+  paddingLarge: 'py-16 sm:py-20 lg:py-24',
+  paddingXlarge: 'py-20 sm:py-24 lg:py-32',
+  
+  // Combined margin bottom and padding top (for full section spacing)
+  sectionTight: 'pt-6 pb-6 sm:pt-8 sm:pb-8 mb-6 sm:mb-8',
+  sectionNormal: 'pt-12 pb-12 sm:pt-16 sm:pb-16 mb-12 sm:mb-16',
+  sectionLarge: 'pt-16 pb-16 sm:pt-20 sm:pb-20 lg:pt-24 lg:pb-24 mb-16 sm:mb-20 lg:mb-24',
+  
+  // Common single-value spacing (for quick use)
+  mb8: 'mb-8',
+  mb12: 'mb-12 sm:mb-16',
+  mb16: 'mb-16 sm:mb-20',
+  py12: 'py-12',
 } as const
 
 // Breakpoints (for reference)

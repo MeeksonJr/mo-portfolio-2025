@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/dialog'
 import { Progress } from '@/components/ui/progress'
 import PageContainer from '@/components/layout/page-container'
+import { SECTION_SPACING } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -237,15 +239,15 @@ export default function TestimonialsPageContent() {
 
   return (
     <PageContainer width="wide" padding="default">
-      <div className="py-12">
+      <div className={SECTION_SPACING.paddingNormal}>
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-12"
+        className={cn("text-center", SECTION_SPACING.normal)}
       >
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Testimonials</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
+        <p className={cn("text-lg text-muted-foreground max-w-2xl mx-auto", SECTION_SPACING.mb8)}>
           What clients, colleagues, and collaborators say about working with me
         </p>
         
@@ -254,7 +256,7 @@ export default function TestimonialsPageContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="max-w-2xl mx-auto mb-8"
+          className={cn("max-w-2xl mx-auto", SECTION_SPACING.mb8)}
         >
           <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 backdrop-blur-sm border-primary/20">
             <CardContent className="p-6">
@@ -285,7 +287,7 @@ export default function TestimonialsPageContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+        className={cn("grid grid-cols-1 md:grid-cols-3 gap-6", SECTION_SPACING.normal)}
       >
         <Card>
           <CardHeader className="pb-2">
@@ -324,7 +326,7 @@ export default function TestimonialsPageContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12"
+          className={cn("grid grid-cols-1 md:grid-cols-2 gap-6", SECTION_SPACING.normal)}
         >
           <Card>
             <CardHeader>
@@ -391,7 +393,7 @@ export default function TestimonialsPageContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="mb-8"
+        className={SECTION_SPACING.mb8}
       >
         <Card>
           <CardHeader>
@@ -478,7 +480,7 @@ export default function TestimonialsPageContent() {
         <TestimonialGridSkeleton count={6} />
       ) : filteredTestimonials.length === 0 ? (
         <Card>
-          <CardContent className="py-12 text-center">
+          <CardContent className={cn(SECTION_SPACING.paddingNormal, "text-center")}>
             <Quote className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">No testimonials found matching your filters.</p>
           </CardContent>

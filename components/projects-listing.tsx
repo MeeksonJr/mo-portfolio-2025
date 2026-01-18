@@ -16,6 +16,8 @@ import Link from 'next/link'
 import { trackClick } from '@/lib/analytics'
 import { isContentNew, formatRelativeTime } from '@/lib/content-freshness'
 import PageContainer from '@/components/layout/page-container'
+import { SECTION_SPACING } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface Project {
   id: string
@@ -88,7 +90,7 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
   return (
     <PageContainer width="wide" padding="default">
           {/* Header */}
-          <div className="text-center mb-12">
+          <div className={cn("text-center", SECTION_SPACING.normal)}>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Projects</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
               Portfolio of projects, applications, and technical implementations
@@ -104,7 +106,7 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
           </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
+      <div className={cn("flex flex-col sm:flex-row gap-4", SECTION_SPACING.mb8)}>
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
@@ -128,7 +130,7 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
 
       {/* Featured Projects Section */}
       {featuredProjects.length > 0 && (
-        <div className="mb-12">
+        <div className={SECTION_SPACING.normal}>
           <div className="flex items-center gap-2 mb-6">
             <Star className="h-5 w-5 text-primary" />
             <h2 className="text-2xl font-bold">Featured Projects</h2>
@@ -294,7 +296,7 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
 
       {/* Empty State */}
       {filteredProjects.length === 0 && (
-        <div className="text-center py-16">
+        <div className={cn("text-center", SECTION_SPACING.paddingNormal)}>
           <p className="text-muted-foreground text-lg">No projects found</p>
         </div>
       )}

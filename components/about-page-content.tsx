@@ -66,6 +66,8 @@ import InteractiveTimeline from '@/components/timeline/interactive-timeline'
 import CertificationsSection from '@/components/certifications/certifications-section'
 import SkillsProficiencyMatrix from '@/components/skills/skills-proficiency-matrix'
 import PageContainer from '@/components/layout/page-container'
+import { SECTION_SPACING } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 export default function AboutPageContent() {
   const { isOpen, images, initialIndex, openLightbox, closeLightbox } = useImageLightbox()
@@ -88,7 +90,7 @@ export default function AboutPageContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="text-center mb-16"
+        className={cn("text-center", SECTION_SPACING.large)}
       >
         <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
           About Me
@@ -103,7 +105,7 @@ export default function AboutPageContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
-        className="glass rounded-2xl p-8 md:p-12 mb-16"
+        className={cn("glass rounded-2xl p-8 md:p-12", SECTION_SPACING.large)}
       >
         <div className="flex items-center gap-2 mb-6">
           <Heart className="text-primary" size={24} />
@@ -148,7 +150,7 @@ export default function AboutPageContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.4 }}
-        className="mb-16"
+        className={SECTION_SPACING.large}
       >
         <InteractiveTimeline />
       </motion.section>
@@ -161,7 +163,7 @@ export default function AboutPageContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.8 }}
-        className="mb-16"
+        className={SECTION_SPACING.large}
       >
         <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">Photo Gallery</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
