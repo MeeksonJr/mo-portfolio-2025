@@ -4,6 +4,8 @@ import { motion } from 'framer-motion'
 import { Zap, Rocket, Sparkles, Check, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 const services = [
   {
@@ -34,7 +36,7 @@ export default function ServicesScattered() {
   return (
     <div className="h-full flex flex-col">
       <div className="mb-4">
-        <h2 className="text-xl md:text-2xl font-bold mb-1">Services</h2>
+        <h2 className={cn(TYPOGRAPHY.h4, "mb-1")}>Services</h2>
         <p className="text-xs text-muted-foreground">What I offer</p>
       </div>
       <div className="flex-1 space-y-3">

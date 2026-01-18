@@ -5,6 +5,8 @@ import { ExternalLink, Github, DollarSign, CheckCircle, ChevronRight, ArrowRight
 import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 const projects = [
   {
@@ -52,7 +54,7 @@ export default function ProjectsLight() {
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold mb-2">Featured Work</h2>
+        <h2 className={cn(TYPOGRAPHY.h3, "mb-2")}>Featured Work</h2>
         <p className="text-sm md:text-base text-muted-foreground">
           Live projects, sold products, and ongoing development
         </p>

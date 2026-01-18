@@ -72,9 +72,9 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
             {post.category}
           </Badge>
         )}
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">{post.title}</h1>
+        <h1 className={cn(TYPOGRAPHY.h1, "mb-4")}>{post.title}</h1>
         {post.excerpt && (
-          <p className="text-xl text-muted-foreground mb-6">{post.excerpt}</p>
+          <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground mb-6")}>{post.excerpt}</p>
         )}
 
         {/* Meta Information */}
