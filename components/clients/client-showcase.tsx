@@ -6,6 +6,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import Image from 'next/image'
 import Link from 'next/link'
 import { clients } from '@/lib/client-data'
+import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 export default function ClientShowcase() {
   if (clients.length === 0) {
