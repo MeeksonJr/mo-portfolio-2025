@@ -273,8 +273,12 @@ import PageHeader from '@/components/layout/page-header'
 - ✅ `components/blog-post-content.tsx` - Migrated h1 and excerpt typography
 - ✅ `components/projects-light-redesigned.tsx` - Migrated h2
 - ✅ `components/services-scattered.tsx` - Migrated h2
+- ✅ `components/about-light-redesigned.tsx` - Fixed missing import and migrated h2
+- ✅ `components/about-page-content.tsx` - Migrated h2 ("My Story")
+- ✅ `components/uses/uses-page-content.tsx` - Migrated h2 sections
+- ✅ `components/hero-light.tsx` - Migrated h1 and lead text
 
-**Total Components with Typography Updates:** 13+ components
+**Total Components with Typography Updates:** 42+ components
 
 ### Phase 5: Documentation & Polish
 - Continue migrating remaining components

@@ -4,6 +4,8 @@ import { motion } from 'framer-motion'
 import { Heart, Sparkles, MapPin, Calendar, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 export default function AboutLight() {
   return (
@@ -14,7 +16,7 @@ export default function AboutLight() {
           <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
             <Heart className="text-primary" size={20} />
           </div>
-          <h2 className={TYPOGRAPHY.h3}>About Me</h2>
+          <h2 className={cn(TYPOGRAPHY.h3)}>About Me</h2>
         </div>
       </div>
 

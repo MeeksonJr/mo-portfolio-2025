@@ -109,7 +109,7 @@ export default function AboutPageContent() {
       >
         <div className="flex items-center gap-2 mb-6">
           <Heart className="text-primary" size={24} />
-          <h2 className="text-3xl md:text-4xl font-bold">My Story</h2>
+          <h2 className={cn(TYPOGRAPHY.h2)}>My Story</h2>
         </div>
 
         <div className="space-y-6 text-lg text-foreground/80 leading-relaxed">

@@ -6,6 +6,8 @@ import Image from "next/image"
 import { useState, useEffect } from "react"
 import AvailabilityBadge from "@/components/availability-badge"
 import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 export default function HeroLight() {
   const [isClient, setIsClient] = useState(false)
@@ -117,10 +119,10 @@ export default function HeroLight() {
                   </div>
                   <AvailabilityBadge variant="compact" />
                 </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
+                <h1 className={cn(TYPOGRAPHY.h1, "mb-4 bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent")}>
                   Mohamed Datt
                 </h1>
-                <p className="text-xl md:text-2xl text-muted-foreground mb-6">
+                <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground mb-6")}>
                   AI-driven web products & SaaS solutions
                 </p>
               </motion.div>

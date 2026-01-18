@@ -17,6 +17,9 @@ import {
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import PageContainer from '@/components/layout/page-container'
+import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 const hardware = [
   {
@@ -105,7 +108,7 @@ export default function UsesPageContent() {
         transition={{ delay: 0.1 }}
         className="mb-16"
       >
-        <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
+        <h2 className={cn(TYPOGRAPHY.h2, "mb-6 flex items-center gap-2")}>
           <Laptop className="w-6 h-6 text-primary" />
           Hardware
         </h2>
@@ -136,7 +139,7 @@ export default function UsesPageContent() {
         transition={{ delay: 0.2 }}
         className="mb-16"
       >
-        <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
+        <h2 className={cn(TYPOGRAPHY.h2, "mb-6 flex items-center gap-2")}>
           <Code className="w-6 h-6 text-primary" />
           Software & Tools
         </h2>
@@ -174,7 +177,7 @@ export default function UsesPageContent() {
         transition={{ delay: 0.3 }}
         className="mb-16"
       >
-        <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
+        <h2 className={cn(TYPOGRAPHY.h2, "mb-6 flex items-center gap-2")}>
           <Zap className="w-6 h-6 text-primary" />
           Browser Extensions
         </h2>
@@ -199,7 +202,7 @@ export default function UsesPageContent() {
         transition={{ delay: 0.4 }}
         className="mb-16"
       >
-        <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
+        <h2 className={cn(TYPOGRAPHY.h2, "mb-6 flex items-center gap-2")}>
           <Keyboard className="w-6 h-6 text-primary" />
           Keyboard Shortcuts
         </h2>
@@ -226,7 +229,7 @@ export default function UsesPageContent() {
         transition={{ delay: 0.5 }}
         className="mb-16"
       >
-        <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
+        <h2 className={cn(TYPOGRAPHY.h2, "mb-6 flex items-center gap-2")}>
           <Settings className="w-6 h-6 text-primary" />
           Desk Setup
         </h2>
@@ -247,7 +250,8 @@ export default function UsesPageContent() {
           </CardContent>
         </Card>
       </motion.section>
-    </div>
+      </div>
+    </PageContainer>
   )
 }
 
