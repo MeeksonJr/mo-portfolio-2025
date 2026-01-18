@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/dialog'
 import { Progress } from '@/components/ui/progress'
 import PageContainer from '@/components/layout/page-container'
-import { SECTION_SPACING } from '@/lib/design-tokens'
+import { SECTION_SPACING, TYPOGRAPHY } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -246,8 +246,8 @@ export default function TestimonialsPageContent() {
         animate={{ opacity: 1, y: 0 }}
         className={cn("text-center", SECTION_SPACING.normal)}
       >
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">Testimonials</h1>
-        <p className={cn("text-lg text-muted-foreground max-w-2xl mx-auto", SECTION_SPACING.mb8)}>
+        <h1 className={cn(TYPOGRAPHY.h1, "mb-4")}>Testimonials</h1>
+        <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto", SECTION_SPACING.mb8)}>
           What clients, colleagues, and collaborators say about working with me
         </p>
         

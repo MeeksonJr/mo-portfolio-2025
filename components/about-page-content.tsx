@@ -66,7 +66,7 @@ import InteractiveTimeline from '@/components/timeline/interactive-timeline'
 import CertificationsSection from '@/components/certifications/certifications-section'
 import SkillsProficiencyMatrix from '@/components/skills/skills-proficiency-matrix'
 import PageContainer from '@/components/layout/page-container'
-import { SECTION_SPACING } from '@/lib/design-tokens'
+import { SECTION_SPACING, TYPOGRAPHY } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
 export default function AboutPageContent() {
@@ -92,10 +92,10 @@ export default function AboutPageContent() {
         transition={{ duration: 0.8 }}
         className={cn("text-center", SECTION_SPACING.large)}
       >
-        <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+        <h1 className={cn(TYPOGRAPHY.h1, "mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent")}>
           About Me
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
           From Guinea to Norfolk, from cartoons to code — the journey continues...
         </p>
       </motion.div>

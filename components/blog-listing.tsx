@@ -22,7 +22,7 @@ import { EnhancedScrollReveal } from '@/components/animations/enhanced-scroll-re
 import { isContentNew, formatRelativeTime } from '@/lib/content-freshness'
 import SeriesBadge from '@/components/content/series-badge'
 import PageContainer from '@/components/layout/page-container'
-import { SECTION_SPACING } from '@/lib/design-tokens'
+import { SECTION_SPACING, TYPOGRAPHY } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
 interface BlogPost {
@@ -135,8 +135,8 @@ export default function BlogListing({ posts }: BlogListingProps) {
     <PageContainer width="wide" padding="default">
       {/* Header */}
       <div className={cn("text-center", SECTION_SPACING.normal)}>
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">Blog</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <h1 className={cn(TYPOGRAPHY.h1, "mb-4")}>Blog</h1>
+        <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
           Technical insights, tutorials, and thoughts on web development, AI, and software engineering
         </p>
       </div>

@@ -108,15 +108,6 @@ export const ACHIEVEMENTS: Achievement[] = [
     points: 30,
   },
   {
-    id: 'complete-onboarding',
-    title: 'Tour Guide',
-    description: 'Complete the interactive onboarding tour',
-    icon: '🎬',
-    category: 'engagement',
-    rarity: 'common',
-    points: 15,
-  },
-  {
     id: 'read-3-case-studies',
     title: 'Case Study Expert',
     description: 'Read 3 case studies',

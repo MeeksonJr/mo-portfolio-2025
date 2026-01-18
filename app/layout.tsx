@@ -11,7 +11,6 @@ import TerminalBackground from "@/components/terminal-background"
 import { Toaster } from "@/components/ui/sonner"
 import AchievementTracker from "@/components/achievements/achievement-tracker"
 import KeyboardShortcutHint from "@/components/keyboard-shortcut-hint"
-import InteractiveOnboarding from "@/components/onboarding/interactive-onboarding"
 import { BottomNavigation } from "@/components/mobile/bottom-navigation"
 import { SwipeNavigation } from "@/components/mobile/swipe-navigation"
 import { InstallPrompt } from "@/components/pwa/install-prompt"
@@ -32,7 +31,6 @@ import AccessibilityAudit from "@/components/accessibility/accessibility-audit"
 import OrganizationSchema from "@/components/structured-data/organization-schema"
 import WebsiteSchema from "@/components/structured-data/website-schema"
 import ConversionTracker from "@/components/analytics/conversion-tracker"
-import GuidedTour from "@/components/onboarding/guided-tour"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -133,7 +131,6 @@ export default function RootLayout({
               <KeyboardShortcutsModal />
               <AchievementTracker />
               <KeyboardShortcutHint />
-              <InteractiveOnboarding />
               <BottomNavigation />
               <SwipeNavigation />
               <InstallPrompt />
@@ -147,7 +144,6 @@ export default function RootLayout({
         <Analytics />
         <SpeedInsights />
         <ConversionTracker />
-        <GuidedTour />
         <Toaster />
       </body>
     </html>

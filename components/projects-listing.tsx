@@ -16,7 +16,7 @@ import Link from 'next/link'
 import { trackClick } from '@/lib/analytics'
 import { isContentNew, formatRelativeTime } from '@/lib/content-freshness'
 import PageContainer from '@/components/layout/page-container'
-import { SECTION_SPACING } from '@/lib/design-tokens'
+import { SECTION_SPACING, TYPOGRAPHY } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
 interface Project {
@@ -91,8 +91,8 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
     <PageContainer width="wide" padding="default">
           {/* Header */}
           <div className={cn("text-center", SECTION_SPACING.normal)}>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Projects</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
+            <h1 className={cn(TYPOGRAPHY.h1, "mb-4")}>Projects</h1>
+            <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto mb-4")}>
               Portfolio of projects, applications, and technical implementations
             </p>
             <Link
