@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import {
   Laptop,
   Monitor,
@@ -18,8 +17,11 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import PageContainer from '@/components/layout/page-container'
-import { TYPOGRAPHY } from '@/lib/design-tokens'
+import { AnimatedSection } from '@/components/ui/animated-section'
+import { SectionHeader } from '@/components/ui/section-header'
+import { TYPOGRAPHY, SECTION_SPACING } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { motion } from 'framer-motion'
 
 const hardware = [
   {
@@ -88,30 +90,24 @@ const deskSetup = {
 export default function UsesPageContent() {
   return (
     <PageContainer width="standard" padding="default">
-      <div className="py-16">
+      <div className={SECTION_SPACING.paddingNormal}>
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-16"
-      >
-        <h1 className={cn(TYPOGRAPHY.h1, "mb-4")}>What I Use</h1>
-        <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
-          My hardware, software, tools, and setup. Everything I use to build and create.
-        </p>
-      </motion.div>
+      <SectionHeader
+        title="What I Use"
+        description="My hardware, software, tools, and setup. Everything I use to build and create."
+        align="center"
+        variant="large"
+        spacing="large"
+      />
 
       {/* Hardware */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="mb-16"
-      >
-        <h2 className={cn(TYPOGRAPHY.h2, "mb-6 flex items-center gap-2")}>
-          <Laptop className="w-6 h-6 text-primary" />
-          Hardware
-        </h2>
+      <AnimatedSection variant="fade-up" delay={0.1} className={SECTION_SPACING.normal}>
+        <SectionHeader
+          title="Hardware"
+          icon={Laptop}
+          align="left"
+          spacing="tight"
+        />
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {hardware[0].items.map((item, index) => {
             const Icon = item.icon
@@ -120,33 +116,30 @@ export default function UsesPageContent() {
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <Icon className="w-5 h-5 text-primary" />
-                    <CardTitle className="text-lg">{item.name}</CardTitle>
+                    <CardTitle className={cn(TYPOGRAPHY.h5)}>{item.name}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>{item.description}</CardDescription>
+                  <CardDescription className={cn(TYPOGRAPHY.bodySmall)}>{item.description}</CardDescription>
                 </CardContent>
               </Card>
             )
           })}
         </div>
-      </motion.section>
+      </AnimatedSection>
 
       {/* Software */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="mb-16"
-      >
-        <h2 className={cn(TYPOGRAPHY.h2, "mb-6 flex items-center gap-2")}>
-          <Code className="w-6 h-6 text-primary" />
-          Software & Tools
-        </h2>
+      <AnimatedSection variant="fade-up" delay={0.2} className={SECTION_SPACING.normal}>
+        <SectionHeader
+          title="Software & Tools"
+          icon={Code}
+          align="left"
+          spacing="tight"
+        />
         <div className="space-y-8">
           {software.map((category, catIndex) => (
             <div key={catIndex}>
-              <h3 className="text-xl font-semibold mb-4">{category.category}</h3>
+              <h3 className={cn(TYPOGRAPHY.h4, "mb-4")}>{category.category}</h3>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {category.items.map((item, index) => {
                   const Icon = item.icon
@@ -155,11 +148,11 @@ export default function UsesPageContent() {
                       <CardHeader>
                         <div className="flex items-center gap-2">
                           <Icon className="w-5 h-5 text-primary" />
-                          <CardTitle className="text-lg">{item.name}</CardTitle>
+                          <CardTitle className={cn(TYPOGRAPHY.h5)}>{item.name}</CardTitle>
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <CardDescription>{item.description}</CardDescription>
+                        <CardDescription className={cn(TYPOGRAPHY.bodySmall)}>{item.description}</CardDescription>
                       </CardContent>
                     </Card>
                   )
@@ -168,51 +161,45 @@ export default function UsesPageContent() {
             </div>
           ))}
         </div>
-      </motion.section>
+      </AnimatedSection>
 
       {/* Browser Extensions */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="mb-16"
-      >
-        <h2 className={cn(TYPOGRAPHY.h2, "mb-6 flex items-center gap-2")}>
-          <Zap className="w-6 h-6 text-primary" />
-          Browser Extensions
-        </h2>
+      <AnimatedSection variant="fade-up" delay={0.3} className={SECTION_SPACING.normal}>
+        <SectionHeader
+          title="Browser Extensions"
+          icon={Zap}
+          align="left"
+          spacing="tight"
+        />
         <div className="grid md:grid-cols-2 gap-4">
           {browserExtensions.map((ext, index) => (
             <Card key={index}>
               <CardHeader>
-                <CardTitle className="text-lg">{ext.name}</CardTitle>
+                <CardTitle className={cn(TYPOGRAPHY.h5)}>{ext.name}</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>{ext.description}</CardDescription>
+                <CardDescription className={cn(TYPOGRAPHY.bodySmall)}>{ext.description}</CardDescription>
               </CardContent>
             </Card>
           ))}
         </div>
-      </motion.section>
+      </AnimatedSection>
 
       {/* Keyboard Shortcuts */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="mb-16"
-      >
-        <h2 className={cn(TYPOGRAPHY.h2, "mb-6 flex items-center gap-2")}>
-          <Keyboard className="w-6 h-6 text-primary" />
-          Keyboard Shortcuts
-        </h2>
+      <AnimatedSection variant="fade-up" delay={0.4} className={SECTION_SPACING.normal}>
+        <SectionHeader
+          title="Keyboard Shortcuts"
+          icon={Keyboard}
+          align="left"
+          spacing="tight"
+        />
         <Card>
           <CardContent className="pt-6">
             <div className="grid md:grid-cols-2 gap-4">
               {keyboardShortcuts.map((shortcut, index) => (
                 <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted">
-                  <span className="font-medium">{shortcut.action}</span>
-                  <Badge variant="outline" className="font-mono">
+                  <span className={cn(TYPOGRAPHY.body, "font-medium")}>{shortcut.action}</span>
+                  <Badge variant="outline" className={cn(TYPOGRAPHY.bodySmall, "font-mono")}>
                     {shortcut.keys}
                   </Badge>
                 </div>
@@ -220,28 +207,25 @@ export default function UsesPageContent() {
             </div>
           </CardContent>
         </Card>
-      </motion.section>
+      </AnimatedSection>
 
       {/* Desk Setup */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="mb-16"
-      >
-        <h2 className={cn(TYPOGRAPHY.h2, "mb-6 flex items-center gap-2")}>
-          <Settings className="w-6 h-6 text-primary" />
-          Desk Setup
-        </h2>
+      <AnimatedSection variant="fade-up" delay={0.5} className={SECTION_SPACING.normal}>
+        <SectionHeader
+          title="Desk Setup"
+          icon={Settings}
+          align="left"
+          spacing="tight"
+        />
         <Card>
           <CardHeader>
-            <CardTitle>My Workspace</CardTitle>
-            <CardDescription>{deskSetup.description}</CardDescription>
+            <CardTitle className={cn(TYPOGRAPHY.h4)}>My Workspace</CardTitle>
+            <CardDescription className={cn(TYPOGRAPHY.body)}>{deskSetup.description}</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
               {deskSetup.features.map((feature, index) => (
-                <li key={index} className="flex items-start gap-2">
+                <li key={index} className={cn(TYPOGRAPHY.body, "flex items-start gap-2")}>
                   <span className="text-primary mt-1">•</span>
                   <span>{feature}</span>
                 </li>
@@ -249,7 +233,7 @@ export default function UsesPageContent() {
             </ul>
           </CardContent>
         </Card>
-      </motion.section>
+      </AnimatedSection>
       </div>
     </PageContainer>
   )

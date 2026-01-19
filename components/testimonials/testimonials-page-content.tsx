@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback, memo, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Filter, Search, Quote, Video, Linkedin, Twitter, Globe, BarChart3, SlidersHorizontal } from 'lucide-react'
 import Link from 'next/link'
@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/dialog'
 import { Progress } from '@/components/ui/progress'
 import PageContainer from '@/components/layout/page-container'
+import { AnimatedDiv } from '@/components/ui/animated-section'
+import { SectionHeader } from '@/components/ui/section-header'
 import { SECTION_SPACING, TYPOGRAPHY } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
@@ -47,7 +49,6 @@ interface Testimonial {
 
 export default function TestimonialsPageContent() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([])
-  const [filteredTestimonials, setFilteredTestimonials] = useState<Testimonial[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [ratingFilter, setRatingFilter] = useState<string>('all')
@@ -61,10 +62,6 @@ export default function TestimonialsPageContent() {
   useEffect(() => {
     loadTestimonials()
   }, [])
-
-  useEffect(() => {
-    filterTestimonials()
-  }, [testimonials, searchQuery, ratingFilter, typeFilter, featuredOnly])
 
   const loadTestimonials = async () => {
     try {
@@ -102,7 +99,7 @@ export default function TestimonialsPageContent() {
     return Array.from(projects).sort()
   }, [testimonials])
 
-  const filterTestimonials = () => {
+  const filteredTestimonials = useMemo(() => {
     let filtered = [...testimonials]
 
     // Search filter
@@ -149,8 +146,8 @@ export default function TestimonialsPageContent() {
       )
     }
 
-    setFilteredTestimonials(filtered)
-  }
+    return filtered
+  }, [testimonials, searchQuery, ratingFilter, typeFilter, projectFilter, featuredOnly, sortOption])
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }).map((_, i) => (
@@ -241,21 +238,18 @@ export default function TestimonialsPageContent() {
     <PageContainer width="wide" padding="default">
       <div className={SECTION_SPACING.paddingNormal}>
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={cn("text-center", SECTION_SPACING.normal)}
-      >
-        <h1 className={cn(TYPOGRAPHY.h1, "mb-4")}>Testimonials</h1>
-        <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto", SECTION_SPACING.mb8)}>
-          What clients, colleagues, and collaborators say about working with me
-        </p>
+      <SectionHeader
+        title="Testimonials"
+        description="What clients, colleagues, and collaborators say about working with me"
+        align="center"
+        variant="large"
+        spacing="large"
+      />
         
         {/* Testimonial Submission Link Box */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+        <AnimatedDiv
+          variant="fade-up"
+          delay={0.1}
           className={cn("max-w-2xl mx-auto", SECTION_SPACING.mb8)}
         >
           <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 backdrop-blur-sm border-primary/20">
@@ -279,14 +273,12 @@ export default function TestimonialsPageContent() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
-      </motion.div>
+        </AnimatedDiv>
 
       {/* Statistics */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+      <AnimatedDiv
+        variant="fade-up"
+        delay={0.1}
         className={cn("grid grid-cols-1 md:grid-cols-3 gap-6", SECTION_SPACING.normal)}
       >
         <Card>
@@ -318,14 +310,13 @@ export default function TestimonialsPageContent() {
             <div className="text-3xl font-bold">{stats.featured}</div>
           </CardContent>
         </Card>
-      </motion.div>
+      </AnimatedDiv>
 
       {/* Distribution Insights */}
       {!isLoading && testimonials.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
+        <AnimatedDiv
+          variant="fade-up"
+          delay={0.15}
           className={cn("grid grid-cols-1 md:grid-cols-2 gap-6", SECTION_SPACING.normal)}
         >
           <Card>
@@ -385,7 +376,7 @@ export default function TestimonialsPageContent() {
               ))}
             </CardContent>
           </Card>
-        </motion.div>
+        </AnimatedDiv>
       )}
 
       {/* Filters */}

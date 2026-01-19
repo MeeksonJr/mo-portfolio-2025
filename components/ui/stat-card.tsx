@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { memo } from 'react'
 import { motion } from 'framer-motion'
 import { LucideIcon } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -21,8 +22,9 @@ interface StatCardProps {
  * Displays a statistic with icon, value, and label in a standardized card format
  * 
  * Used across hub pages for displaying quick statistics and metrics
+ * Memoized for better performance
  */
-export function StatCard({ 
+export const StatCard = memo(function StatCard({ 
   label, 
   value, 
   icon: Icon, 
@@ -48,7 +50,7 @@ export function StatCard({
       </Card>
     </motion.div>
   )
-}
+})
 
 interface StatCardsGridProps {
   stats: Array<{

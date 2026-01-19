@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { memo } from 'react'
 import { motion, MotionProps } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
@@ -21,8 +22,9 @@ interface AnimatedSectionProps extends Omit<MotionProps, 'initial' | 'animate'> 
  * Wrapper component for sections with standardized animations
  * 
  * Provides consistent fade-in animations across the application
+ * Memoized for better performance
  */
-export function AnimatedSection({
+export const AnimatedSection = memo(function AnimatedSection({
   children,
   delay = 0,
   duration = 0.6,
@@ -64,7 +66,7 @@ export function AnimatedSection({
       {children}
     </motion.section>
   )
-}
+})
 
 interface AnimatedDivProps extends Omit<MotionProps, 'initial' | 'animate'> {
   children: React.ReactNode
@@ -79,8 +81,9 @@ interface AnimatedDivProps extends Omit<MotionProps, 'initial' | 'animate'> {
  * Wrapper for divs with standardized animations
  * 
  * Use for inline animated content that doesn't need section semantics
+ * Memoized for better performance
  */
-export function AnimatedDiv({
+export const AnimatedDiv = memo(function AnimatedDiv({
   children,
   delay = 0,
   duration = 0.6,
@@ -120,5 +123,5 @@ export function AnimatedDiv({
       {children}
     </motion.div>
   )
-}
+})
 
