@@ -61,6 +61,8 @@ export const AnimatedSection = memo(function AnimatedSection({
       viewport={viewport}
       transition={{ duration, delay }}
       className={className}
+      role="region"
+      aria-live="polite"
       {...props}
     >
       {children}

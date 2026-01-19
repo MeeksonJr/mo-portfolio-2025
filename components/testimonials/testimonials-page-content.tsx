@@ -457,6 +457,8 @@ export default function TestimonialsPageContent() {
                   variant={featuredOnly ? 'default' : 'outline'}
                   onClick={() => setFeaturedOnly(!featuredOnly)}
                   className="w-full"
+                  aria-label={featuredOnly ? 'Show all testimonials' : 'Show only featured testimonials'}
+                  aria-pressed={featuredOnly}
                 >
                   {featuredOnly ? 'Show All' : 'Featured Only'}
                 </Button>
@@ -541,10 +543,17 @@ export default function TestimonialsPageContent() {
                       {testimonial.video_url && (
                         <button
                           onClick={() => openVideoModal(testimonial.video_url!, testimonial.client_name)}
-                          className="text-muted-foreground hover:text-primary transition-colors"
-                          aria-label="Watch video testimonial"
+                          className="text-muted-foreground hover:text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded transition-colors p-1"
+                          aria-label={`Watch video testimonial from ${testimonial.client_name}`}
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              openVideoModal(testimonial.video_url!, testimonial.client_name)
+                            }
+                          }}
                         >
-                          <Video className="h-4 w-4" />
+                          <Video className="h-4 w-4" aria-hidden="true" />
                         </button>
                       )}
                       {testimonial.linkedin_url && (

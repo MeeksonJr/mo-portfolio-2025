@@ -140,12 +140,25 @@ export default function CommandHub() {
                     onClick={command.action}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    aria-label={command.label}
+                    aria-pressed={command.isActive ? 'true' : 'false'}
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        command.action()
+                      }
+                    }}
                   >
-                    <command.icon size={16} className="md:hidden" />
-                    <command.icon size={18} className="hidden md:block" />
+                    <command.icon size={16} className="md:hidden" aria-hidden="true" />
+                    <command.icon size={18} className="hidden md:block" aria-hidden="true" />
 
                     {/* Tooltip */}
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black border border-gray-600 rounded text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                    <div 
+                      className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black border border-gray-600 rounded text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity pointer-events-none z-10"
+                      role="tooltip"
+                      aria-hidden="true"
+                    >
                       {command.label}
                     </div>
                   </motion.button>
@@ -158,7 +171,7 @@ export default function CommandHub() {
 
       {/* Main Button - positioned above everything */}
       <motion.button
-        className="fixed w-10 h-10 md:w-12 md:h-12 bg-green-400 text-black rounded-full flex items-center justify-center shadow-lg hover:bg-green-300 transition-colors z-50"
+        className="fixed w-10 h-10 md:w-12 md:h-12 bg-green-400 text-black rounded-full flex items-center justify-center shadow-lg hover:bg-green-300 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors z-50"
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
@@ -173,10 +186,23 @@ export default function CommandHub() {
           top: isOpen ? "50%" : "1rem",
           right: isOpen ? "50%" : "1rem",
         }}
+        aria-label={isOpen ? "Close command menu" : "Open command menu"}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setIsOpen(!isOpen)
+          } else if (e.key === 'Escape' && isOpen) {
+            e.preventDefault()
+            setIsOpen(false)
+          }
+        }}
       >
         <motion.div animate={{ rotate: isOpen ? 45 : 0 }} transition={{ duration: 0.3 }}>
-          <Terminal size={16} className="md:hidden" />
-          <Terminal size={20} className="hidden md:block" />
+          <Terminal size={16} className="md:hidden" aria-hidden="true" />
+          <Terminal size={20} className="hidden md:block" aria-hidden="true" />
         </motion.div>
       </motion.button>
     </>

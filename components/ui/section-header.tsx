@@ -57,45 +57,65 @@ export function SectionHeader({
 
   const spacingClass = SECTION_SPACING[spacing]
 
+  const headerId = `section-header-${title.toLowerCase().replace(/\s+/g, '-')}`
+  const HeadingTag = variant === 'large' ? 'h1' : variant === 'small' ? 'h3' : 'h2'
+  
   return (
-    <AnimatedDiv
-      variant="fade-up"
-      delay={delay}
-      className={cn(
-        "flex flex-col",
-        alignClass,
-        spacingClass,
-        className
-      )}
+    <div
+      role="region"
+      aria-labelledby={headerId}
     >
+      <AnimatedDiv
+        variant="fade-up"
+        delay={delay}
+        className={cn(
+          "flex flex-col",
+          alignClass,
+          spacingClass,
+          className
+        )}
+      >
       {(Icon || title) && (
         <div className={cn(
           "flex items-center gap-3 mb-4",
           align === 'center' && 'justify-center',
           align === 'right' && 'justify-end'
         )}>
-          {Icon && <Icon className="h-8 w-8 text-primary" />}
-          <h2 className={cn(
-            titleVariantClass,
-            titleClassName
-          )}>
+          {Icon && (
+            <Icon 
+              className="h-8 w-8 text-primary" 
+              aria-hidden="true"
+              role="presentation"
+            />
+          )}
+          <HeadingTag 
+            id={headerId}
+            className={cn(
+              titleVariantClass,
+              titleClassName
+            )}
+          >
             {title}
-          </h2>
+          </HeadingTag>
         </div>
       )}
       {description && (
-        <p className={cn(
-          descriptionVariantClass,
-          "text-muted-foreground",
-          align === 'center' && 'mx-auto max-w-2xl',
-          align === 'right' && 'ml-auto max-w-2xl',
-          spacing !== 'normal' && 'mt-2',
-          descriptionClassName
-        )}>
+        <p 
+          className={cn(
+            descriptionVariantClass,
+            "text-muted-foreground",
+            align === 'center' && 'mx-auto max-w-2xl',
+            align === 'right' && 'ml-auto max-w-2xl',
+            spacing !== 'normal' && 'mt-2',
+            descriptionClassName
+          )}
+          aria-describedby={headerId}
+        >
           {description}
         </p>
-      )}
-    </AnimatedDiv>
+        )}
+      </AnimatedDiv>
+    </div>
   )
 }
 

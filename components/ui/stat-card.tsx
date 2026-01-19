@@ -32,20 +32,41 @@ export const StatCard = memo(function StatCard({
   className,
   delay = 0.4
 }: StatCardProps) {
+  const cardId = `stat-card-${label.toLowerCase().replace(/\s+/g, '-')}-${index}`
+  
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: delay + index * 0.1 }}
+      role="article"
+      aria-labelledby={`${cardId}-title`}
     >
       <Card className={cn(
-        "text-center border-2 hover:border-primary/50 transition-colors",
+        "text-center border-2 hover:border-primary/50 transition-colors focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2",
         className
-      )}>
+      )}
+      tabIndex={0}
+      >
         <CardContent className="pt-6">
-          <Icon className="h-6 w-6 mx-auto mb-2 text-primary" />
-          <div className={cn(TYPOGRAPHY.h3, "font-bold")}>{value}</div>
-          <div className={cn(TYPOGRAPHY.bodySmall, "text-muted-foreground mt-1")}>{label}</div>
+          <Icon 
+            className="h-6 w-6 mx-auto mb-2 text-primary" 
+            aria-hidden="true"
+            role="presentation"
+          />
+          <div 
+            id={`${cardId}-title`}
+            className={cn(TYPOGRAPHY.h3, "font-bold")}
+            aria-label={`${label}: ${value}`}
+          >
+            {value}
+          </div>
+          <div 
+            className={cn(TYPOGRAPHY.bodySmall, "text-muted-foreground mt-1")}
+            aria-hidden="true"
+          >
+            {label}
+          </div>
         </CardContent>
       </Card>
     </motion.div>
