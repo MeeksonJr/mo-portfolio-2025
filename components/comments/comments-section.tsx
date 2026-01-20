@@ -10,11 +10,12 @@ import CommentItem from './comment-item'
 
 interface Comment {
   id: string
-  author_name: string
+  author_name: string | null
   author_email: string | null
   author_website: string | null
   content: string
   created_at: string
+  approved_at: string | null
   replies?: Comment[]
   reactions: {
     like: number

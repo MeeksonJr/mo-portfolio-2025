@@ -250,7 +250,7 @@ export default function CommentsTable() {
         </CardHeader>
         <CardContent>
           {/* Stats */}
-          <div className="grid grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-6">
             <Card>
               <CardContent className="pt-6">
                 <div className="text-2xl font-bold">{counts.total}</div>
@@ -284,7 +284,7 @@ export default function CommentsTable() {
           </div>
 
           {/* Filters */}
-          <div className="flex gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -295,7 +295,7 @@ export default function CommentsTable() {
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
@@ -308,7 +308,7 @@ export default function CommentsTable() {
               </SelectContent>
             </Select>
             <Select value={contentTypeFilter} onValueChange={setContentTypeFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Filter by type" />
               </SelectTrigger>
               <SelectContent>
@@ -334,10 +334,10 @@ export default function CommentsTable() {
                 <Card key={comment.id}>
                   <CardContent className="pt-6">
                     <div className="space-y-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h4 className="font-semibold">{comment.author_name}</h4>
+                      <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <h4 className="font-semibold">{comment.author_name || 'Anonymous'}</h4>
                             {getStatusBadge(comment.status)}
                             <Badge variant="outline">{getContentTypeLabel(comment.content_type)}</Badge>
                             {comment.parent_id && (
@@ -345,27 +345,34 @@ export default function CommentsTable() {
                             )}
                           </div>
                           {comment.author_email && (
-                            <p className="text-sm text-muted-foreground">{comment.author_email}</p>
+                            <p className="text-sm text-muted-foreground break-all">{comment.author_email}</p>
                           )}
                           {comment.author_website && (
                             <a
                               href={comment.author_website}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm text-blue-600 hover:underline"
+                              className="text-sm text-blue-600 hover:underline break-all"
                             >
                               {comment.author_website}
                             </a>
                           )}
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                          </p>
+                          <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-muted-foreground">
+                            <span>Posted: {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}</span>
+                            {comment.approved_at && (
+                              <>
+                                <span>•</span>
+                                <span>Approved: {formatDistanceToNow(new Date(comment.approved_at), { addSuffix: true })}</span>
+                              </>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleEdit(comment)}
+                            className="flex-shrink-0"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -375,7 +382,7 @@ export default function CommentsTable() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleStatusChange(comment.id, 'approved')}
-                                className="text-green-600"
+                                className="text-green-600 flex-shrink-0"
                               >
                                 <Check className="h-4 w-4" />
                               </Button>
@@ -383,7 +390,7 @@ export default function CommentsTable() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleStatusChange(comment.id, 'rejected')}
-                                className="text-red-600"
+                                className="text-red-600 flex-shrink-0"
                               >
                                 <X className="h-4 w-4" />
                               </Button>
@@ -391,7 +398,7 @@ export default function CommentsTable() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleStatusChange(comment.id, 'spam')}
-                                className="text-red-600"
+                                className="text-red-600 flex-shrink-0"
                               >
                                 <AlertTriangle className="h-4 w-4" />
                               </Button>
@@ -401,13 +408,15 @@ export default function CommentsTable() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleDelete(comment.id)}
-                            className="text-red-600"
+                            className="text-red-600 flex-shrink-0"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
-                      <p className="text-foreground whitespace-pre-wrap">{comment.content}</p>
+                      <div className="border-t pt-4">
+                        <p className="text-foreground whitespace-pre-wrap break-words">{comment.content}</p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -427,7 +436,7 @@ export default function CommentsTable() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="author_name">Name</Label>
                 <Input

@@ -23,15 +23,37 @@ export async function GET(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+    // Normalize contentType for database lookup (support both 'blog' and 'blog_post' for backwards compatibility)
+    let dbContentType = contentType.toLowerCase().trim()
+    if (dbContentType === 'blog') {
+      dbContentType = 'blog_post'
+    }
+
     // Fetch approved comments with reactions count
-    const { data: comments, error } = await supabase
+    // Try exact match first, then try legacy 'blog' format for backwards compatibility
+    let { data: comments, error } = await supabase
       .from('comments')
       .select('*')
-      .eq('content_type', contentType)
+      .eq('content_type', dbContentType)
       .eq('content_id', contentId)
       .eq('status', 'approved')
       .is('parent_id', null) // Only top-level comments
       .order('created_at', { ascending: false })
+
+    // If no results and we're looking for blog_post, also check for legacy 'blog' entries
+    if ((!comments || comments.length === 0) && dbContentType === 'blog_post') {
+      const { data: legacyComments } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('content_type', 'blog')
+        .eq('content_id', contentId)
+        .eq('status', 'approved')
+        .is('parent_id', null)
+        .order('created_at', { ascending: false })
+      if (legacyComments && legacyComments.length > 0) {
+        comments = legacyComments
+      }
+    }
 
     if (error) {
       console.error('Error fetching comments:', error)
@@ -41,10 +63,43 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Helper function to get reaction counts for a comment
+    const getReactionCounts = async (commentId: string) => {
+      const [likeCount, helpfulCount, loveCount, insightfulCount] = await Promise.all([
+        supabase
+          .from('comment_reactions')
+          .select('*', { count: 'exact', head: true })
+          .eq('comment_id', commentId)
+          .eq('reaction_type', 'like'),
+        supabase
+          .from('comment_reactions')
+          .select('*', { count: 'exact', head: true })
+          .eq('comment_id', commentId)
+          .eq('reaction_type', 'helpful'),
+        supabase
+          .from('comment_reactions')
+          .select('*', { count: 'exact', head: true })
+          .eq('comment_id', commentId)
+          .eq('reaction_type', 'love'),
+        supabase
+          .from('comment_reactions')
+          .select('*', { count: 'exact', head: true })
+          .eq('comment_id', commentId)
+          .eq('reaction_type', 'insightful'),
+      ])
+
+      return {
+        like: likeCount.count || 0,
+        helpful: helpfulCount.count || 0,
+        love: loveCount.count || 0,
+        insightful: insightfulCount.count || 0,
+      }
+    }
+
     // Get replies for each comment and reaction counts
     const commentsWithReplies = await Promise.all(
       (comments || []).map(async (comment) => {
-        // Get replies
+        // Get replies with reaction counts
         const { data: replies } = await supabase
           .from('comments')
           .select('*')
@@ -52,40 +107,21 @@ export async function GET(request: NextRequest) {
           .eq('status', 'approved')
           .order('created_at', { ascending: true })
 
-        // Get reaction counts
-        const { count: likeCount } = await supabase
-          .from('comment_reactions')
-          .select('*', { count: 'exact', head: true })
-          .eq('comment_id', comment.id)
-          .eq('reaction_type', 'like')
+        // Get reaction counts for replies
+        const repliesWithReactions = await Promise.all(
+          (replies || []).map(async (reply) => ({
+            ...reply,
+            reactions: await getReactionCounts(reply.id),
+          }))
+        )
 
-        const { count: helpfulCount } = await supabase
-          .from('comment_reactions')
-          .select('*', { count: 'exact', head: true })
-          .eq('comment_id', comment.id)
-          .eq('reaction_type', 'helpful')
-
-        const { count: loveCount } = await supabase
-          .from('comment_reactions')
-          .select('*', { count: 'exact', head: true })
-          .eq('comment_id', comment.id)
-          .eq('reaction_type', 'love')
-
-        const { count: insightfulCount } = await supabase
-          .from('comment_reactions')
-          .select('*', { count: 'exact', head: true })
-          .eq('comment_id', comment.id)
-          .eq('reaction_type', 'insightful')
+        // Get reaction counts for main comment
+        const reactions = await getReactionCounts(comment.id)
 
         return {
           ...comment,
-          replies: replies || [],
-          reactions: {
-            like: likeCount || 0,
-            helpful: helpfulCount || 0,
-            love: loveCount || 0,
-            insightful: insightfulCount || 0,
-          },
+          replies: repliesWithReactions,
+          reactions,
         }
       })
     )
@@ -169,23 +205,23 @@ export async function POST(request: NextRequest) {
     const normalizedContentType = (content_type || '').toLowerCase().trim()
     
     // Map API types to database constraint values
-    // Database constraint allows: 'blog', 'case-study', 'project'
+    // Database constraint allows: 'blog_post', 'case_study', 'project', 'resource'
     const contentTypeMap: Record<string, string> = {
-      'blog_post': 'blog',
-      'blog': 'blog',
-      'blogpost': 'blog',
-      'case_study': 'case-study',
-      'case-study': 'case-study',
-      'casestudy': 'case-study',
+      'blog_post': 'blog_post',
+      'blog': 'blog_post', // Legacy support: map 'blog' to 'blog_post'
+      'blogpost': 'blog_post',
+      'case_study': 'case_study',
+      'case-study': 'case_study',
+      'casestudy': 'case_study',
       'project': 'project',
-      'resource': 'project', // Map resource to project if needed, or update constraint
+      'resource': 'resource',
     }
     
     // Map to database constraint values
     const finalContentType = contentTypeMap[normalizedContentType]
     
-    // Database constraint only allows: 'blog', 'case-study', 'project'
-    const validTypes = ['blog', 'case-study', 'project']
+    // Database constraint only allows: 'blog_post', 'case_study', 'project', 'resource'
+    const validTypes = ['blog_post', 'case_study', 'project', 'resource']
     if (!finalContentType || !validTypes.includes(finalContentType)) {
       console.error('Invalid content_type received:', content_type, 'Normalized:', normalizedContentType, 'Final:', finalContentType)
       return NextResponse.json(

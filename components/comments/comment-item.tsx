@@ -3,17 +3,18 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ThumbsUp, Heart, Lightbulb, HelpCircle, Reply, Loader2 } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow, format } from 'date-fns'
 import { toast } from 'sonner'
 import CommentForm from './comment-form'
 
 interface Comment {
   id: string
-  author_name: string
+  author_name: string | null
   author_email: string | null
   author_website: string | null
   content: string
   created_at: string
+  approved_at: string | null
   replies?: Comment[]
   reactions: {
     like: number
@@ -81,9 +82,9 @@ export default function CommentItem({
     <div className={`space-y-4 ${depth > 0 ? 'ml-8 border-l-2 border-border pl-4' : ''}`}>
       <div className="space-y-2">
         <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <h4 className="font-semibold">{comment.author_name}</h4>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h4 className="font-semibold">{comment.author_name || 'Anonymous'}</h4>
               {comment.author_website && (
                 <a
                   href={comment.author_website}
@@ -95,9 +96,17 @@ export default function CommentItem({
                 </a>
               )}
             </div>
-            <p className="text-sm text-muted-foreground">
-              {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-            </p>
+            <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-muted-foreground">
+              <span>Posted: {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}</span>
+              {comment.approved_at && (
+                <>
+                  <span>•</span>
+                  <span>Approved: {formatDistanceToNow(new Date(comment.approved_at), { addSuffix: true })}</span>
+                </>
+              )}
+              <span className="hidden sm:inline">•</span>
+              <span className="hidden sm:inline">{format(new Date(comment.created_at), 'MMM d, yyyy h:mm a')}</span>
+            </div>
           </div>
         </div>
 
