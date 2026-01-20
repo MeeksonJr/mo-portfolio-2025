@@ -1,0 +1,32 @@
+{
+  "common": {
+    "home": "Accueil",
+    "about": "À propos",
+    "projects": "Projets",
+    "blog": "Blog",
+    "contact": "Contact",
+    "readMore": "Lire la suite",
+    "learnMore": "En savoir plus",
+    "viewAll": "Voir tout",
+    "download": "Télécharger",
+    "share": "Partager"
+  },
+  "hero": {
+    "title": "Mohamed Datt",
+    "subtitle": "Développeur Full Stack",
+    "cta": "Commencer"
+  },
+  "about": {
+    "title": "À propos de moi",
+    "description": "Développeur Full Stack créatif spécialisé dans les applications web alimentées par l'IA"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "about": "À propos",
+    "projects": "Projets",
+    "blog": "Blog",
+    "caseStudies": "Études de cas",
+    "contact": "Contact"
+  }
+}
+

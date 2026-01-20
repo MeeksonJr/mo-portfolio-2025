@@ -94,8 +94,23 @@ Try asking me something like "Show me projects using React" or "What's your expe
     }
   }, [])
 
+  // Auto-scroll only within the chat container, not the entire page
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messagesEndRef.current) {
+      // Find the scrollable container (CardContent)
+      const scrollContainer = messagesEndRef.current.closest('.overflow-y-auto')
+      if (scrollContainer) {
+        // Scroll only within the container
+        const scrollHeight = scrollContainer.scrollHeight
+        const clientHeight = scrollContainer.clientHeight
+        if (scrollHeight > clientHeight) {
+          scrollContainer.scrollTo({
+            top: scrollHeight,
+            behavior: 'smooth'
+          })
+        }
+      }
+    }
   }, [messages])
 
   const handleSend = async (query?: string) => {

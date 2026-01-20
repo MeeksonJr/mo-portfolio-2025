@@ -1,0 +1,32 @@
+{
+  "common": {
+    "home": "Home",
+    "about": "About",
+    "projects": "Projects",
+    "blog": "Blog",
+    "contact": "Contact",
+    "readMore": "Read More",
+    "learnMore": "Learn More",
+    "viewAll": "View All",
+    "download": "Download",
+    "share": "Share"
+  },
+  "hero": {
+    "title": "Mohamed Datt",
+    "subtitle": "Full Stack Developer",
+    "cta": "Get Started"
+  },
+  "about": {
+    "title": "About Me",
+    "description": "Creative Full Stack Developer specializing in AI-powered web applications"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "projects": "Projects",
+    "blog": "Blog",
+    "caseStudies": "Case Studies",
+    "contact": "Contact"
+  }
+}
+

@@ -27,17 +27,28 @@ export default function FloatingActionMenu() {
     setActiveFeature(null)
   }
 
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024) // lg breakpoint
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   return (
     <>
-      {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6 z-50 sm:bottom-6 md:bottom-8">
+      {/* Floating Action Button - Different position for mobile vs desktop */}
+      <div className={`fixed ${isMobile ? 'bottom-20 right-4' : 'bottom-6 right-6'} z-50 ${isMobile ? 'lg:hidden' : 'hidden lg:block'}`}>
         <AnimatePresence>
           {isOpen && (
             <>
               {/* Voice Commands Button */}
               <motion.button
                 initial={{ opacity: 0, scale: 0, y: 0 }}
-                animate={{ opacity: 1, scale: 1, y: -80 }}
+                animate={{ opacity: 1, scale: 1, y: isMobile ? -60 : -80 }}
                 exit={{ opacity: 0, scale: 0, y: 0 }}
                 transition={{ delay: 0.1 }}
                 onClick={() => handleFeatureClick('voice')}
@@ -50,7 +61,7 @@ export default function FloatingActionMenu() {
               {/* Music Player Button */}
               <motion.button
                 initial={{ opacity: 0, scale: 0, y: 0 }}
-                animate={{ opacity: 1, scale: 1, y: -160 }}
+                animate={{ opacity: 1, scale: 1, y: isMobile ? -120 : -160 }}
                 exit={{ opacity: 0, scale: 0, y: 0 }}
                 transition={{ delay: 0.2 }}
                 onClick={() => handleFeatureClick('music')}
@@ -63,7 +74,7 @@ export default function FloatingActionMenu() {
               {/* Chatbot Button */}
               <motion.button
                 initial={{ opacity: 0, scale: 0, y: 0 }}
-                animate={{ opacity: 1, scale: 1, y: -240 }}
+                animate={{ opacity: 1, scale: 1, y: isMobile ? -180 : -240 }}
                 exit={{ opacity: 0, scale: 0, y: 0 }}
                 transition={{ delay: 0.3 }}
                 onClick={() => handleFeatureClick('chat')}
@@ -79,7 +90,7 @@ export default function FloatingActionMenu() {
         {/* Main Toggle Button */}
         <motion.button
           onClick={toggleMenu}
-          className={`w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all ${
+          className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full shadow-2xl flex items-center justify-center transition-all ${
             isOpen
               ? 'bg-red-500 hover:bg-red-600 text-white'
               : 'bg-primary hover:bg-primary/90 text-primary-foreground'
@@ -89,7 +100,7 @@ export default function FloatingActionMenu() {
           animate={isOpen ? { rotate: 45 } : { rotate: 0 }}
           aria-label="Toggle menu"
         >
-          {isOpen ? <X size={28} /> : <Plus size={28} />}
+          {isOpen ? <X size={isMobile ? 24 : 28} /> : <Plus size={isMobile ? 24 : 28} />}
         </motion.button>
       </div>
 

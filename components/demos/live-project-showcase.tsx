@@ -87,12 +87,16 @@ export default function LiveProjectShowcase() {
       // Try to fetch from projects API
       const response = await fetch('/api/admin/content/projects')
       if (response.ok) {
-        const data = await response.json()
+        const result = await response.json()
+        // API returns { success: true, data: [...] }
+        const data = result.data || result
+        const projectsArray = Array.isArray(data) ? data : []
+        
         // Filter to only published projects with live demos
-        const projectsWithDemos = data.filter((p: any) => 
+        const projectsWithDemos = projectsArray.filter((p: any) => 
           p.status === 'published' &&
-          p.homepage_url && 
-          p.homepage_url !== '#' && 
+          p.homepage_url &&
+          p.homepage_url !== '#' &&
           !p.homepage_url.includes('github.com') &&
           p.homepage_url.startsWith('http')
         )

@@ -19,10 +19,10 @@ import { ErrorBoundary } from "@/components/error-boundary"
 import { ErrorHandler } from "@/components/error-handler"
 import FloatingActionMenu from "@/components/floating-action-menu"
 import VisitorProfileProvider from "@/components/personalization/visitor-profile-provider"
-import MobileBottomNav from "@/components/mobile/mobile-bottom-nav"
 import SkipToContent from "@/components/accessibility/skip-to-content"
 import CustomCursor from "@/components/ui/custom-cursor"
 import { TranslationProvider } from "@/components/i18n/translation-provider"
+import { MusicProvider } from "@/contexts/music-context"
 import KeyboardShortcutsHandler from "@/components/keyboard-shortcuts-handler"
 import KeyboardShortcutsModal from "@/components/keyboard-shortcuts-modal"
 import EnhancedKeyboardNavigation from "@/components/accessibility/enhanced-keyboard-navigation"
@@ -118,15 +118,16 @@ export default function RootLayout({
         >
           <PreferencesProvider>
             <TranslationProvider>
-              <VisitorProfileProvider>
-                <ErrorHandler />
-                <ErrorBoundary>
-                  <KeyboardShortcutsHandler />
-                  <EnhancedKeyboardNavigation />
-                  <AccessibilityAudit />
-                  <ClientLayoutWrapper>
-                    {children}
-                  </ClientLayoutWrapper>
+              <MusicProvider>
+                <VisitorProfileProvider>
+                  <ErrorHandler />
+                  <ErrorBoundary>
+                    <KeyboardShortcutsHandler />
+                    <EnhancedKeyboardNavigation />
+                    <AccessibilityAudit />
+                    <ClientLayoutWrapper>
+                      {children}
+                    </ClientLayoutWrapper>
               <CommandPalette />
               <KeyboardShortcutsModal />
               <AchievementTracker />
@@ -138,6 +139,7 @@ export default function RootLayout({
               <FloatingActionMenu />
                 </ErrorBoundary>
               </VisitorProfileProvider>
+              </MusicProvider>
             </TranslationProvider>
           </PreferencesProvider>
         </ThemeProvider>

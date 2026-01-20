@@ -120,10 +120,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate content_type
-    if (!['blog_post', 'case_study', 'project', 'resource'].includes(content_type)) {
+    // Validate content_type (accept API format, will be mapped to DB format)
+    const validApiTypes = ['blog', 'blog_post', 'case_study', 'case-study', 'project', 'resource']
+    if (!validApiTypes.includes(content_type)) {
       return NextResponse.json(
-        { error: 'Invalid content_type. Must be: blog_post, case_study, project, or resource' },
+        { error: 'Invalid content_type. Must be: blog, blog_post, case_study, case-study, project, or resource' },
         { status: 400 }
       )
     }
@@ -167,23 +168,28 @@ export async function POST(request: NextRequest) {
     // Ensure content_type is lowercase, trimmed, and matches constraint
     const normalizedContentType = (content_type || '').toLowerCase().trim()
     
-    // Map common variations to valid types
+    // Map API types to database constraint values
+    // Database constraint allows: 'blog', 'case-study', 'project'
     const contentTypeMap: Record<string, string> = {
-      'blog': 'blog_post',
-      'blogpost': 'blog_post',
-      'case-study': 'case_study',
-      'casestudy': 'case_study',
+      'blog_post': 'blog',
+      'blog': 'blog',
+      'blogpost': 'blog',
+      'case_study': 'case-study',
+      'case-study': 'case-study',
+      'casestudy': 'case-study',
       'project': 'project',
-      'resource': 'resource',
+      'resource': 'project', // Map resource to project if needed, or update constraint
     }
     
-    // Check mapped types first, then exact match
-    const finalContentType = contentTypeMap[normalizedContentType] || normalizedContentType
+    // Map to database constraint values
+    const finalContentType = contentTypeMap[normalizedContentType]
     
-    if (!['blog_post', 'case_study', 'project', 'resource'].includes(finalContentType)) {
+    // Database constraint only allows: 'blog', 'case-study', 'project'
+    const validTypes = ['blog', 'case-study', 'project']
+    if (!finalContentType || !validTypes.includes(finalContentType)) {
       console.error('Invalid content_type received:', content_type, 'Normalized:', normalizedContentType, 'Final:', finalContentType)
       return NextResponse.json(
-        { error: `Invalid content_type: ${content_type}. Must be one of: blog_post, case_study, project, resource` },
+        { error: `Invalid content_type: ${content_type}. Must be one of: blog, blog_post, case_study, case-study, project, resource` },
         { status: 400 }
       )
     }

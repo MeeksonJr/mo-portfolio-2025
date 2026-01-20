@@ -46,6 +46,10 @@ const pwaConfig = withPWA({
   publicExcludes: ['!robots.txt', '!sitemap.xml'],
 })
 
+import createNextIntlPlugin from 'next-intl/plugin'
+
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -123,4 +127,4 @@ const nextConfig = {
   },
 }
 
-export default pwaConfig(nextConfig)
+export default withNextIntl(pwaConfig(nextConfig))

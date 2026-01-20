@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import createIntlMiddleware from 'next-intl/middleware'
+
+// Create next-intl middleware
+const intlMiddleware = createIntlMiddleware({
+  locales: ['en', 'fr'],
+  defaultLocale: 'en',
+  localePrefix: 'as-needed' // Don't add /en prefix for default locale
+})
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+  // First run next-intl middleware to handle locale detection
+  const intlResponse = intlMiddleware(request)
+  const response = intlResponse || NextResponse.next()
 
   // Build CSP directives with better organization
   const cspDirectives = [

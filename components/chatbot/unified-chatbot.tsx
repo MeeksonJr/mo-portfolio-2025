@@ -172,9 +172,24 @@ export default function UnifiedChatbot({
     : customMessages
   const isLoadingState = useAISDK ? (aiSDKChatResult as any).isLoading || false : isLoading
 
-  // Auto-scroll
+  // Auto-scroll only within the chat container, not the entire page
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messagesEndRef.current) {
+      // Find the scrollable container
+      const scrollContainer = messagesEndRef.current.closest('[class*="overflow"], [class*="scroll"]') || 
+                              messagesEndRef.current.parentElement
+      if (scrollContainer) {
+        const scrollHeight = scrollContainer.scrollHeight
+        const clientHeight = scrollContainer.clientHeight
+        // Only scroll if content exceeds container height
+        if (scrollHeight > clientHeight) {
+          scrollContainer.scrollTo({
+            top: scrollHeight - clientHeight,
+            behavior: 'smooth'
+          })
+        }
+      }
+    }
   }, [messages])
 
   // Voice input setup

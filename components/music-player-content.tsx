@@ -1,109 +1,44 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useEffect } from 'react'
 import { Play, Pause, SkipForward, SkipBack } from 'lucide-react'
-import { getProxyAudioUrl } from '@/lib/music-helpers'
-
-interface Song {
-  title: string
-  file: string
-}
+import { useMusic } from '@/contexts/music-context'
 
 export default function MusicPlayerContent() {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTrack, setCurrentTrack] = useState(0)
-  const [progress, setProgress] = useState(0)
-  const [songs, setSongs] = useState<Song[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const audioRef = useRef<HTMLAudioElement>(null)
+  const {
+    isPlaying,
+    currentTrack,
+    songs,
+    progress,
+    isLoading,
+    audioRef,
+    setIsPlaying,
+    setCurrentTrack,
+    handlePlayPause,
+    handleNext,
+    handlePrevious,
+    handleProgressChange,
+    loadSongs,
+  } = useMusic()
 
-  // Load songs dynamically from API
+  // Load songs on mount
   useEffect(() => {
-    const loadSongs = async () => {
-      try {
-        const response = await fetch('/api/music/songs')
-        const data = await response.json()
-        // Transform API response to match component format
-        const transformedSongs = (data.songs || []).map((song: any) => ({
-          title: song.title,
-          file: getProxyAudioUrl(song.file_url) || song.file_url,
-        }))
-        setSongs(transformedSongs)
-      } catch (error) {
-        console.error('Failed to load songs:', error)
-        setSongs([])
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
     loadSongs()
-  }, [])
+  }, [loadSongs])
 
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-
-    const updateProgress = () => {
-      const value = (audio.currentTime / audio.duration) * 100
-      setProgress(isNaN(value) ? 0 : value)
-    }
-
-    const handleEnded = () => {
-      if (songs.length > 0) {
-        setCurrentTrack((prev) => (prev + 1) % songs.length)
-        setIsPlaying(true)
-        setTimeout(() => {
-          audioRef.current?.play()
-        }, 100)
-      }
-    }
-
-    audio.addEventListener('timeupdate', updateProgress)
-    audio.addEventListener('ended', handleEnded)
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateProgress)
-      audio.removeEventListener('ended', handleEnded)
-    }
-  }, [currentTrack, songs.length])
-
-  const handlePlayPause = () => {
-    const audio = audioRef.current
-    if (!audio) return
-
-    if (isPlaying) {
-      audio.pause()
-    } else {
-      audio.play()
-    }
-    setIsPlaying(!isPlaying)
+  const handleProgressChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleProgressChange(parseFloat(e.target.value))
   }
 
-  const handleNext = () => {
-    setCurrentTrack((prev) => (prev + 1) % songs.length)
-    setIsPlaying(true)
-    setTimeout(() => {
-      audioRef.current?.play()
-    }, 100)
+  // Helper to format time
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  const handlePrevious = () => {
-    setCurrentTrack((prev) => (prev - 1 + songs.length) % songs.length)
-    setIsPlaying(true)
-    setTimeout(() => {
-      audioRef.current?.play()
-    }, 100)
-  }
-
-  const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const audio = audioRef.current
-    if (!audio) return
-
-    const newProgress = parseFloat(e.target.value)
-    audio.currentTime = (newProgress / 100) * audio.duration
-    setProgress(newProgress)
-  }
+  const currentTime = audioRef.current?.currentTime || 0
+  const duration = audioRef.current?.duration || 0
 
   if (isLoading) {
     return <div className="text-center text-muted-foreground">Loading songs...</div>
@@ -115,15 +50,7 @@ export default function MusicPlayerContent() {
 
   return (
     <div className="space-y-4">
-      <audio 
-        ref={audioRef} 
-        src={songs[currentTrack]?.file || undefined} 
-        preload="auto"
-        onError={(e) => {
-          console.error('Audio loading error:', e)
-          console.error('Failed to load:', songs[currentTrack]?.file)
-        }}
-      />
+      {/* Audio element is managed by MusicProvider context and persists across component unmounts */}
       
       <div className="text-center">
         <h3 className="font-semibold text-lg mb-1">{songs[currentTrack]?.title}</h3>
@@ -142,21 +69,13 @@ export default function MusicPlayerContent() {
           min="0"
           max="100"
           value={progress}
-          onChange={handleProgressChange}
+          onChange={handleProgressChangeEvent}
           className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
           aria-label="Progress"
         />
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>
-            {audioRef.current
-              ? `${Math.floor(audioRef.current.currentTime || 0)}s`
-              : '0s'}
-          </span>
-          <span>
-            {audioRef.current && audioRef.current.duration
-              ? `${Math.floor(audioRef.current.duration)}s`
-              : '--'}
-          </span>
+          <span>{formatTime(currentTime)}</span>
+          <span>{duration > 0 ? formatTime(duration) : '--:--'}</span>
         </div>
       </div>
 
@@ -193,7 +112,7 @@ export default function MusicPlayerContent() {
               setCurrentTrack(index)
               setIsPlaying(true)
               setTimeout(() => {
-                audioRef.current?.play()
+                audioRef.current?.play().catch(console.error)
               }, 100)
             }}
             className={`w-full text-left p-2 rounded-lg transition-colors ${
