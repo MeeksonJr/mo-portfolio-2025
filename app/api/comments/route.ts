@@ -23,14 +23,23 @@ export async function GET(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Normalize contentType for database lookup (support both 'blog' and 'blog_post' for backwards compatibility)
+    // Normalize contentType for database lookup
+    // Database uses: 'blog', 'case-study', 'project'
     let dbContentType = contentType.toLowerCase().trim()
-    if (dbContentType === 'blog') {
-      dbContentType = 'blog_post'
+    
+    // Map API format to database format
+    const contentTypeMap: Record<string, string> = {
+      'blog_post': 'blog',
+      'blog': 'blog',
+      'case_study': 'case-study',
+      'case-study': 'case-study',
+      'project': 'project',
+      'resource': 'project', // Map resource to project
     }
+    
+    dbContentType = contentTypeMap[dbContentType] || dbContentType
 
     // Fetch approved comments with reactions count
-    // Try exact match first, then try legacy 'blog' format for backwards compatibility
     let { data: comments, error } = await supabase
       .from('comments')
       .select('*')
@@ -39,21 +48,6 @@ export async function GET(request: NextRequest) {
       .eq('status', 'approved')
       .is('parent_id', null) // Only top-level comments
       .order('created_at', { ascending: false })
-
-    // If no results and we're looking for blog_post, also check for legacy 'blog' entries
-    if ((!comments || comments.length === 0) && dbContentType === 'blog_post') {
-      const { data: legacyComments } = await supabase
-        .from('comments')
-        .select('*')
-        .eq('content_type', 'blog')
-        .eq('content_id', contentId)
-        .eq('status', 'approved')
-        .is('parent_id', null)
-        .order('created_at', { ascending: false })
-      if (legacyComments && legacyComments.length > 0) {
-        comments = legacyComments
-      }
-    }
 
     if (error) {
       console.error('Error fetching comments:', error)
@@ -178,20 +172,31 @@ export async function POST(request: NextRequest) {
     const normalizedContentType = (content_type || '').toLowerCase().trim()
     
     // Map API types to database constraint values
-    // Database constraint allows: 'blog_post', 'case_study', 'project', 'resource'
+    // Database constraint allows: 'blog', 'case-study', 'project'
+    // Note: 'resource' is mapped to 'project' since constraint doesn't allow 'resource'
     const contentTypeMap: Record<string, string> = {
-      'blog_post': 'blog_post',
-      'blog': 'blog_post', // Legacy support: map 'blog' to 'blog_post'
-      'blogpost': 'blog_post',
-      'case_study': 'case_study',
-      'case-study': 'case_study',
-      'casestudy': 'case_study',
+      'blog_post': 'blog',
+      'blog': 'blog',
+      'blogpost': 'blog',
+      'case_study': 'case-study',
+      'case-study': 'case-study',
+      'casestudy': 'case-study',
       'project': 'project',
-      'resource': 'resource',
+      'resource': 'project', // Map resource to project since constraint doesn't allow 'resource'
     }
     
     // Map to database constraint values
     const finalContentType = contentTypeMap[normalizedContentType]
+    
+    // Validate that we have a valid mapped type
+    const validTypes = ['blog', 'case-study', 'project']
+    if (!finalContentType || !validTypes.includes(finalContentType)) {
+      console.error('Invalid content_type received:', content_type, 'Normalized:', normalizedContentType, 'Final:', finalContentType)
+      return NextResponse.json(
+        { error: `Invalid content_type: ${content_type}. Must be one of: blog, blog_post, case_study, case-study, project, resource` },
+        { status: 400 }
+      )
+    }
 
     // If parent_id is provided, verify it exists and belongs to the same content
     if (parent_id) {
@@ -208,7 +213,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Normalize parent content type for comparison (handle both 'blog' legacy and 'blog_post')
+      // Normalize parent content type for comparison
       const normalizedParentType = (parentComment.content_type || '').toLowerCase().trim()
       const mappedParentType = contentTypeMap[normalizedParentType] || normalizedParentType
       
@@ -227,16 +232,6 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
-    }
-    
-    // Database constraint only allows: 'blog_post', 'case_study', 'project', 'resource'
-    const validTypes = ['blog_post', 'case_study', 'project', 'resource']
-    if (!finalContentType || !validTypes.includes(finalContentType)) {
-      console.error('Invalid content_type received:', content_type, 'Normalized:', normalizedContentType, 'Final:', finalContentType)
-      return NextResponse.json(
-        { error: `Invalid content_type: ${content_type}. Must be one of: blog, blog_post, case_study, case-study, project, resource` },
-        { status: 400 }
-      )
     }
 
     // Insert comment with status 'pending' for review
