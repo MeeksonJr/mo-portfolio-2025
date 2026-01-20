@@ -2,14 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mic, Music, MessageCircle, X, Plus } from 'lucide-react'
+import { Mic, Music, MessageCircle, X, Plus, Settings } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import VoiceCommands from './voice-commands'
 import MusicPlayerContent from './music-player-content'
 import { AIChatbotContent } from './chatbot/chatbot-wrappers'
+import HomepageCustomizer from './homepage/homepage-customizer'
 
 export default function FloatingActionMenu() {
   const [isOpen, setIsOpen] = useState(false)
-  const [activeFeature, setActiveFeature] = useState<'voice' | 'music' | 'chat' | null>(null)
+  const [activeFeature, setActiveFeature] = useState<'voice' | 'music' | 'chat' | 'customize' | null>(null)
+  const pathname = usePathname()
+  const isHomepage = pathname === '/'
 
   const toggleMenu = () => {
     setIsOpen(!isOpen)
@@ -18,7 +22,7 @@ export default function FloatingActionMenu() {
     }
   }
 
-  const handleFeatureClick = (feature: 'voice' | 'music' | 'chat') => {
+  const handleFeatureClick = (feature: 'voice' | 'music' | 'chat' | 'customize') => {
     setActiveFeature(feature)
     setIsOpen(false)
   }
@@ -83,6 +87,21 @@ export default function FloatingActionMenu() {
               >
                 <MessageCircle size={24} />
               </motion.button>
+
+              {/* Customize Homepage Button - Only show on homepage */}
+              {isHomepage && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0, y: 0 }}
+                  animate={{ opacity: 1, scale: 1, y: isMobile ? -240 : -320 }}
+                  exit={{ opacity: 0, scale: 0, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  onClick={() => handleFeatureClick('customize')}
+                  className="absolute bottom-16 right-0 w-14 h-14 rounded-full bg-green-500 text-white shadow-lg flex items-center justify-center hover:bg-green-600 transition-colors"
+                  aria-label="Customize Homepage"
+                >
+                  <Settings size={24} />
+                </motion.button>
+              )}
             </>
           )}
         </AnimatePresence>
@@ -208,6 +227,39 @@ export default function FloatingActionMenu() {
               <div className="flex-1 overflow-y-auto">
                 <AIChatbotContent />
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {activeFeature === 'customize' && isHomepage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onClick={closeFeature}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <Settings className="text-green-500" size={24} />
+                  Customize Homepage
+                </h2>
+                <button
+                  onClick={closeFeature}
+                  className="text-muted-foreground hover:text-foreground"
+                  aria-label="Close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <HomepageCustomizer onClose={closeFeature} />
             </motion.div>
           </motion.div>
         )}

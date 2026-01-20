@@ -21,10 +21,12 @@ export default function MusicPlayerContent() {
     loadSongs,
   } = useMusic()
 
-  // Load songs on mount
+  // Load songs on mount - only once
   useEffect(() => {
-    loadSongs()
-  }, [loadSongs])
+    if (songs.length === 0 && !isLoading) {
+      loadSongs()
+    }
+  }, []) // Empty deps - only run once on mount
 
   const handleProgressChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleProgressChange(parseFloat(e.target.value))

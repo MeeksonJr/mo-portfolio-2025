@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useRef, useEffect, useCallback, ReactNode } from 'react'
 
 interface MusicContextType {
   isPlaying: boolean
@@ -50,9 +50,23 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Load songs
-  const loadSongs = async () => {
+  // Track if songs have been loaded to prevent infinite loops
+  const songsLoadedRef = useRef(false)
+
+  // Load songs - memoized to prevent infinite loops
+  const loadSongs = useCallback(async () => {
+    // Prevent multiple simultaneous loads
+    if (songsLoadedRef.current) {
+      return
+    }
+    
+    if (isLoading) {
+      return // Already loading
+    }
+
     try {
+      setIsLoading(true)
+      songsLoadedRef.current = true // Set early to prevent concurrent calls
       const { getProxyAudioUrl } = await import('@/lib/music-helpers')
       const response = await fetch('/api/music/songs')
       const data = await response.json()
@@ -64,89 +78,124 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Failed to load songs:', error)
       setSongs([])
+      songsLoadedRef.current = false // Reset on error so it can retry
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [isLoading]) // Only depend on isLoading
 
-  // Update audio source when track changes
+  // Update audio source when track changes (but not when isPlaying changes)
   useEffect(() => {
     const audio = audioRef.current
     if (!audio || songs.length === 0) return
 
     const currentSong = songs[currentTrack]
-    if (currentSong?.file) {
+    if (currentSong?.file && audio.src !== currentSong.file) {
+      // Only change source if it's different
+      const wasPlaying = !audio.paused
       audio.src = currentSong.file
-      if (isPlaying) {
+      audio.load() // Reload the audio element
+      
+      // Resume playing if it was playing before
+      if (wasPlaying || isPlaying) {
         audio.play().catch(console.error)
       }
     }
-  }, [currentTrack, songs, isPlaying])
+  }, [currentTrack, songs]) // Removed isPlaying from deps
 
-  // Update progress
+  // Sync audio playback state with isPlaying
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio || songs.length === 0) return
+
+    if (isPlaying && audio.paused) {
+      audio.play().catch(console.error)
+    } else if (!isPlaying && !audio.paused) {
+      audio.pause()
+    }
+  }, [isPlaying, songs.length])
+
+  // Update progress and handle track end
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
 
     const updateProgress = () => {
-      const value = (audio.currentTime / audio.duration) * 100
-      setProgress(isNaN(value) ? 0 : value)
+      if (audio.duration) {
+        const value = (audio.currentTime / audio.duration) * 100
+        setProgress(isNaN(value) ? 0 : value)
+      }
     }
 
     const handleEnded = () => {
       if (songs.length > 0) {
-        setCurrentTrack((prev) => (prev + 1) % songs.length)
+        const nextTrack = (currentTrack + 1) % songs.length
+        setCurrentTrack(nextTrack)
         setIsPlaying(true)
-        setTimeout(() => {
-          audioRef.current?.play()
-        }, 100)
       }
     }
 
+    const handlePlay = () => setIsPlaying(true)
+    const handlePause = () => setIsPlaying(false)
+
     audio.addEventListener('timeupdate', updateProgress)
     audio.addEventListener('ended', handleEnded)
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
 
     return () => {
       audio.removeEventListener('timeupdate', updateProgress)
       audio.removeEventListener('ended', handleEnded)
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
     }
   }, [currentTrack, songs.length])
 
-  const handlePlayPause = () => {
+  const handlePlayPause = useCallback(() => {
     const audio = audioRef.current
-    if (!audio) return
+    if (!audio || songs.length === 0) return
 
     if (isPlaying) {
       audio.pause()
+      setIsPlaying(false)
     } else {
-      audio.play().catch(console.error)
+      // If no source is set, set it first
+      if (!audio.src && songs[currentTrack]?.file) {
+        audio.src = songs[currentTrack].file
+        audio.load()
+      }
+      audio.play()
+        .then(() => setIsPlaying(true))
+        .catch((error) => {
+          console.error('Play error:', error)
+          setIsPlaying(false)
+        })
     }
-    setIsPlaying(!isPlaying)
-  }
+  }, [isPlaying, songs, currentTrack])
 
-  const handleNext = () => {
-    setCurrentTrack((prev) => (prev + 1) % songs.length)
+  const handleNext = useCallback(() => {
+    if (songs.length === 0) return
+    const nextTrack = (currentTrack + 1) % songs.length
+    setCurrentTrack(nextTrack)
     setIsPlaying(true)
-    setTimeout(() => {
-      audioRef.current?.play()
-    }, 100)
-  }
+    // Audio will auto-play when source changes in useEffect
+  }, [currentTrack, songs.length])
 
-  const handlePrevious = () => {
-    setCurrentTrack((prev) => (prev - 1 + songs.length) % songs.length)
+  const handlePrevious = useCallback(() => {
+    if (songs.length === 0) return
+    const prevTrack = (currentTrack - 1 + songs.length) % songs.length
+    setCurrentTrack(prevTrack)
     setIsPlaying(true)
-    setTimeout(() => {
-      audioRef.current?.play()
-    }, 100)
-  }
+    // Audio will auto-play when source changes in useEffect
+  }, [currentTrack, songs.length])
 
-  const handleProgressChange = (newProgress: number) => {
+  const handleProgressChange = useCallback((newProgress: number) => {
     const audio = audioRef.current
-    if (!audio) return
+    if (!audio || !audio.duration) return
 
     audio.currentTime = (newProgress / 100) * audio.duration
     setProgress(newProgress)
-  }
+  }, [])
 
   return (
     <MusicContext.Provider
