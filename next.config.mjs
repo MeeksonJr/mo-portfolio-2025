@@ -31,6 +31,30 @@ const pwaConfig = withPWA({
       },
     },
     {
+      urlPattern: /\/api\/widgets\/.*/,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'widgetCache',
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 2 * 60, // 2 minutes for widget data
+        },
+        networkTimeoutSeconds: 3,
+      },
+    },
+    {
+      urlPattern: /\/widgets\/.*/,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'widgetPagesCache',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 5 * 60, // 5 minutes for widget pages
+        },
+        networkTimeoutSeconds: 5,
+      },
+    },
+    {
       urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
       handler: 'CacheFirst',
       options: {

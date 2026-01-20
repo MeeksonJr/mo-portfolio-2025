@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { BookOpen, FolderKanban, Wrench, BarChart3, Activity, TrendingUp, Music, Plus, Share2, Check } from 'lucide-react'
-import { isIOS } from '@/lib/pwa-utils'
+import { BookOpen, FolderKanban, Wrench, BarChart3, Activity, TrendingUp, Music, Plus, Share2, Check, Smartphone } from 'lucide-react'
+import { isIOS, isAndroid, isPWAInstalled } from '@/lib/pwa-utils'
 import { toast } from 'sonner'
 
 const widgets = [
@@ -76,10 +76,14 @@ const widgets = [
 
 export default function WidgetInstaller() {
   const [isIOSDevice, setIsIOSDevice] = useState(false)
+  const [isAndroidDevice, setIsAndroidDevice] = useState(false)
+  const [isPWA, setIsPWA] = useState(false)
   const [installedWidgets, setInstalledWidgets] = useState<string[]>([])
 
   useEffect(() => {
     setIsIOSDevice(isIOS())
+    setIsAndroidDevice(isAndroid())
+    setIsPWA(isPWAInstalled())
     // Check for installed widgets from localStorage
     const installed = localStorage.getItem('installed_widgets')
     if (installed) {
@@ -92,20 +96,27 @@ export default function WidgetInstaller() {
   }, [])
 
   const handleInstallWidget = async (widget: typeof widgets[0]) => {
-    if (!isIOSDevice) {
-      toast.error('Widget installation is currently optimized for iOS devices')
+    if (!isIOSDevice && !isAndroidDevice) {
+      toast.error('Widget installation is optimized for mobile devices (iOS/Android)')
       return
     }
 
     try {
-      // Open the widget page in a new window for iOS "Add to Home Screen"
+      // Open the widget page in a new window for "Add to Home Screen"
       const widgetUrl = `${window.location.origin}${widget.url}`
       
-      // Show instructions
-      toast.info(
-        `To install ${widget.name}: 1) Tap Share button 2) Select "Add to Home Screen" 3) Customize the name 4) Tap "Add"`,
-        { duration: 10000 }
-      )
+      // Show platform-specific instructions
+      if (isIOSDevice) {
+        toast.info(
+          `To install ${widget.name}: 1) Tap Share button 2) Select "Add to Home Screen" 3) Customize the name 4) Tap "Add"`,
+          { duration: 10000 }
+        )
+      } else if (isAndroidDevice) {
+        toast.info(
+          `To install ${widget.name}: 1) Tap the menu (3 dots) 2) Select "Add to Home screen" 3) Customize the name 4) Tap "Add"`,
+          { duration: 10000 }
+        )
+      }
 
       // Track installation attempt
       const current = [...installedWidgets]
@@ -128,13 +139,21 @@ export default function WidgetInstaller() {
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold mb-2">Install Widgets</h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Add these widgets to your iOS home screen for quick access to portfolio content.
+          Add these widgets to your {isIOSDevice ? 'iOS' : isAndroidDevice ? 'Android' : 'mobile'} home screen for quick access to portfolio content.
           All widgets connect to the database and update automatically.
         </p>
-        {!isIOSDevice && (
+        {(isIOSDevice || isAndroidDevice) && (
+          <div className="mt-4 p-4 bg-primary/10 rounded-lg max-w-md mx-auto flex items-center justify-center gap-2">
+            <Smartphone className="h-5 w-5 text-primary" />
+            <p className="text-sm font-medium">
+              {isIOSDevice ? 'iOS' : 'Android'} device detected - Ready to install widgets!
+            </p>
+          </div>
+        )}
+        {!isIOSDevice && !isAndroidDevice && (
           <div className="mt-4 p-4 bg-muted rounded-lg max-w-md mx-auto">
             <p className="text-sm text-muted-foreground">
-              Widget installation is optimized for iOS devices. Android support coming soon.
+              Widget installation is optimized for iOS and Android devices. Open this page on your mobile device to install widgets.
             </p>
           </div>
         )}
@@ -192,35 +211,116 @@ export default function WidgetInstaller() {
         })}
       </div>
 
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Share2 className="h-5 w-5" />
-            How to Install on iOS
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ol className="list-decimal list-inside space-y-2 text-sm">
-            <li>Tap the "Install" button on any widget above</li>
-            <li>The widget page will open in a new tab</li>
-            <li>Tap the Share button (square with arrow) at the bottom of Safari</li>
-            <li>Scroll down and select "Add to Home Screen"</li>
-            <li>Customize the widget name if desired</li>
-            <li>Tap "Add" in the top right corner</li>
-            <li>The widget will appear on your home screen</li>
-            <li>Tap the widget icon to open it anytime</li>
-          </ol>
-          <div className="mt-4 p-4 bg-muted rounded-lg">
-            <p className="text-sm font-medium mb-2">💡 Tips:</p>
-            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Widgets automatically refresh every few minutes</li>
-              <li>Long press the widget icon to see additional options</li>
-              <li>Organize widgets into folders on your home screen</li>
-              <li>All widgets connect to the live database for real-time data</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
+      {/* iOS Installation Instructions */}
+      {isIOSDevice && (
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Share2 className="h-5 w-5" />
+              How to Install on iOS
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ol className="list-decimal list-inside space-y-2 text-sm">
+              <li>Tap the "Install" button on any widget above</li>
+              <li>The widget page will open in a new tab</li>
+              <li>Tap the Share button (square with arrow) at the bottom of Safari</li>
+              <li>Scroll down and select "Add to Home Screen"</li>
+              <li>Customize the widget name if desired</li>
+              <li>Tap "Add" in the top right corner</li>
+              <li>The widget will appear on your home screen</li>
+              <li>Tap the widget icon to open it anytime</li>
+            </ol>
+            <div className="mt-4 p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">💡 iOS Tips:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                <li>Widgets automatically refresh every few minutes</li>
+                <li>Long press the widget icon to see additional options</li>
+                <li>Organize widgets into folders on your home screen</li>
+                <li>All widgets connect to the live database for real-time data</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Android Installation Instructions */}
+      {isAndroidDevice && (
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Smartphone className="h-5 w-5" />
+              How to Install on Android
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ol className="list-decimal list-inside space-y-2 text-sm">
+              <li>Tap the "Install" button on any widget above</li>
+              <li>The widget page will open in a new tab</li>
+              <li>Tap the menu button (three dots) in the top right corner</li>
+              <li>Select "Add to Home screen" or "Install app"</li>
+              <li>Customize the widget name if desired</li>
+              <li>Tap "Add" or "Install"</li>
+              <li>The widget will appear on your home screen</li>
+              <li>Tap the widget icon to open it anytime</li>
+            </ol>
+            <div className="mt-4 p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">💡 Android Tips:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                <li>Widgets automatically refresh every 2-5 minutes via background sync</li>
+                <li>Long press the widget icon to see additional options</li>
+                <li>Organize widgets into folders on your home screen</li>
+                <li>All widgets connect to the live database for real-time data</li>
+                <li>Works with Chrome, Edge, Samsung Internet, and other Chromium-based browsers</li>
+                <li>Background sync ensures widgets stay updated even when the app is closed</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Generic Instructions for Desktop */}
+      {!isIOSDevice && !isAndroidDevice && (
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Share2 className="h-5 w-5" />
+              How to Install Widgets
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold mb-2">For iOS Devices:</h3>
+                <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-4">
+                  <li>Open this page in Safari on your iPhone or iPad</li>
+                  <li>Tap "Install" on any widget</li>
+                  <li>Tap the Share button → "Add to Home Screen"</li>
+                  <li>Customize and tap "Add"</li>
+                </ol>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">For Android Devices:</h3>
+                <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-4">
+                  <li>Open this page in Chrome or Edge on your Android device</li>
+                  <li>Tap "Install" on any widget</li>
+                  <li>Tap the menu (3 dots) → "Add to Home screen"</li>
+                  <li>Customize and tap "Add"</li>
+                </ol>
+              </div>
+            </div>
+            <div className="mt-4 p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">💡 Benefits:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                <li>Widgets automatically refresh with background sync</li>
+                <li>Works offline with cached data</li>
+                <li>All widgets connect to the live database for real-time updates</li>
+                <li>Organize widgets into folders on your home screen</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

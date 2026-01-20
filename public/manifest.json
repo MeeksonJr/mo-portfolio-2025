@@ -7,6 +7,9 @@
   "background_color": "#ffffff",
   "theme_color": "#22c55e",
   "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "screenshots": [],
   "icons": [
     {
       "src": "/placeholder-logo.png",
@@ -22,7 +25,6 @@
     }
   ],
   "categories": ["portfolio", "developer", "technology"],
-  "screenshots": [],
   "shortcuts": [
     {
       "name": "Blog",
