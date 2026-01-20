@@ -47,6 +47,33 @@ export function isMobile(): boolean {
 }
 
 /**
+ * Check if device likely has a keyboard (desktop/laptop)
+ * Uses screen size and touch capability as indicators
+ */
+export function hasKeyboard(): boolean {
+  if (typeof window === 'undefined') return false
+  
+  // Check screen width - desktop/laptop typically have larger screens
+  const isLargeScreen = window.innerWidth >= 1024 || window.screen.width >= 1024
+  
+  // Check if device is touch-capable (mobile/tablet usually are, desktop usually aren't)
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+  
+  // Check user agent for desktop indicators
+  const userAgent = navigator.userAgent.toLowerCase()
+  const isDesktopUA = !userAgent.includes('mobile') && 
+                      !userAgent.includes('android') && 
+                      !userAgent.includes('iphone') && 
+                      !userAgent.includes('ipad') &&
+                      !userAgent.includes('tablet')
+  
+  // Device has keyboard if:
+  // - Large screen AND (not touch device OR desktop user agent)
+  // - OR specifically desktop user agent
+  return (isLargeScreen && (!isTouchDevice || isDesktopUA)) || isDesktopUA
+}
+
+/**
  * Register service worker for background sync
  */
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
