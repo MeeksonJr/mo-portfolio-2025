@@ -174,33 +174,6 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // If parent_id is provided, verify it exists and belongs to the same content
-    if (parent_id) {
-      const { data: parentComment } = await supabase
-        .from('comments')
-        .select('id, content_type, content_id')
-        .eq('id', parent_id)
-        .single()
-
-      if (!parentComment) {
-        return NextResponse.json(
-          { error: 'Parent comment not found' },
-          { status: 404 }
-        )
-      }
-
-      // Normalize parent content type for comparison
-      const normalizedParentType = parentComment.content_type.toLowerCase().trim()
-      const normalizedChildType = (content_type || '').toLowerCase().trim()
-      
-      if (normalizedParentType !== normalizedChildType || parentComment.content_id !== content_id) {
-        return NextResponse.json(
-          { error: 'Parent comment does not belong to this content' },
-          { status: 400 }
-        )
-      }
-    }
-
     // Ensure content_type is lowercase, trimmed, and matches constraint
     const normalizedContentType = (content_type || '').toLowerCase().trim()
     
@@ -219,6 +192,42 @@ export async function POST(request: NextRequest) {
     
     // Map to database constraint values
     const finalContentType = contentTypeMap[normalizedContentType]
+
+    // If parent_id is provided, verify it exists and belongs to the same content
+    if (parent_id) {
+      const { data: parentComment } = await supabase
+        .from('comments')
+        .select('id, content_type, content_id')
+        .eq('id', parent_id)
+        .single()
+
+      if (!parentComment) {
+        return NextResponse.json(
+          { error: 'Parent comment not found' },
+          { status: 404 }
+        )
+      }
+
+      // Normalize parent content type for comparison (handle both 'blog' legacy and 'blog_post')
+      const normalizedParentType = (parentComment.content_type || '').toLowerCase().trim()
+      const mappedParentType = contentTypeMap[normalizedParentType] || normalizedParentType
+      
+      // Compare both using mapped/standardized values and content_id
+      if (mappedParentType !== finalContentType || parentComment.content_id !== content_id) {
+        console.error('Parent comment validation failed:', {
+          parentType: parentComment.content_type,
+          mappedParentType,
+          childType: content_type,
+          finalContentType,
+          parentContentId: parentComment.content_id,
+          childContentId: content_id,
+        })
+        return NextResponse.json(
+          { error: 'Parent comment does not belong to this content' },
+          { status: 400 }
+        )
+      }
+    }
     
     // Database constraint only allows: 'blog_post', 'case_study', 'project', 'resource'
     const validTypes = ['blog_post', 'case_study', 'project', 'resource']
