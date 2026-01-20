@@ -56,12 +56,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   // Load songs - memoized to prevent infinite loops
   const loadSongs = useCallback(async () => {
     // Prevent multiple simultaneous loads
-    if (songsLoadedRef.current) {
+    if (songsLoadedRef.current || isLoading) {
       return
-    }
-    
-    if (isLoading) {
-      return // Already loading
     }
 
     try {
@@ -69,11 +65,31 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       songsLoadedRef.current = true // Set early to prevent concurrent calls
       const { getProxyAudioUrl } = await import('@/lib/music-helpers')
       const response = await fetch('/api/music/songs')
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch songs: ${response.status}`)
+      }
+      
       const data = await response.json()
-      const transformedSongs = (data.songs || []).map((song: any) => ({
-        title: song.title,
-        file: getProxyAudioUrl(song.file_url) || song.file_url,
-      }))
+      
+      if (!data.songs || !Array.isArray(data.songs)) {
+        console.error('Invalid songs data:', data)
+        setSongs([])
+        songsLoadedRef.current = false // Reset on error so it can retry
+        return
+      }
+      
+      const transformedSongs = data.songs
+        .filter((song: any) => song.file_url) // Only include songs with file_url
+        .map((song: any) => ({
+          title: song.title || song.artist ? `${song.title || 'Unknown'}${song.artist ? ' - ' + song.artist : ''}` : 'Unknown Song',
+          file: getProxyAudioUrl(song.file_url) || song.file_url,
+        }))
+      
+      if (transformedSongs.length === 0) {
+        console.warn('No songs with valid file URLs found')
+      }
+      
       setSongs(transformedSongs)
     } catch (error) {
       console.error('Failed to load songs:', error)

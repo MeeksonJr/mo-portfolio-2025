@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server'
+import { createServerClient, createAdminClient } from '@/lib/supabase/server'
 import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import CaseStudyContent from '@/components/case-study-content'
@@ -64,12 +64,24 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
     notFound()
   }
 
-  // Increment views (fire and forget)
-  supabase
-    .from('case_studies')
-    .update({ views: (caseStudy.views || 0) + 1 })
-    .eq('id', caseStudy.id)
-    .then(() => {}) // Fire and forget
+  // Increment views using admin client to bypass RLS (fire and forget)
+  try {
+    const adminClient = createAdminClient()
+    Promise.resolve(
+      adminClient
+        .from('case_studies')
+        .update({ views: (caseStudy.views || 0) + 1 })
+        .eq('id', caseStudy.id)
+    )
+      .then(() => {
+        // Success - fire and forget
+      })
+      .catch((error: any) => {
+        console.error('Error incrementing views:', error)
+      })
+  } catch (error: any) {
+    console.error('Error creating admin client for view increment:', error)
+  }
 
   // Fetch related case studies
   let relatedCaseStudies: Array<{

@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server'
+import { createServerClient, createAdminClient } from '@/lib/supabase/server'
 import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import ResourceContent from '@/components/resource-content'
@@ -61,12 +61,24 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
     notFound()
   }
 
-  // Increment views (fire and forget)
-  supabase
-    .from('resources')
-    .update({ views: (resource.views || 0) + 1 })
-    .eq('id', resource.id)
-    .then(() => {}) // Fire and forget
+  // Increment views using admin client to bypass RLS (fire and forget)
+  try {
+    const adminClient = createAdminClient()
+    Promise.resolve(
+      adminClient
+        .from('resources')
+        .update({ views: (resource.views || 0) + 1 })
+        .eq('id', resource.id)
+    )
+      .then(() => {
+        // Success - fire and forget
+      })
+      .catch((error: any) => {
+        console.error('Error incrementing views:', error)
+      })
+  } catch (error: any) {
+    console.error('Error creating admin client for view increment:', error)
+  }
 
   // Fetch related resources (same type or category)
   let relatedResources: Array<{

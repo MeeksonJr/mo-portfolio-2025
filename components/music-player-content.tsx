@@ -26,6 +26,7 @@ export default function MusicPlayerContent() {
     if (songs.length === 0 && !isLoading) {
       loadSongs()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // Empty deps - only run once on mount
 
   const handleProgressChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {

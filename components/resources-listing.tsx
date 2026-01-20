@@ -155,9 +155,10 @@ export default function ResourcesListing({ resources }: ResourcesListingProps) {
           {filteredResources.map((resource) => {
             const TypeIcon = typeIcons[resource.type]
             return (
-              <div
+              <Link
                 key={resource.id}
-                className="group glass rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300"
+                href={`/resources/${resource.slug}`}
+                className="group glass rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 block"
               >
                 {resource.featured_image && (
                   <div className="relative w-full h-48 overflow-hidden">
@@ -215,7 +216,7 @@ export default function ResourcesListing({ resources }: ResourcesListingProps) {
                     </div>
                   </div>
                   {resource.url && (
-                    <Link
+                    <a
                       href={resource.url}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -224,10 +225,10 @@ export default function ResourcesListing({ resources }: ResourcesListingProps) {
                     >
                       Visit Resource
                       <ExternalLink className="h-3 w-3" />
-                    </Link>
+                    </a>
                   )}
                 </div>
-              </div>
+              </Link>
             )
           })}
         </div>

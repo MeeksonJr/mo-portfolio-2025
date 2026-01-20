@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server'
+import { createServerClient, createAdminClient } from '@/lib/supabase/server'
 import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import ProjectContent from '@/components/project-content'
@@ -82,12 +82,24 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound()
   }
 
-  // Increment views (fire and forget)
-  supabase
-    .from('projects')
-    .update({ views: (project.views || 0) + 1 })
-    .eq('id', project.id)
-    .then(() => {}) // Fire and forget
+  // Increment views using admin client to bypass RLS (fire and forget)
+  try {
+    const adminClient = createAdminClient()
+    Promise.resolve(
+      adminClient
+        .from('projects')
+        .update({ views: (project.views || 0) + 1 })
+        .eq('id', project.id)
+    )
+      .then(() => {
+        // Success - fire and forget
+      })
+      .catch((error: any) => {
+        console.error('Error incrementing views:', error)
+      })
+  } catch (error: any) {
+    console.error('Error creating admin client for view increment:', error)
+  }
 
   // Fetch related projects (similar tech stack or featured)
   let relatedProjects: Array<{
