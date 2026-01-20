@@ -43,12 +43,13 @@ const pwaConfig = withPWA({
     },
   ],
   buildExcludes: [/middleware-manifest\.json$/],
-  publicExcludes: ['!robots.txt', '!sitemap.xml'],
+  publicExcludes: ['!robots.txt', '!sitemap.xml', '!manifest.json'],
 })
 
-import createNextIntlPlugin from 'next-intl/plugin'
-
-const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
+// Temporarily disabled next-intl plugin to fix routing issues
+// TODO: Re-enable when [locale] route structure is implemented
+// import createNextIntlPlugin from 'next-intl/plugin'
+// const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -127,4 +128,6 @@ const nextConfig = {
   },
 }
 
-export default withNextIntl(pwaConfig(nextConfig))
+// Temporarily disable next-intl wrapper
+export default pwaConfig(nextConfig)
+// export default withNextIntl(pwaConfig(nextConfig))

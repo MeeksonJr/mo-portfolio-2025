@@ -1,18 +1,41 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import createIntlMiddleware from 'next-intl/middleware'
 
-// Create next-intl middleware
-const intlMiddleware = createIntlMiddleware({
-  locales: ['en', 'fr'],
-  defaultLocale: 'en',
-  localePrefix: 'as-needed' // Don't add /en prefix for default locale
-})
+// Temporarily disable next-intl middleware to fix routing issues
+// TODO: Re-enable when [locale] route structure is implemented
+// import createIntlMiddleware from 'next-intl/middleware'
+// const intlMiddleware = createIntlMiddleware({
+//   locales: ['en', 'fr'],
+//   defaultLocale: 'en',
+//   localePrefix: 'as-needed'
+// })
 
 export function middleware(request: NextRequest) {
-  // First run next-intl middleware to handle locale detection
-  const intlResponse = intlMiddleware(request)
-  const response = intlResponse || NextResponse.next()
+  const pathname = request.nextUrl.pathname
+  
+  // Skip for static files, API routes, and public files
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/manifest.json') ||
+    pathname.startsWith('/robots.txt') ||
+    pathname.startsWith('/sitemap.xml') ||
+    pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|json|ico|css|js)$/)
+  ) {
+    const response = NextResponse.next()
+    applySecurityHeaders(response)
+    return response
+  }
+
+  // For now, skip next-intl middleware to prevent routing issues
+  // Apply security headers and pass through
+  const response = NextResponse.next()
+  applySecurityHeaders(response)
+  return response
+}
+
+// Extract security headers to a separate function
+function applySecurityHeaders(response: NextResponse) {
 
   // Build CSP directives with better organization
   const cspDirectives = [
@@ -91,8 +114,6 @@ export function middleware(request: NextRequest) {
       response.headers.set(key, value)
     }
   })
-
-  return response
 }
 
 export const config = {
@@ -103,9 +124,11 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - manifest.json (PWA manifest)
+     * - robots.txt, sitemap.xml (SEO files)
      * - public files (public folder)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|manifest.json|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|json)$).*)',
   ],
 }
 
