@@ -5,6 +5,7 @@ import { Wrench, Eye, Calendar, Book, Video, FileText, GraduationCap } from 'luc
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
+import { usePathname } from 'next/navigation'
 
 const typeIcons = {
   tool: Wrench,
@@ -25,14 +26,23 @@ const typeLabels = {
 }
 
 export default function ResourcesWidget() {
+  const pathname = usePathname()
   const [resources, setResources] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Ensure correct URL when opened from home screen
+    if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
+      if (pathname !== '/widgets/resources') {
+        window.location.replace('/widgets/resources')
+        return
+      }
+    }
+    
     fetchResources()
     const interval = setInterval(fetchResources, 5 * 60 * 1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [pathname])
 
   const fetchResources = async () => {
     try {

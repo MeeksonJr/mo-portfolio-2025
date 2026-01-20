@@ -4,16 +4,26 @@ import { useEffect, useState } from 'react'
 import { TrendingUp, Eye, BookOpen, FolderKanban, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { usePathname } from 'next/navigation'
 
 export default function PopularWidget() {
+  const pathname = usePathname()
   const [popularContent, setPopularContent] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Ensure correct URL when opened from home screen
+    if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
+      if (pathname !== '/widgets/popular') {
+        window.location.replace('/widgets/popular')
+        return
+      }
+    }
+    
     fetchPopular()
     const interval = setInterval(fetchPopular, 10 * 60 * 1000) // Refresh every 10 minutes
     return () => clearInterval(interval)
-  }, [])
+  }, [pathname])
 
   const fetchPopular = async () => {
     try {

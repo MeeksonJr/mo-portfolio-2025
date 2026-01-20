@@ -5,6 +5,7 @@ import { Activity, MessageSquare, User, Calendar, BookOpen, FolderKanban, Wrench
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
+import { usePathname } from 'next/navigation'
 
 const contentTypeIcons = {
   blog: BookOpen,
@@ -25,14 +26,23 @@ const contentTypeLabels = {
 }
 
 export default function ActivityWidget() {
+  const pathname = usePathname()
   const [activities, setActivities] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Ensure correct URL when opened from home screen
+    if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
+      if (pathname !== '/widgets/activity') {
+        window.location.replace('/widgets/activity')
+        return
+      }
+    }
+    
     fetchActivity()
     const interval = setInterval(fetchActivity, 2 * 60 * 1000) // Refresh every 2 minutes
     return () => clearInterval(interval)
-  }, [])
+  }, [pathname])
 
   const fetchActivity = async () => {
     try {

@@ -4,17 +4,28 @@ import { useEffect, useState } from 'react'
 import { BookOpen, Eye, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { usePathname } from 'next/navigation'
 
 export default function BlogWidget() {
+  const pathname = usePathname()
   const [posts, setPosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Ensure correct URL when opened from home screen
+    if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
+      // Running as PWA - ensure we're on the correct widget page
+      if (pathname !== '/widgets/blog') {
+        window.location.replace('/widgets/blog')
+        return
+      }
+    }
+    
     fetchPosts()
     // Refresh every 5 minutes
     const interval = setInterval(fetchPosts, 5 * 60 * 1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [pathname])
 
   const fetchPosts = async () => {
     try {

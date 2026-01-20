@@ -3,18 +3,28 @@
 import { useEffect, useState } from 'react'
 import { Music, Play, Pause } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { MusicProvider, useMusic } from '@/contexts/music-context'
 
 function MusicWidgetContent() {
+  const pathname = usePathname()
   const [songs, setSongs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const { isPlaying, handlePlayPause, currentTrack, songs: contextSongs, setCurrentTrack } = useMusic()
 
   useEffect(() => {
+    // Ensure correct URL when opened from home screen
+    if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
+      if (pathname !== '/widgets/music') {
+        window.location.replace('/widgets/music')
+        return
+      }
+    }
+    
     fetchSongs()
     const interval = setInterval(fetchSongs, 5 * 60 * 1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [pathname])
 
   useEffect(() => {
     if (contextSongs.length > 0) {

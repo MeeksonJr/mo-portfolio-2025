@@ -3,16 +3,26 @@
 import { useEffect, useState } from 'react'
 import { Wrench, Eye, Github, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export default function ProjectsWidget() {
+  const pathname = usePathname()
   const [projects, setProjects] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Ensure correct URL when opened from home screen
+    if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
+      if (pathname !== '/widgets/projects') {
+        window.location.replace('/widgets/projects')
+        return
+      }
+    }
+    
     fetchProjects()
     const interval = setInterval(fetchProjects, 5 * 60 * 1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [pathname])
 
   const fetchProjects = async () => {
     try {

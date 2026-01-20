@@ -3,16 +3,26 @@
 import { useEffect, useState } from 'react'
 import { BarChart3, BookOpen, FolderKanban, Wrench, TrendingUp, MessageSquare, Eye } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export default function StatsWidget() {
+  const pathname = usePathname()
   const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Ensure correct URL when opened from home screen
+    if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
+      if (pathname !== '/widgets/stats') {
+        window.location.replace('/widgets/stats')
+        return
+      }
+    }
+    
     fetchStats()
     const interval = setInterval(fetchStats, 10 * 60 * 1000) // Refresh every 10 minutes
     return () => clearInterval(interval)
-  }, [])
+  }, [pathname])
 
   const fetchStats = async () => {
     try {

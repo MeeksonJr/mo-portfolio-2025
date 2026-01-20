@@ -126,8 +126,9 @@ export default function WidgetInstaller() {
         localStorage.setItem('installed_widgets', JSON.stringify(current))
       }
 
-      // Open widget page
-      window.open(widgetUrl, '_blank')
+      // Open widget page in the same window to ensure proper URL for "Add to Home Screen"
+      // This ensures the browser uses the widget's URL, not the main app's start_url
+      window.location.href = widgetUrl
     } catch (error) {
       console.error('Error installing widget:', error)
       toast.error('Failed to install widget')
@@ -239,6 +240,15 @@ export default function WidgetInstaller() {
                 <li>Organize widgets into folders on your home screen</li>
                 <li>All widgets connect to the live database for real-time data</li>
               </ul>
+            </div>
+            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <p className="text-sm font-medium mb-2 text-blue-900 dark:text-blue-100">📱 About iOS Native Widgets:</p>
+              <p className="text-xs text-blue-800 dark:text-blue-200 mb-2">
+                The "Edit Widget" feature you see in iOS (where you can add widgets to the home screen via Edit mode) 
+                requires App Clips or a native iOS app. Our PWA widgets work as standalone apps that you add to your 
+                home screen. When you tap a widget icon, it opens directly to that widget's content. Each widget is a 
+                separate "app" on your home screen, which is why you can add multiple widgets.
+              </p>
             </div>
           </CardContent>
         </Card>

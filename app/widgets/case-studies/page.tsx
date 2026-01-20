@@ -4,16 +4,26 @@ import { useEffect, useState } from 'react'
 import { FolderKanban, Eye, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { usePathname } from 'next/navigation'
 
 export default function CaseStudiesWidget() {
+  const pathname = usePathname()
   const [studies, setStudies] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Ensure correct URL when opened from home screen
+    if (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches) {
+      if (pathname !== '/widgets/case-studies') {
+        window.location.replace('/widgets/case-studies')
+        return
+      }
+    }
+    
     fetchStudies()
     const interval = setInterval(fetchStudies, 5 * 60 * 1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [pathname])
 
   const fetchStudies = async () => {
     try {
