@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase/server'
+import { createServerClient, createAdminClient } from '@/lib/supabase/server'
 import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import BlogPostContent from '@/components/blog-post-content'
@@ -73,12 +73,24 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound()
   }
 
-  // Increment views (fire and forget)
-  supabase
-    .from('blog_posts')
-    .update({ views: (post.views || 0) + 1 })
-    .eq('id', post.id)
-    .then(() => {}) // Fire and forget
+  // Increment views using admin client to bypass RLS (fire and forget)
+  try {
+    const adminClient = createAdminClient()
+    Promise.resolve(
+      adminClient
+        .from('blog_posts')
+        .update({ views: (post.views || 0) + 1 })
+        .eq('id', post.id)
+    )
+      .then(() => {
+        // Success - fire and forget
+      })
+      .catch((error: any) => {
+        console.error('Error incrementing views:', error)
+      })
+  } catch (error: any) {
+    console.error('Error creating admin client for view increment:', error)
+  }
 
   // Fetch related posts (same category or tags)
   let relatedPosts: Array<{

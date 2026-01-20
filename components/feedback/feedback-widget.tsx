@@ -1,19 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ThumbsUp, ThumbsDown, MessageSquare, Star, Loader2, Check } from 'lucide-react'
+import { ThumbsUp, ThumbsDown, Star, Loader2, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { toast } from 'sonner'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
 
 interface FeedbackWidgetProps {
   contentId: string
@@ -37,10 +28,8 @@ export default function FeedbackWidget({
 }: FeedbackWidgetProps) {
   const [helpful, setHelpful] = useState<boolean | null>(null)
   const [rating, setRating] = useState<number | null>(null)
-  const [comment, setComment] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [showCommentDialog, setShowCommentDialog] = useState(false)
   const [stats, setStats] = useState<FeedbackStats | null>(null)
   const [isLoadingStats, setIsLoadingStats] = useState(true)
 
@@ -112,9 +101,12 @@ export default function FeedbackWidget({
   }
 
   const handleRating = async (value: number) => {
-    if (isSubmitted) return
+    if (isSubmitted || isSubmitting) return
 
+    // Optimistically update UI
+    setRating(value)
     setIsSubmitting(true)
+    
     try {
       const response = await fetch('/api/feedback', {
         method: 'POST',
@@ -126,56 +118,29 @@ export default function FeedbackWidget({
         }),
       })
 
+      const data = await response.json()
+
       if (response.ok) {
-        setRating(value)
         setIsSubmitted(true)
         const feedbackKey = `feedback_${contentType}_${contentId}`
         localStorage.setItem(feedbackKey, JSON.stringify({ rating: value }))
-        toast.success('Thank you for your rating!')
+        toast.success(`Thank you for rating this ${value} out of 5!`)
         fetchStats()
       } else {
-        toast.error('Failed to submit rating')
+        // Revert optimistic update on error
+        setRating(null)
+        toast.error(data.error || 'Failed to submit rating. Please try again.')
       }
     } catch (error) {
+      // Revert optimistic update on error
+      setRating(null)
       console.error('Error submitting rating:', error)
-      toast.error('Failed to submit rating')
+      toast.error('Failed to submit rating. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleCommentSubmit = async () => {
-    if (!comment.trim()) return
-
-    setIsSubmitting(true)
-    try {
-      const response = await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contentId,
-          contentType,
-          comment: comment.trim(),
-          helpful,
-          rating,
-        }),
-      })
-
-      if (response.ok) {
-        toast.success('Thank you for your comment!')
-        setComment('')
-        setShowCommentDialog(false)
-        fetchStats()
-      } else {
-        toast.error('Failed to submit comment')
-      }
-    } catch (error) {
-      console.error('Error submitting comment:', error)
-      toast.error('Failed to submit comment')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -228,7 +193,7 @@ export default function FeedbackWidget({
       {/* Rating */}
       <Card className="bg-background/95 backdrop-blur-sm">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h3 className="font-semibold mb-1">Rate this content</h3>
               {stats && stats.averageRating && (
@@ -238,77 +203,46 @@ export default function FeedbackWidget({
               )}
             </div>
             <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((value) => (
-                <button
-                  key={value}
-                  onClick={() => handleRating(value)}
-                  disabled={isSubmitting || isSubmitted}
-                  aria-label={`Rate ${value} out of 5`}
-                  title={`Rate ${value} out of 5`}
-                  className={`p-1 transition-colors ${
-                    rating !== null && value <= rating
-                      ? 'text-yellow-500'
-                      : 'text-muted-foreground hover:text-yellow-500'
-                  } ${isSubmitted ? 'cursor-default' : 'cursor-pointer'}`}
-                >
-                  <Star
-                    className={`h-5 w-5 ${
-                      rating !== null && value <= rating ? 'fill-current' : ''
-                    }`}
-                  />
-                </button>
-              ))}
+              {[1, 2, 3, 4, 5].map((value) => {
+                const isActive = rating !== null && value <= rating
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => !isSubmitted && handleRating(value)}
+                    disabled={isSubmitting || isSubmitted}
+                    aria-label={`Rate ${value} out of 5`}
+                    title={isSubmitted ? 'Already rated' : `Rate ${value} out of 5`}
+                    className={`p-1 transition-all duration-200 ${
+                      isActive
+                        ? 'text-yellow-500 scale-110'
+                        : 'text-muted-foreground hover:text-yellow-400 hover:scale-110'
+                    } ${isSubmitted ? 'cursor-default opacity-60' : 'cursor-pointer'}`}
+                  >
+                    <Star
+                      className={`h-6 w-6 transition-all ${
+                        isActive ? 'fill-current' : ''
+                      }`}
+                    />
+                  </button>
+                )
+              })}
             </div>
           </div>
+          {isSubmitting && (
+            <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Submitting rating...
+            </div>
+          )}
+          {isSubmitted && rating !== null && (
+            <div className="mt-4 flex items-center gap-2 text-sm text-green-600">
+              <Check className="h-4 w-4" />
+              Thank you for rating this content {rating} out of 5!
+            </div>
+          )}
         </CardContent>
       </Card>
-
-      {/* Comment */}
-      <Dialog open={showCommentDialog} onOpenChange={setShowCommentDialog}>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="w-full gap-2">
-            <MessageSquare className="h-4 w-4" />
-            Leave a comment
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Share your thoughts</DialogTitle>
-            <DialogDescription>
-              Your feedback helps improve the content quality.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Textarea
-              placeholder="What did you think about this content?"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              rows={4}
-            />
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowCommentDialog(false)
-                  setComment('')
-                }}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleCommentSubmit} disabled={!comment.trim() || isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  'Submit'
-                )}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
