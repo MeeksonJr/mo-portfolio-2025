@@ -51,6 +51,9 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Mohamed Datt",
   },
+  formatDetection: {
+    telephone: false,
+  },
   openGraph: {
     type: "website",
     locale: "en_US",

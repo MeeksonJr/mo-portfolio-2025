@@ -51,6 +51,62 @@
       "description": "Download resume",
       "url": "/resume",
       "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Blog Widget",
+      "short_name": "Blog Widget",
+      "description": "Latest blog posts widget",
+      "url": "/widgets/blog",
+      "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Case Studies Widget",
+      "short_name": "Case Studies",
+      "description": "Latest case studies widget",
+      "url": "/widgets/case-studies",
+      "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Projects Widget",
+      "short_name": "Projects",
+      "description": "Featured projects widget",
+      "url": "/widgets/projects",
+      "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Resources Widget",
+      "short_name": "Resources",
+      "description": "Popular resources widget",
+      "url": "/widgets/resources",
+      "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Stats Widget",
+      "short_name": "Stats",
+      "description": "Site statistics widget",
+      "url": "/widgets/stats",
+      "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Activity Widget",
+      "short_name": "Activity",
+      "description": "Recent activity widget",
+      "url": "/widgets/activity",
+      "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Popular Widget",
+      "short_name": "Popular",
+      "description": "Popular content widget",
+      "url": "/widgets/popular",
+      "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Music Widget",
+      "short_name": "Music",
+      "description": "Music player widget",
+      "url": "/widgets/music",
+      "icons": [{ "src": "/placeholder-logo.png", "sizes": "192x192" }]
     }
   ],
   "share_target": {
@@ -62,6 +118,56 @@
       "text": "text",
       "url": "url"
     }
-  }
+  },
+  "widgets": [
+    {
+      "name": "Latest Blog Posts",
+      "tag": "blog-widget",
+      "url": "/widgets/blog",
+      "display": "standalone"
+    },
+    {
+      "name": "Latest Case Studies",
+      "tag": "case-studies-widget",
+      "url": "/widgets/case-studies",
+      "display": "standalone"
+    },
+    {
+      "name": "Featured Projects",
+      "tag": "projects-widget",
+      "url": "/widgets/projects",
+      "display": "standalone"
+    },
+    {
+      "name": "Popular Resources",
+      "tag": "resources-widget",
+      "url": "/widgets/resources",
+      "display": "standalone"
+    },
+    {
+      "name": "Site Statistics",
+      "tag": "stats-widget",
+      "url": "/widgets/stats",
+      "display": "standalone"
+    },
+    {
+      "name": "Recent Activity",
+      "tag": "activity-widget",
+      "url": "/widgets/activity",
+      "display": "standalone"
+    },
+    {
+      "name": "Popular Content",
+      "tag": "popular-widget",
+      "url": "/widgets/popular",
+      "display": "standalone"
+    },
+    {
+      "name": "Music Player",
+      "tag": "music-widget",
+      "url": "/widgets/music",
+      "display": "standalone"
+    }
+  ]
 }
 

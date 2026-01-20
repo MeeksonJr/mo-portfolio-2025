@@ -49,6 +49,7 @@ export default function Navigation() {
     { name: "Music", href: "/music" },
     { name: "Games", href: "/games" },
     { name: "Achievements", href: "/achievements" },
+    { name: "Widgets", href: "/widgets" },
   ]
 
   // Tools & Hubs dropdown - Interactive tools and utilities (consolidated)
@@ -60,6 +61,7 @@ export default function Navigation() {
     { name: "Games", href: "/games" },
     { name: "AI Assistant", href: "/portfolio-assistant" },
     { name: "Live Demos", href: "/demos" },
+    { name: "Widgets", href: "/widgets" },
   ]
 
   // For Recruiters (consolidated)

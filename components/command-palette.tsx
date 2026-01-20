@@ -44,6 +44,7 @@ import {
   Monitor,
   Terminal,
   Radio,
+  LayoutGrid,
 } from 'lucide-react'
 import { GlobalSearch } from '@/components/search/global-search'
 
@@ -242,6 +243,12 @@ export default function CommandPalette() {
           >
             <BarChart3 className="mr-2 h-4 w-4" />
             <span>Insights Hub</span>
+          </CommandItem>
+          <CommandItem
+            onSelect={() => runCommand(() => router.push('/widgets'))}
+          >
+            <LayoutGrid className="mr-2 h-4 w-4" />
+            <span>Widgets</span>
           </CommandItem>
           <CommandItem
             onSelect={() => runCommand(() => router.push('/calendar'))}
