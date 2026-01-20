@@ -21,13 +21,15 @@ export default function MusicPlayerContent() {
     loadSongs,
   } = useMusic()
 
-  // Load songs on mount - only once
+  // Load songs when component mounts and songs are empty
   useEffect(() => {
     if (songs.length === 0 && !isLoading) {
-      loadSongs()
+      console.log('MusicPlayerContent: Loading songs...')
+      loadSongs().catch((error) => {
+        console.error('MusicPlayerContent: Error loading songs:', error)
+      })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Empty deps - only run once on mount
+  }, [songs.length, isLoading, loadSongs]) // Include all dependencies
 
   const handleProgressChangeEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleProgressChange(parseFloat(e.target.value))

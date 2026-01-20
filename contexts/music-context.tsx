@@ -28,7 +28,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const [currentTrack, setCurrentTrack] = useState(0)
   const [progress, setProgress] = useState(0)
   const [songs, setSongs] = useState<Array<{ title: string; file: string }>>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false) // Start as false, only set true when actively loading
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   // Create audio element outside component to persist across unmounts
@@ -50,55 +50,76 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Track if songs have been loaded to prevent infinite loops
-  const songsLoadedRef = useRef(false)
+  // Track if songs are currently being loaded to prevent concurrent calls
+  const isLoadingRef = useRef(false)
 
   // Load songs - memoized to prevent infinite loops
   const loadSongs = useCallback(async () => {
     // Prevent multiple simultaneous loads
-    if (songsLoadedRef.current || isLoading) {
+    if (isLoadingRef.current) {
+      console.log('Songs are already loading, skipping...')
+      return
+    }
+
+    // If songs are already loaded, don't reload unless forced
+    if (songs.length > 0) {
+      console.log('Songs already loaded, skipping...')
       return
     }
 
     try {
+      isLoadingRef.current = true
       setIsLoading(true)
-      songsLoadedRef.current = true // Set early to prevent concurrent calls
+      console.log('Starting to load songs from API...')
+      
       const { getProxyAudioUrl } = await import('@/lib/music-helpers')
       const response = await fetch('/api/music/songs')
       
       if (!response.ok) {
-        throw new Error(`Failed to fetch songs: ${response.status}`)
+        const errorText = await response.text().catch(() => 'Unknown error')
+        throw new Error(`Failed to fetch songs: ${response.status} - ${errorText}`)
       }
       
       const data = await response.json()
+      console.log('Received songs data:', { songCount: data.songs?.length, hasSongs: !!data.songs })
       
       if (!data.songs || !Array.isArray(data.songs)) {
-        console.error('Invalid songs data:', data)
+        console.error('Invalid songs data structure:', data)
         setSongs([])
-        songsLoadedRef.current = false // Reset on error so it can retry
         return
       }
       
       const transformedSongs = data.songs
-        .filter((song: any) => song.file_url) // Only include songs with file_url
+        .filter((song: any) => {
+          const hasFile = !!(song.file_url || song.file_path)
+          if (!hasFile) {
+            console.warn('Song missing file URL:', song.title || song.id)
+          }
+          return hasFile
+        })
         .map((song: any) => ({
-          title: song.title || song.artist ? `${song.title || 'Unknown'}${song.artist ? ' - ' + song.artist : ''}` : 'Unknown Song',
-          file: getProxyAudioUrl(song.file_url) || song.file_url,
+          title: song.title && song.artist 
+            ? `${song.title} - ${song.artist}`
+            : song.title || song.artist || 'Unknown Song',
+          file: getProxyAudioUrl(song.file_url || song.file_path) || song.file_url || song.file_path,
         }))
       
+      console.log(`Loaded ${transformedSongs.length} songs`)
+      
       if (transformedSongs.length === 0) {
-        console.warn('No songs with valid file URLs found')
+        console.warn('No songs with valid file URLs found after filtering')
       }
       
       setSongs(transformedSongs)
     } catch (error) {
       console.error('Failed to load songs:', error)
       setSongs([])
-      songsLoadedRef.current = false // Reset on error so it can retry
+      // Don't throw - just log the error and show empty state
     } finally {
       setIsLoading(false)
+      isLoadingRef.current = false
     }
-  }, [isLoading]) // Only depend on isLoading
+  }, [songs.length]) // Depend on songs.length to allow retry when songs are empty
 
   // Update audio source when track changes (but not when isPlaying changes)
   useEffect(() => {
