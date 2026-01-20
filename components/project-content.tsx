@@ -10,6 +10,8 @@ import SmartRecommendations from '@/components/recommendations/smart-recommendat
 import PageContainer from '@/components/layout/page-container'
 import { TYPOGRAPHY } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import CommentsSection from '@/components/comments/comments-section'
+import FeedbackWidget from '@/components/feedback/feedback-widget'
 
 interface Project {
   id: string
@@ -143,6 +145,26 @@ export default function ProjectContent({ project, relatedProjects }: ProjectCont
           </Link>
         </div>
       </header>
+
+      {/* Feedback Widget */}
+      {project.id && (
+        <div className="mt-16 pt-8 border-t">
+          <FeedbackWidget
+            contentId={project.id}
+            contentType="project"
+          />
+        </div>
+      )}
+
+      {/* Comments Section */}
+      {project.id && (
+        <div className="mt-16 pt-8 border-t">
+          <CommentsSection
+            contentType="project"
+            contentId={project.id}
+          />
+        </div>
+      )}
 
       {/* Related Projects */}
       {relatedProjects.length > 0 && (

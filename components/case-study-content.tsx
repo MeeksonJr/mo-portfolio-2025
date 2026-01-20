@@ -12,6 +12,8 @@ import ReactMarkdown from 'react-markdown'
 import PageContainer from '@/components/layout/page-container'
 import { TYPOGRAPHY } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import CommentsSection from '@/components/comments/comments-section'
+import FeedbackWidget from '@/components/feedback/feedback-widget'
 
 interface CaseStudy {
   id: string
@@ -367,6 +369,26 @@ export default function CaseStudyContent({ caseStudy, relatedCaseStudies }: Case
             ))}
           </ul>
         </section>
+      )}
+
+      {/* Feedback Widget */}
+      {caseStudy.id && (
+        <div className="mt-16 pt-8 border-t">
+          <FeedbackWidget
+            contentId={caseStudy.id}
+            contentType="case_study"
+          />
+        </div>
+      )}
+
+      {/* Comments Section */}
+      {caseStudy.id && (
+        <div className="mt-16 pt-8 border-t">
+          <CommentsSection
+            contentType="case_study"
+            contentId={caseStudy.id}
+          />
+        </div>
       )}
 
       {/* Related Case Studies */}

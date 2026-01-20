@@ -8,6 +8,8 @@ import { format } from 'date-fns'
 import PageContainer from '@/components/layout/page-container'
 import { TYPOGRAPHY } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import CommentsSection from '@/components/comments/comments-section'
+import FeedbackWidget from '@/components/feedback/feedback-widget'
 
 interface Resource {
   id: string
@@ -163,6 +165,26 @@ export default function ResourceContent({ resource, relatedResources }: Resource
           </div>
         )}
       </header>
+
+      {/* Feedback Widget */}
+      {resource.id && (
+        <div className="mt-16 pt-8 border-t">
+          <FeedbackWidget
+            contentId={resource.id}
+            contentType="resource"
+          />
+        </div>
+      )}
+
+      {/* Comments Section */}
+      {resource.id && (
+        <div className="mt-16 pt-8 border-t">
+          <CommentsSection
+            contentType="resource"
+            contentId={resource.id}
+          />
+        </div>
+      )}
 
       {/* Related Resources */}
       {relatedResources.length > 0 && (
