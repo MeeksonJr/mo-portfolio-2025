@@ -101,7 +101,7 @@ Be helpful, ask good questions, and guide users toward contacting Mohamed for wo
     { provider: "google", model: "gemini-2.0-flash", name: "Gemini 2.0 Flash" },
     { provider: "google", model: "gemini-2.5-pro", name: "Gemini 2.5 Pro" },
     { provider: "groq", model: "llama-3.3-70b-versatile", name: "Llama 3.3 70B (Groq)" },
-    { provider: "groq", model: "llama-3.1-70b-versatile", name: "Llama 3.1 70B (Groq)" },
+    { provider: "groq", model: "llama-3.3-70b-versatile", name: "Llama 3.3 70B (Groq)" }, // Updated from deprecated model
     { provider: "groq", model: "mixtral-8x7b-32768", name: "Mixtral 8x7B (Groq)" },
   ]
 
@@ -117,7 +117,7 @@ Be helpful, ask good questions, and guide users toward contacting Mohamed for wo
         model: modelInstance,
         messages: messageHistory,
         temperature: 0.7,
-        maxTokens: 1000,
+        maxOutputTokens: 1000,
       })
 
       console.log(`✅ Successfully using ${modelConfig.name}`)

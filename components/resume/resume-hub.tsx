@@ -193,7 +193,7 @@ function ResumeHubContent() {
       <PageContainer width="wide" padding="default">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           {/* Tab Navigation */}
-          <div className="sticky top-20 z-40 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 border-b mb-6">
+          <div className="sticky top-20 z-40 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 border-b mb-6 shadow-sm">
             <div className="overflow-x-auto scrollbar-hide">
               <TabsList 
                 className="grid w-full grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 h-auto p-1 bg-muted/60 backdrop-blur-sm min-w-max"

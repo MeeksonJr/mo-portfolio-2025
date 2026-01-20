@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
@@ -23,6 +23,29 @@ interface EnhancedPageLayoutProps {
   containerPadding?: 'default' | 'tight' | 'wide'
 }
 
+// Breadcrumb component that only shows when navbar is at top (not scrolled)
+function BreadcrumbNavigationWithScroll() {
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+    
+    // Check initial scroll position
+    handleScroll()
+    
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Only show breadcrumbs when navbar is at top (not scrolled)
+  // When navbar follows user on scroll, breadcrumbs are hidden
+  if (isScrolled) return null
+
+  return <BreadcrumbNavigation />
+}
+
 export default function EnhancedPageLayout({
   children,
   title,
@@ -39,7 +62,8 @@ export default function EnhancedPageLayout({
       <ScrollProgressIndicator />
       <Navigation />
       
-      {showBreadcrumbs && <BreadcrumbNavigation />}
+      {/* Breadcrumbs appear under navbar - only show when navbar is at top (not scrolled) */}
+      {showBreadcrumbs && <BreadcrumbNavigationWithScroll />}
       
       <main 
         id="main-content" 

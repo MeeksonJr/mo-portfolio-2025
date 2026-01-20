@@ -24,7 +24,21 @@
 
 Welcome to my creative, terminal-inspired portfolio! This isn't just another developer portfolio - it's an **interactive experience** that tells the story of a 20-year-old developer who learned English from Dora the Explorer and built a career in AI-powered web development.
 
-**Live Demo:** [mohameddatt.com](https://mohameddatt.com) *(Coming Soon)*
+**Live Demo:** [mohameddatt.com](https://mohameddatt.com)
+
+## 🎨 Design System
+
+This portfolio uses a comprehensive design system with:
+
+- **Design Tokens**: Centralized constants for spacing, typography, colors, and more
+- **Layout Components**: Standardized containers and page structures  
+- **Utility Components**: Reusable UI components with built-in accessibility
+- **Performance Optimizations**: Memoized components for optimal rendering
+- **Accessibility**: ARIA attributes, keyboard navigation, and screen reader support
+
+📚 **See [`docs/DESIGN_SYSTEM_GUIDE.md`](docs/DESIGN_SYSTEM_GUIDE.md) for complete documentation**
+
+🏗️ **See [`DESIGN_SYSTEM_IMPLEMENTATION.md`](DESIGN_SYSTEM_IMPLEMENTATION.md) for implementation status**
 
 ## 🎮 **The Terminal Adventure Game**
 

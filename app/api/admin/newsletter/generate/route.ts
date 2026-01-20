@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     const groqApiKey = process.env.GROQ_API_KEY
     const GROQ_MODELS = [
       'llama-3.3-70b-versatile', // Production - best quality
-      'llama-3.1-70b-versatile', // Production - good quality
+      'llama-3.3-70b-versatile', // Production - good quality (updated from deprecated model)
       'llama-3.1-8b-instant', // Production - fastest
     ]
 

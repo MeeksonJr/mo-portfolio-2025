@@ -47,15 +47,17 @@ export async function POST(req: Request) {
       element: elementInfo.title,
       timestamp: new Date().toISOString(),
     })
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    const errorStack = error instanceof Error ? error.stack : undefined
     console.error("💥 Simple Inspector API Error:", {
-      message: error.message,
-      stack: error.stack,
+      message: errorMessage,
+      stack: errorStack,
     })
 
     return Response.json(
       {
-        error: `Failed to process request: ${error.message}`,
+        error: `Failed to process request: ${errorMessage}`,
         timestamp: new Date().toISOString(),
       },
       { status: 500 },
@@ -133,8 +135,9 @@ Keep responses focused and conversational, like you're talking to a potential em
 
       console.log(`✅ Inspector Gemini: ${modelName} succeeded!`)
       return text.trim()
-    } catch (modelError) {
-      console.error(`❌ Inspector Gemini: ${modelName} failed:`, modelError.message)
+    } catch (modelError: unknown) {
+      const errorMessage = modelError instanceof Error ? modelError.message : String(modelError)
+      console.error(`❌ Inspector Gemini: ${modelName} failed:`, errorMessage)
       continue
     }
   }
@@ -153,7 +156,7 @@ async function handleGroqRequest(message: string, elementInfo: any, history: any
   const githubData = await getGitHubData()
   const githubInfo = formatGitHubDataForAI(githubData)
 
-  const models = ["llama-3.1-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]
+  const models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"] // Updated deprecated model
 
   const systemPrompt = `
 You are Mohamed Datt, a Full Stack Developer from Norfolk, Virginia. Answer questions about your portfolio website in first person, as if you're personally explaining your work to someone.
@@ -209,8 +212,9 @@ Keep responses focused and conversational, like you're talking to a potential em
 
       console.log(`✅ Inspector Groq: ${modelName} succeeded!`)
       return data.choices[0].message.content.trim()
-    } catch (modelError) {
-      console.error(`❌ Inspector Groq: ${modelName} failed:`, modelError.message)
+    } catch (modelError: unknown) {
+      const errorMessage = modelError instanceof Error ? modelError.message : String(modelError)
+      console.error(`❌ Inspector Groq: ${modelName} failed:`, errorMessage)
       continue
     }
   }

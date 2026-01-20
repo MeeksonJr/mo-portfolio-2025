@@ -30,7 +30,7 @@ export default function FloatingActionMenu() {
   return (
     <>
       {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-6 z-50 sm:bottom-6 md:bottom-8">
         <AnimatePresence>
           {isOpen && (
             <>
@@ -134,7 +134,10 @@ export default function FloatingActionMenu() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-            onClick={closeFeature}
+            onClick={(e) => {
+              // Don't stop music when closing menu - just close the modal
+              closeFeature()
+            }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -151,7 +154,7 @@ export default function FloatingActionMenu() {
                 <button
                   onClick={closeFeature}
                   className="text-muted-foreground hover:text-foreground"
-                  aria-label="Close"
+                  aria-label="Close (music will continue playing)"
                 >
                   <X size={20} />
                 </button>
@@ -166,30 +169,34 @@ export default function FloatingActionMenu() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-            onClick={closeFeature}
+            className="fixed top-20 right-6 z-40 sm:top-24 md:top-28"
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0, y: -20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: -20 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+              className="glass rounded-2xl p-6 w-[90vw] max-w-md max-h-[70vh] overflow-hidden flex flex-col shadow-2xl"
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 flex-shrink-0">
                 <h2 className="text-xl font-bold flex items-center gap-2">
                   <MessageCircle className="text-blue-500" size={24} />
                   AI Chatbot
                 </h2>
                 <button
-                  onClick={closeFeature}
+                  onClick={() => {
+                    // Don't clear chat when closing - just close the modal
+                    closeFeature()
+                  }}
                   className="text-muted-foreground hover:text-foreground"
-                  aria-label="Close"
+                  aria-label="Close (chat history will be saved)"
                 >
                   <X size={20} />
                 </button>
               </div>
-              <AIChatbotContent />
+              <div className="flex-1 overflow-y-auto">
+                <AIChatbotContent />
+              </div>
             </motion.div>
           </motion.div>
         )}

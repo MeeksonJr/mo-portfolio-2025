@@ -16,7 +16,7 @@ interface AIResponse {
 }
 
 const GROQ_MODELS = [
-  'llama-3.1-70b-versatile', // Primary - best quality
+  'llama-3.3-70b-versatile', // Primary - best quality (replaced deprecated llama-3.1-70b-versatile)
   'llama-3.1-8b-instant', // Fast fallback
   'mixtral-8x7b-32768', // Alternative
 ]

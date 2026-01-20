@@ -4,7 +4,7 @@ import { groq } from "@ai-sdk/groq"
 
 // Groq model fallback chain
 const GROQ_MODELS = [
-  "llama-3.1-70b-versatile",
+  "llama-3.3-70b-versatile", // Updated from deprecated llama-3.1-70b-versatile
   "llama-3.1-8b-instant",
   "mixtral-8x7b-32768",
   "gemma2-9b-it",
@@ -22,17 +22,18 @@ async function tryGroqModels(messages: any[], systemPrompt: string) {
         model: groq(modelName),
         system: systemPrompt,
         messages,
-        maxTokens: 400,
+        maxOutputTokens: 400,
       })
 
       console.log(`✅ Inspector: Groq model ${modelName} succeeded!`)
       return result
-    } catch (error) {
-      console.error(`❌ Inspector: Groq model ${modelName} failed:`, error.message)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      console.error(`❌ Inspector: Groq model ${modelName} failed:`, errorMessage)
 
       if (i === GROQ_MODELS.length - 1) {
         console.error("💥 Inspector: All Groq models failed!")
-        throw new Error(`All Groq models failed. Last error: ${error.message}`)
+        throw new Error(`All Groq models failed. Last error: ${errorMessage}`)
       }
     }
   }
@@ -43,8 +44,9 @@ export const maxDuration = 30
 export async function POST(req: Request) {
   console.log("🔍 Inspector Chat API: Request received")
 
+  let body: any = {}
   try {
-    const body = await req.json()
+    body = await req.json()
     console.log("📝 Inspector Chat API: Request body parsed:", {
       messagesCount: body.messages?.length,
       model: body.model,
@@ -112,11 +114,12 @@ Keep responses focused on the selected element while connecting to Mohamed's ove
               model: google("gemini-2.0-flash"),
               system: systemPrompt,
               messages,
-              maxTokens: 400,
+              maxOutputTokens: 400,
             })
             console.log("✅ Inspector: Gemini 2.0 Flash succeeded!")
-          } catch (gemini2Error) {
-            console.error("❌ Inspector: Gemini 2.0 Flash failed:", gemini2Error.message)
+          } catch (gemini2Error: unknown) {
+            const gemini2ErrorMsg = gemini2Error instanceof Error ? gemini2Error.message : String(gemini2Error)
+            console.error("❌ Inspector: Gemini 2.0 Flash failed:", gemini2ErrorMsg)
             console.log("🔄 Inspector: Falling back to Gemini 1.5 Flash...")
 
             try {
@@ -124,41 +127,55 @@ Keep responses focused on the selected element while connecting to Mohamed's ove
                 model: google("gemini-1.5-flash"),
                 system: systemPrompt,
                 messages,
-                maxTokens: 400,
+                maxOutputTokens: 400,
               })
               console.log("✅ Inspector: Gemini 1.5 Flash succeeded!")
-            } catch (gemini15Error) {
-              console.error("❌ Inspector: Gemini 1.5 Flash failed:", gemini15Error.message)
-              throw new Error(`Both Gemini models failed. 2.0: ${gemini2Error.message}, 1.5: ${gemini15Error.message}`)
+            } catch (gemini15Error: unknown) {
+              const gemini15ErrorMsg = gemini15Error instanceof Error ? gemini15Error.message : String(gemini15Error)
+              console.error("❌ Inspector: Gemini 1.5 Flash failed:", gemini15ErrorMsg)
+              throw new Error(`Both Gemini models failed. 2.0: ${gemini2ErrorMsg}, 1.5: ${gemini15ErrorMsg}`)
             }
           }
       }
 
+      if (!result) {
+        throw new Error("No result from model")
+      }
+
       console.log("📤 Inspector Chat API: Returning streaming response")
-      const response = result.toDataStreamResponse()
+      const response = result.toTextStreamResponse()
       console.log("🎯 Inspector Chat API: Response created successfully")
       return response
-    } catch (modelError) {
+    } catch (modelError: unknown) {
+      const errorMessage = modelError instanceof Error ? modelError.message : String(modelError)
+      const errorStack = modelError instanceof Error ? modelError.stack : undefined
       console.error("🔥 Inspector Chat API: Model-specific error:", {
         model,
-        error: modelError.message,
-        stack: modelError.stack,
+        error: errorMessage,
+        stack: errorStack,
       })
       throw modelError
     }
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    const errorStack = error instanceof Error ? error.stack : undefined
+    const errorName = error instanceof Error ? error.name : 'Unknown'
+    
+    // Use body already parsed above, or default
+    const modelName = body?.model || "unknown"
+
     console.error("💥 Inspector Chat API Error:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
+      message: errorMessage,
+      stack: errorStack,
+      name: errorName,
     })
 
     return new Response(
       JSON.stringify({
         error: "Failed to process inspector chat request",
-        details: error.message,
+        details: errorMessage,
         timestamp: new Date().toISOString(),
-        model: req.body?.model || "unknown",
+        model: modelName,
       }),
       {
         status: 500,

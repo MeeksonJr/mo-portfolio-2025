@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import AppLoadingScreen from '@/components/loading/app-loading-screen'
 import PageTransition from '@/components/loading/page-transition'
-import BreadcrumbNavigation from '@/components/navigation/breadcrumb-navigation'
 
 interface ClientLayoutWrapperProps {
   children: React.ReactNode
@@ -38,7 +37,6 @@ export default function ClientLayoutWrapper({ children }: ClientLayoutWrapperPro
       )}
       {!isInitialLoad && (
         <PageTransition>
-          <BreadcrumbNavigation />
           {children}
         </PageTransition>
       )}

@@ -1,6 +1,35 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getAuthenticatedUser, isAdminUser } from '@/lib/supabase/api-helpers'
 import { createAdminClient } from '@/lib/supabase/server'
+
+// GET - Fetch all projects (public, no auth required for live demos)
+export async function GET(request: NextRequest) {
+  try {
+    const adminClient = createAdminClient()
+
+    // Fetch all published projects
+    const { data, error } = await adminClient
+      .from('projects')
+      .select('*')
+      .eq('status', 'published')
+      .order('display_order', { ascending: true })
+      .order('created_at', { ascending: false })
+      .limit(100)
+
+    if (error) {
+      console.error('Error fetching projects:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true, data: data || [] }, { status: 200 })
+  } catch (error: any) {
+    console.error('Error in GET /api/admin/content/projects:', error)
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -18,7 +47,7 @@ export async function POST(request: Request) {
 
     const adminClient = createAdminClient()
     const body = await request.json()
-    const {
+    let {
       name,
       description,
       tech_stack,

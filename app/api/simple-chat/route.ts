@@ -211,7 +211,7 @@ async function handleGroqRequest(message: string, history: any[]): Promise<strin
   const githubData = await getGitHubData()
   const githubInfo = formatGitHubDataForAI(githubData)
 
-  const models = ["llama-3.1-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]
+  const models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"] // Updated deprecated model
 
   const systemPrompt = MOHAMED_PROFILE_DATA + "\n\n" + githubInfo
 

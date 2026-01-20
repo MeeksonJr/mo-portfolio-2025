@@ -106,6 +106,37 @@ export default function UnifiedChatbot({
   const recognitionRef = useRef<any>(null)
   const synthesisRef = useRef<HTMLAudioElement | SpeechSynthesisUtterance | null>(null)
 
+  // Chat persistence key - unique per API endpoint
+  const chatStorageKey = `chatbot_messages_${apiEndpoint}`
+
+  // Load messages from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !useAISDK) {
+      try {
+        const saved = localStorage.getItem(chatStorageKey)
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCustomMessages(parsed)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load chat from localStorage:', error)
+      }
+    }
+  }, [chatStorageKey, useAISDK])
+
+  // Save messages to localStorage whenever they change (only for custom messages)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !useAISDK && customMessages.length > 0) {
+      try {
+        localStorage.setItem(chatStorageKey, JSON.stringify(customMessages))
+      } catch (error) {
+        console.error('Failed to save chat to localStorage:', error)
+      }
+    }
+  }, [customMessages, chatStorageKey, useAISDK])
+
   // AI SDK hook (for streaming) - only used when useAISDK is true
   // Using type assertion to handle API property compatibility
   const aiSDKChatConfig = useAISDK
