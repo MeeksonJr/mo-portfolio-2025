@@ -19,6 +19,7 @@ import { ErrorBoundary } from "@/components/error-boundary"
 import { ErrorHandler } from "@/components/error-handler"
 import FloatingActionMenu from "@/components/floating-action-menu"
 import VisitorProfileProvider from "@/components/personalization/visitor-profile-provider"
+import { PersonaOnboarding } from "@/components/personalization/persona-onboarding"
 import SkipToContent from "@/components/accessibility/skip-to-content"
 import CustomCursor from "@/components/ui/custom-cursor"
 import { TranslationProvider } from "@/components/i18n/translation-provider"
@@ -123,6 +124,7 @@ export default function RootLayout({
             <TranslationProvider>
               <MusicProvider>
                 <VisitorProfileProvider>
+                  <PersonaOnboarding />
                   <ErrorHandler />
                   <ErrorBoundary>
                     <KeyboardShortcutsHandler />
