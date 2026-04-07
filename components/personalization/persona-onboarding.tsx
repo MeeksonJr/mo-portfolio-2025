@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Briefcase, Code, User, ChevronRight, Sparkles } from "lucide-react"
-import { useVisitorProfile } from "@/components/personalization/visitor-profile-provider"
+import { usePersonalization } from "@/components/personalization/visitor-profile-provider"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -20,7 +20,7 @@ export function PersonaOnboarding() {
   const [open, setOpen] = useState(false)
   const [isClient, setIsClient] = useState(false)
   const router = useRouter()
-  const { profile, updateProfile } = useVisitorProfile()
+  const { profile, updateProfile } = usePersonalization()
 
   useEffect(() => {
     setIsClient(true)
@@ -40,7 +40,7 @@ export function PersonaOnboarding() {
     localStorage.setItem("hasVisitedBefore", "true")
     
     // Update the visitor profile context
-    updateProfile({ role: type })
+    updateProfile()
     
     setOpen(false)
 
