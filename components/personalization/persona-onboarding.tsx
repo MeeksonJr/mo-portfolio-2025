@@ -17,22 +17,12 @@ import {
 import { Card } from "@/components/ui/card"
 
 export function PersonaOnboarding() {
-  const [open, setOpen] = useState(false)
   const [isClient, setIsClient] = useState(false)
   const router = useRouter()
-  const { profile, updateProfile } = usePersonalization()
+  const { profile, updateProfile, showPersonaModal, setShowPersonaModal } = usePersonalization()
 
   useEffect(() => {
     setIsClient(true)
-    // Check if the user has already selected a persona or visited before
-    const hasVisited = localStorage.getItem("hasVisitedBefore")
-    const hasPersona = localStorage.getItem("userPersona")
-    
-    if (!hasVisited && !hasPersona) {
-      // Small delay for dramatic effect on first load
-      const timer = setTimeout(() => setOpen(true), 1500)
-      return () => clearTimeout(timer)
-    }
   }, [])
 
   const handleSelectPersona = (type: "recruiter" | "client" | "developer" | "general") => {
@@ -42,7 +32,7 @@ export function PersonaOnboarding() {
     // Update the visitor profile context
     updateProfile()
     
-    setOpen(false)
+    setShowPersonaModal(false)
 
     // Route based on persona for a tailored experience
     switch (type) {
@@ -64,7 +54,7 @@ export function PersonaOnboarding() {
   if (!isClient) return null
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={showPersonaModal} onOpenChange={setShowPersonaModal}>
       <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="p-8 md:p-10 space-y-8">
           <div className="space-y-3 text-center">

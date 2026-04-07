@@ -13,6 +13,8 @@ import {
 interface PersonalizationContextType {
   profile: VisitorProfile
   updateProfile: () => void
+  showPersonaModal: boolean
+  setShowPersonaModal: (show: boolean) => void
 }
 
 const PersonalizationContext = createContext<PersonalizationContextType | undefined>(undefined)
@@ -30,6 +32,7 @@ interface VisitorProfileProviderProps {
 }
 
 export default function VisitorProfileProvider({ children }: VisitorProfileProviderProps) {
+  const [showPersonaModal, setShowPersonaModal] = useState(false)
   const [profile, setProfile] = useState<VisitorProfile>(() => {
     if (typeof window !== 'undefined') {
       return getVisitorProfile()
@@ -73,7 +76,7 @@ export default function VisitorProfileProvider({ children }: VisitorProfileProvi
   }
 
   return (
-    <PersonalizationContext.Provider value={{ profile, updateProfile }}>
+    <PersonalizationContext.Provider value={{ profile, updateProfile, showPersonaModal, setShowPersonaModal }}>
       {children}
     </PersonalizationContext.Provider>
   )

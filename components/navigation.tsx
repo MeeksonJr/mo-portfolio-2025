@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Menu, X, Download, ChevronDown } from "lucide-react"
+import { Menu, X, Download, ChevronDown, UserCircle } from "lucide-react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { UserPreferencesDialog } from "@/components/preferences/user-preferences-dialog"
 import LanguageSwitcher from "@/components/i18n/language-switcher"
 import NotificationCenter from "@/components/notifications/notification-center"
+import { usePersonalization } from "@/components/personalization/visitor-profile-provider"
 import AvailabilityBadge from "@/components/availability-badge"
 import {
   DropdownMenu,
@@ -23,6 +24,7 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
+  const { setShowPersonaModal } = usePersonalization()
   const isHomePage = pathname === '/'
 
   useEffect(() => {
@@ -183,6 +185,15 @@ export default function Navigation() {
               <LanguageSwitcher />
               <UserPreferencesDialog />
             </div>
+            
+            <button
+              onClick={() => setShowPersonaModal(true)}
+              className="p-2 rounded-md hover:bg-muted transition-colors focus:outline-none"
+              title="Change Persona Perspective"
+              aria-label="Change Persona"
+            >
+              <UserCircle className="w-5 h-5 text-foreground/70 hover:text-primary transition-colors" />
+            </button>
             <ThemeToggle />
             <a
               href="/resume"
@@ -319,6 +330,16 @@ export default function Navigation() {
                   <span className="text-sm font-medium text-foreground/70">Theme</span>
                   <ThemeToggle />
                 </div>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setShowPersonaModal(true);
+                  }}
+                  className="flex items-center justify-between py-2 w-full text-left"
+                >
+                  <span className="text-sm font-medium text-foreground/70">Change Persona</span>
+                  <UserCircle size={16} className="text-foreground/70" />
+                </button>
                 <Link
                   href="/resume"
                   className="flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-primary transition-colors py-2"

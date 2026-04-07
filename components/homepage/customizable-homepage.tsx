@@ -1,18 +1,33 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import FramedHomepageLayout from '@/components/homepage/framed-homepage-layout'
+import { usePersonalization } from '@/components/personalization/visitor-profile-provider'
+import DeveloperHomepage from '@/components/homepage/persona-homepages/developer-homepage'
+import RecruiterHomepage from '@/components/homepage/persona-homepages/recruiter-homepage'
+import ClientHomepage from '@/components/homepage/persona-homepages/client-homepage'
+import GeneralHomepage from '@/components/homepage/persona-homepages/general-homepage'
 
 export default function CustomizableHomepage() {
   const [mounted, setMounted] = useState(false)
+  const { profile } = usePersonalization()
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Use new framed layout for clean, flowing design
   if (mounted) {
-    return <FramedHomepageLayout />
+    switch (profile.type) {
+      case 'developer':
+        return <DeveloperHomepage />
+      case 'recruiter':
+        return <RecruiterHomepage />
+      case 'client':
+        return <ClientHomepage />
+      case 'student':
+      case 'general':
+      default:
+        return <GeneralHomepage />
+    }
   }
 
   // Show skeleton during mount
