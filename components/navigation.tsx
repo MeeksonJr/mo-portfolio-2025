@@ -188,11 +188,12 @@ export default function Navigation() {
             
             <button
               onClick={() => setShowPersonaModal(true)}
-              className="p-2 rounded-md hover:bg-muted transition-colors focus:outline-none"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary transition-all focus:outline-none shadow-sm"
               title="Change Persona Perspective"
               aria-label="Change Persona"
             >
-              <UserCircle className="w-5 h-5 text-foreground/70 hover:text-primary transition-colors" />
+              <UserCircle className="w-4 h-4" />
+              <span className="text-xs font-bold leading-none hidden xl:inline-block">Switch Persona</span>
             </button>
             <ThemeToggle />
             <a
