@@ -12,6 +12,9 @@ node_modules
 /out/
 
 /public/transcript-2026.pdf
+transcript_dump.txt
+transcript_extracted.txt
+transcript_strings.txt
 
 # production
 /build
