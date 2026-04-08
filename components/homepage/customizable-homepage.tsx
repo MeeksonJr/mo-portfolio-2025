@@ -6,6 +6,7 @@ import DeveloperHomepage from '@/components/homepage/persona-homepages/developer
 import RecruiterHomepage from '@/components/homepage/persona-homepages/recruiter-homepage'
 import ClientHomepage from '@/components/homepage/persona-homepages/client-homepage'
 import GeneralHomepage from '@/components/homepage/persona-homepages/general-homepage'
+import StudentHomepage from '@/components/homepage/persona-homepages/student-homepage'
 
 export default function CustomizableHomepage() {
   const [mounted, setMounted] = useState(false)
@@ -24,6 +25,7 @@ export default function CustomizableHomepage() {
       case 'client':
         return <ClientHomepage />
       case 'student':
+        return <StudentHomepage />
       case 'general':
       default:
         return <GeneralHomepage />

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Briefcase, Code, User, ChevronRight, Sparkles, Globe } from "lucide-react"
+import { Briefcase, Code, User, ChevronRight, Sparkles, Globe, GraduationCap } from "lucide-react"
 import { usePersonalization } from "@/components/personalization/visitor-profile-provider"
 
 export function PersonaOnboarding() {
@@ -28,7 +28,7 @@ export function PersonaOnboarding() {
     }
   }, [showPersonaModal])
 
-  const handleSelectPersona = (type: "recruiter" | "client" | "developer" | "general") => {
+  const handleSelectPersona = (type: "recruiter" | "client" | "developer" | "student" | "general") => {
     localStorage.setItem("userPersona", type)
     localStorage.setItem("hasVisitedBefore", "true")
     
@@ -51,25 +51,25 @@ export function PersonaOnboarding() {
     <AnimatePresence>
       {showPersonaModal && (
         <motion.div 
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/95 backdrop-blur-3xl overflow-y-auto"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background overflow-y-auto"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
-          {/* Subtle Background Elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] mix-blend-screen" />
-            <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px] mix-blend-screen" />
+          {/* Subtle Background Elements that aren't transparent but add texture */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-50">
+            <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[100px]" />
           </div>
 
-          <div className="relative w-full max-w-4xl p-6 md:p-12 mb-12 mt-12 flex flex-col items-center">
+          <div className="relative w-full max-w-5xl p-6 md:p-12 mb-12 mt-12 flex flex-col items-center">
             
             <motion.div 
               initial={{ scale: 0 }} 
               animate={{ scale: 1 }} 
               transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}
-              className="w-20 h-20 bg-background border border-primary/20 shadow-2xl shadow-primary/20 rounded-3xl flex items-center justify-center mb-8"
+              className="w-20 h-20 bg-card border border-primary/20 shadow-2xl shadow-primary/20 rounded-3xl flex items-center justify-center mb-8"
             >
               <Sparkles className="w-10 h-10 text-primary" />
             </motion.div>
@@ -86,13 +86,13 @@ export function PersonaOnboarding() {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mx-auto">
               <PersonaCard 
                 icon={Briefcase} 
                 title="Recruiter / Hiring" 
                 description="Immediately highlights my resume, quick stats, and candidate summary."
                 onClick={() => handleSelectPersona("recruiter")}
-                color="border-blue-500/30 hover:border-blue-500"
+                color="border-blue-500/40 hover:border-blue-500"
                 delay={0.3}
               />
               <PersonaCard 
@@ -100,7 +100,7 @@ export function PersonaOnboarding() {
                 title="Client / Founder" 
                 description="Showcases freelancing services, pricing, and case studies."
                 onClick={() => handleSelectPersona("client")}
-                color="border-purple-500/30 hover:border-purple-500"
+                color="border-purple-500/40 hover:border-purple-500"
                 delay={0.4}
               />
               <PersonaCard 
@@ -108,15 +108,23 @@ export function PersonaOnboarding() {
                 title="Software Engineer" 
                 description="Dives deep into architecture teardowns and technical metrics."
                 onClick={() => handleSelectPersona("developer")}
-                color="border-green-500/30 hover:border-green-500"
+                color="border-green-500/40 hover:border-green-500"
                 delay={0.5}
+              />
+              <PersonaCard 
+                icon={GraduationCap} 
+                title="Student / Peer" 
+                description="Focuses on learning resources, blog posts, and educational journeys."
+                onClick={() => handleSelectPersona("student")}
+                color="border-amber-500/40 hover:border-amber-500"
+                delay={0.6}
               />
             </div>
             
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
+              transition={{ delay: 0.8 }}
               className="mt-16 text-center"
             >
               <button 
@@ -144,17 +152,19 @@ function PersonaCard({ icon: Icon, title, description, onClick, color, delay }: 
       className="h-full"
     >
       <div 
-        className={`h-full p-8 rounded-3xl border bg-card/50 backdrop-blur-sm cursor-pointer transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center ${color} hover:bg-card hover:shadow-2xl hover:-translate-y-2`}
+        className={`h-full p-8 rounded-3xl border bg-card cursor-pointer transition-all duration-300 group relative overflow-hidden flex flex-row items-center text-left ${color} hover:bg-card/80 hover:shadow-2xl hover:-translate-y-1 gap-6`}
         onClick={onClick}
       >
-        <div className="w-16 h-16 rounded-full bg-background border flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-sm">
+        <div className="w-16 h-16 rounded-2xl bg-muted border flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500 shadow-sm">
           <Icon className="w-8 h-8 text-foreground group-hover:text-primary transition-colors" />
         </div>
         
-        <h3 className="text-xl font-bold text-foreground mb-3">{title}</h3>
-        <p className="text-sm text-muted-foreground leading-relaxed flex-grow">{description}</p>
+        <div className="flex-1">
+          <h3 className="text-xl font-bold text-foreground mb-2">{title}</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+        </div>
         
-        <div className="mt-8 overflow-hidden rounded-full p-2 bg-background border opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+        <div className="shrink-0 overflow-hidden rounded-full p-2 bg-background border opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-300">
           <ChevronRight className="w-5 h-5 text-primary" />
         </div>
       </div>
