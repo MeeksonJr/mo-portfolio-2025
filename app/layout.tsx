@@ -32,6 +32,7 @@ import AccessibilityAudit from "@/components/accessibility/accessibility-audit"
 import OrganizationSchema from "@/components/structured-data/organization-schema"
 import WebsiteSchema from "@/components/structured-data/website-schema"
 import ConversionTracker from "@/components/analytics/conversion-tracker"
+import { GoogleTranslateScript } from "@/components/i18n/google-translate-script"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -104,6 +105,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <OrganizationSchema />
         <WebsiteSchema />
+        <GoogleTranslateScript />
         <SkipToContent />
         <div
           id="screen-reader-announcements"

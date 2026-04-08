@@ -3,6 +3,45 @@ import { getAuthenticatedUser, isAdminUser } from '@/lib/supabase/api-helpers'
 import { createAdminClient } from '@/lib/supabase/server'
 import { createSlug, generateUniqueSlug } from '@/lib/slug-utils'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+export async function GET(request: Request) {
+  try {
+    const user = await getAuthenticatedUser(request)
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const isAdmin = await isAdminUser(user.id)
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const adminClient = createAdminClient()
+
+    const { data, error } = await adminClient
+      .from('case_studies')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100)
+
+    if (error) {
+      console.error('Error fetching case studies:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true, data: data || [] }, { status: 200 })
+  } catch (error: any) {
+    console.error('Error in GET /api/admin/content/case-studies:', error)
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const user = await getAuthenticatedUser(request)

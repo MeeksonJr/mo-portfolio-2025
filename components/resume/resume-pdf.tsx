@@ -189,24 +189,33 @@ export function ResumePDF({ data, format }: ResumePDFProps) {
           <Text style={styles.sectionTitle}>TECHNICAL SKILLS</Text>
           <View style={{ marginBottom: 5 }}>
             <Text style={styles.bulletItem}>
-              <Text style={{ fontWeight: 'bold' }}>Frontend:</Text> {skills.frontend.join(', ')}
+              <Text style={{ fontWeight: 'bold' }}>Frontend:</Text> {(skills.frontend || []).join(', ')}
             </Text>
           </View>
           <View style={{ marginBottom: 5 }}>
             <Text style={styles.bulletItem}>
-              <Text style={{ fontWeight: 'bold' }}>Backend:</Text> {skills.backend.join(', ')}
+              <Text style={{ fontWeight: 'bold' }}>Backend:</Text> {(skills.backend || []).join(', ')}
             </Text>
           </View>
-          <View style={{ marginBottom: 5 }}>
-            <Text style={styles.bulletItem}>
-              <Text style={{ fontWeight: 'bold' }}>AI Tools:</Text> {skills.ai.join(', ')}
-            </Text>
-          </View>
+          {skills.ai && skills.ai.length > 0 && (
+            <View style={{ marginBottom: 5 }}>
+              <Text style={styles.bulletItem}>
+                <Text style={{ fontWeight: 'bold' }}>AI Tools:</Text> {skills.ai.join(', ')}
+              </Text>
+            </View>
+          )}
           <View>
             <Text style={styles.bulletItem}>
-              <Text style={{ fontWeight: 'bold' }}>Tools:</Text> {skills.tools.join(', ')}
+              <Text style={{ fontWeight: 'bold' }}>Tools:</Text> {(skills.tools || []).join(', ')}
             </Text>
           </View>
+          {skills.other && skills.other.length > 0 && (
+            <View style={{ marginBottom: 5 }}>
+              <Text style={styles.bulletItem}>
+                <Text style={{ fontWeight: 'bold' }}>Other:</Text> {skills.other.join(', ')}
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Projects */}

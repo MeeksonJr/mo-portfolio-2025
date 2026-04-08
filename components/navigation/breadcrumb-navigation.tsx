@@ -67,7 +67,7 @@ export default function BreadcrumbNavigation() {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      className="w-full border-b border-border bg-background sticky top-16 z-40 shadow-sm"
     >
       <div className="max-w-6xl mx-auto px-4 py-3">
         <ol className="flex items-center gap-2 text-sm text-muted-foreground">
