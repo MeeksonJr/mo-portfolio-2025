@@ -25,6 +25,12 @@ const FIRST_VISIT_KEY = 'portfolio_first_visit'
 export function detectVisitorType(): VisitorType {
   if (typeof window === 'undefined') return 'general'
 
+  // If user explicitly selected a persona via the onboarding modal, prioritize it
+  const explicitPersona = localStorage.getItem('userPersona') as VisitorType | null
+  if (explicitPersona && ['recruiter', 'developer', 'client', 'student', 'general'].includes(explicitPersona)) {
+    return explicitPersona
+  }
+
   const viewedContent = JSON.parse(localStorage.getItem(VIEWED_CONTENT_KEY) || '[]')
   const searchQueries = JSON.parse(localStorage.getItem('portfolio_search_queries') || '[]')
   
