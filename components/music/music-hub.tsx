@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { 
-  Play, Pause, SkipForward, SkipBack, Search, Music2, Shuffle, Repeat, 
+  Play, Pause, SkipForward, SkipBack, Search, Music2, Shuffle, Repeat, Repeat1,
   Volume2, VolumeX, ListMusic, Download, Disc3, 
   PlayCircle, Upload, Menu, Heart
 } from 'lucide-react'
@@ -28,11 +28,23 @@ interface Song {
   cover_image_url: string | null
 }
 
+interface Playlist {
+  id: string
+  name: string
+  description: string | null
+  cover_image_url: string | null
+  song_count?: number
+}
+
 export default function MusicHub() {
   const router = useRouter()
   
   // Audio state
   const [songs, setSongs] = useState<Song[]>([])
+  const [activeTab, setActiveTab] = useState<'all' | 'playlists' | 'liked'>('all')
+  const [likedTrackIds, setLikedTrackIds] = useState<string[]>([])
+  const [playlists, setPlaylists] = useState<Playlist[]>([])
+  const [loadingPlaylists, setLoadingPlaylists] = useState(false)
   const [currentTrack, setCurrentTrack] = useState<number>(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -62,11 +74,52 @@ export default function MusicHub() {
         setLoading(false)
       }
     }
+    
+    const loadPlaylists = async () => {
+      try {
+        setLoadingPlaylists(true)
+        const response = await fetch('/api/playlists')
+        if (response.ok) {
+          const data = await response.json()
+          setPlaylists(data.playlists || [])
+        }
+      } catch (e) {
+        console.error('Error loading playlists', e)
+      } finally {
+        setLoadingPlaylists(false)
+      }
+    }
+    
+    const loadLikedTracks = () => {
+      const saved = localStorage.getItem('mo-portfolio-liked-tracks')
+      if (saved) {
+        try {
+          setLikedTrackIds(JSON.parse(saved))
+        } catch (e) {}
+      }
+    }
+
     loadSongs()
+    loadPlaylists()
+    loadLikedTracks()
   }, [])
 
-  // Filter songs based on search
-  const filteredSongs = songs.filter((song) =>
+  const toggleLike = (songId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setLikedTrackIds(prev => {
+      const newLiked = prev.includes(songId) ? prev.filter(id => id !== songId) : [...prev, songId]
+      localStorage.setItem('mo-portfolio-liked-tracks', JSON.stringify(newLiked))
+      return newLiked
+    })
+  }
+
+  // Filter songs based on search and active tab
+  let displaySongs = songs
+  if (activeTab === 'liked') {
+    displaySongs = songs.filter(song => likedTrackIds.includes(song.id))
+  }
+
+  const filteredSongs = displaySongs.filter((song) =>
     song.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     song.artist?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     song.album?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -193,14 +246,26 @@ export default function MusicHub() {
           
           <div className="space-y-4">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Library</div>
-            <Button variant="secondary" className="w-full justify-start font-medium">
+            <Button 
+              variant={activeTab === 'all' ? 'secondary' : 'ghost'} 
+              className={cn("w-full justify-start font-medium", activeTab !== 'all' && "hover:bg-white/5")}
+              onClick={() => setActiveTab('all')}
+            >
               <Music2 className="mr-3 h-4 w-4" /> All Songs
             </Button>
-            <Button variant="ghost" className="w-full justify-start font-medium hover:bg-white/5">
+            <Button 
+              variant={activeTab === 'playlists' ? 'secondary' : 'ghost'} 
+              className={cn("w-full justify-start font-medium", activeTab !== 'playlists' && "hover:bg-white/5")}
+              onClick={() => setActiveTab('playlists')}
+            >
               <ListMusic className="mr-3 h-4 w-4" /> Playlists
             </Button>
-            <Button variant="ghost" className="w-full justify-start font-medium hover:bg-white/5">
-              <Heart className="mr-3 h-4 w-4" /> Liked Tracks
+            <Button 
+              variant={activeTab === 'liked' ? 'secondary' : 'ghost'} 
+              className={cn("w-full justify-start font-medium", activeTab !== 'liked' && "hover:bg-white/5")}
+              onClick={() => setActiveTab('liked')}
+            >
+              <Heart className={cn("mr-3 h-4 w-4", activeTab === 'liked' && "fill-primary text-primary")} /> Liked Tracks
             </Button>
           </div>
 
@@ -234,16 +299,39 @@ export default function MusicHub() {
             </div>
           </header>
 
-          {/* Song List */}
+          {/* Main List */}
           <div className="p-6 pb-32 max-w-5xl mx-auto w-full">
             <div className="mb-8">
-              <h2 className="text-3xl font-bold tracking-tight mb-2">Tracks</h2>
+              <h2 className="text-3xl font-bold tracking-tight mb-2">
+                {activeTab === 'all' ? 'Tracks' : activeTab === 'liked' ? 'Liked Tracks' : 'Playlists'}
+              </h2>
               <p className="text-muted-foreground">Your curated audio experience.</p>
             </div>
 
             {loading ? (
               <div className="flex items-center justify-center p-12">
                 <Music2 className="h-8 w-8 animate-bounce text-muted-foreground" />
+              </div>
+            ) : activeTab === 'playlists' ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                {loadingPlaylists ? (
+                  <div className="col-span-full text-center p-12"><Disc3 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" /></div>
+                ) : playlists.length === 0 ? (
+                  <div className="col-span-full text-center p-12 bg-muted/20 rounded-2xl border border-white/5">
+                    <ListMusic className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium">No playlists</h3>
+                  </div>
+                ) : (
+                  playlists.map((playlist) => (
+                    <motion.div key={playlist.id} whileHover={{ y: -5 }} className="bg-muted/30 p-4 rounded-xl border border-white/5 cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                        {playlist.cover_image_url ? <img src={playlist.cover_image_url} alt={playlist.name} className="w-full h-full object-cover" /> : <ListMusic className="text-muted-foreground/50 w-10 h-10" />}
+                      </div>
+                      <h4 className="font-medium truncate">{playlist.name}</h4>
+                      <p className="text-sm text-muted-foreground">{playlist.song_count || 0} songs</p>
+                    </motion.div>
+                  ))
+                )}
               </div>
             ) : filteredSongs.length === 0 ? (
               <div className="text-center p-12 bg-muted/20 rounded-2xl border border-white/5">
@@ -311,6 +399,18 @@ export default function MusicHub() {
                         {song.album || 'Single'}
                       </div>
 
+                      {/* Like Button */}
+                      <div className="w-10 flex items-center justify-center">
+                        <Button
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 hover:bg-transparent"
+                          onClick={(e) => toggleLike(song.id, e)}
+                        >
+                          <Heart className={cn("h-4 w-4 transition-colors", likedTrackIds.includes(song.id) ? "fill-primary text-primary" : "text-muted-foreground hover:text-foreground")} />
+                        </Button>
+                      </div>
+
                       {/* Duration */}
                       <div className="text-sm text-muted-foreground w-12 text-right">
                         {song.duration ? formatTime(song.duration) : '--:--'}
@@ -367,8 +467,12 @@ export default function MusicHub() {
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={handleNext}>
                   <SkipForward className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" onClick={() => setRepeat(repeat === 'off' ? 'all' : repeat === 'all' ? 'one' : 'off')}>
-                  <Repeat className={cn("h-4 w-4", repeat !== 'off' && "text-primary")} />
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground relative" onClick={() => setRepeat(repeat === 'off' ? 'all' : repeat === 'all' ? 'one' : 'off')}>
+                  {repeat === 'one' ? (
+                    <Repeat1 className="h-5 w-5 text-primary" />
+                  ) : (
+                    <Repeat className={cn("h-4 w-4", repeat === 'all' && "text-primary")} />
+                  )}
                 </Button>
               </div>
 
