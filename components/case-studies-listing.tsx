@@ -11,6 +11,8 @@ import { trackClick } from '@/lib/analytics'
 import PageContainer from '@/components/layout/page-container'
 import { TYPOGRAPHY } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import EnhancedFilters from '@/components/filters/enhanced-filters'
+import OptimizedImage from '@/components/performance/image-optimizer'
 
 interface CaseStudy {
   id: string
@@ -30,16 +32,37 @@ interface CaseStudiesListingProps {
 
 export default function CaseStudiesListing({ caseStudies }: CaseStudiesListingProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedTechStack, setSelectedTechStack] = useState<string | null>(null)
+  const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({
+    tech: [],
+  })
 
-  // Extract all unique tech stacks
-  const allTechStacks = useMemo(() => {
-    const techSet = new Set<string>()
+  // Fetch unique tech stacks for the enhanced filter map
+  const techOptions = useMemo(() => {
+    const techMap = new Map<string, number>()
     caseStudies.forEach((cs) => {
-      cs.tech_stack?.forEach((tech) => techSet.add(tech))
+      cs.tech_stack?.forEach((tech) => {
+        techMap.set(tech, (techMap.get(tech) || 0) + 1)
+      })
     })
-    return Array.from(techSet).sort()
+    return Array.from(techMap.entries())
+      .map(([value, count]) => ({ value, label: value, count }))
+      .sort((a, b) => b.count - a.count)
   }, [caseStudies])
+
+  const handleFilterChange = (filterType: string, value: string) => {
+    setActiveFilters((prev) => {
+      const active = prev[filterType] || []
+      const updated = active.includes(value)
+        ? active.filter((v) => v !== value)
+        : [...active, value]
+      return { ...prev, [filterType]: updated }
+    })
+  }
+
+  const handleClearFilters = () => {
+    setActiveFilters({ tech: [] })
+    setSearchQuery('')
+  }
 
   // Filter case studies
   const filteredCaseStudies = useMemo(() => {
@@ -54,14 +77,16 @@ export default function CaseStudiesListing({ caseStudies }: CaseStudiesListingPr
       )
     }
 
-    if (selectedTechStack) {
+    if (activeFilters.tech.length > 0) {
       filtered = filtered.filter((cs) =>
-        cs.tech_stack?.some((tech) => tech === selectedTechStack)
+        activeFilters.tech.some((selectedTech) => 
+          cs.tech_stack?.includes(selectedTech)
+        )
       )
     }
 
     return filtered
-  }, [caseStudies, searchQuery, selectedTechStack])
+  }, [caseStudies, searchQuery, activeFilters])
 
   return (
     <PageContainer width="wide" padding="default">
@@ -75,49 +100,28 @@ export default function CaseStudiesListing({ caseStudies }: CaseStudiesListingPr
 
       {/* Search and Filters */}
       <div className="flex flex-col gap-4 mb-8">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Search case studies..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search case studies..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          
+          <EnhancedFilters 
+            filters={{
+              tags: techOptions
+            }}
+            activeFilters={{
+              tags: activeFilters.tech
+            }}
+            onFilterChange={(type, value) => handleFilterChange(type === 'tags' ? 'tech' : type, value)}
+            onClearFilters={handleClearFilters}
           />
         </div>
-
-        {/* Tech Stack Filter */}
-        {allTechStacks.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">Filter by Tech Stack:</p>
-              {selectedTechStack && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedTechStack(null)}
-                  className="h-7 text-xs"
-                >
-                  Clear filter
-                </Button>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {allTechStacks.map((tech) => (
-                <Button
-                  key={tech}
-                  variant={selectedTechStack === tech ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() =>
-                    setSelectedTechStack(selectedTechStack === tech ? null : tech)
-                  }
-                  className="h-8 text-xs"
-                >
-                  {tech}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Case Studies Grid */}
@@ -135,11 +139,12 @@ export default function CaseStudiesListing({ caseStudies }: CaseStudiesListingPr
               onClick={() => trackClick('case_study', caseStudy.id, { source: 'listing' })}
             >
               {caseStudy.featured_image && (
-                <div className="relative w-full h-48 overflow-hidden">
-                  <img
+                <div className="relative w-full h-48">
+                  <OptimizedImage
                     src={caseStudy.featured_image}
                     alt={caseStudy.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
               )}

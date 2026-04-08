@@ -18,6 +18,8 @@ import { isContentNew, formatRelativeTime } from '@/lib/content-freshness'
 import PageContainer from '@/components/layout/page-container'
 import { SECTION_SPACING, TYPOGRAPHY } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import EnhancedFilters from '@/components/filters/enhanced-filters'
+import OptimizedImage from '@/components/performance/image-optimizer'
 
 interface Project {
   id: string
@@ -46,7 +48,43 @@ const createSlug = (name: string): string => {
 
 export default function ProjectsListing({ projects }: ProjectsListingProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [filterFeatured, setFilterFeatured] = useState<string>('all')
+  const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({
+    tech: [],
+    status: [],
+  })
+
+  // Fetch unique tech stacks for the enhanced filter map
+  const techOptions = useMemo(() => {
+    const techMap = new Map<string, number>()
+    projects.forEach((p) => {
+      p.tech_stack?.forEach((tech) => {
+        techMap.set(tech, (techMap.get(tech) || 0) + 1)
+      })
+    })
+    return Array.from(techMap.entries())
+      .map(([value, count]) => ({ value, label: value, count }))
+      .sort((a, b) => b.count - a.count)
+  }, [projects])
+
+  const statusOptions = [
+    { value: 'featured', label: 'Featured' },
+    { value: 'not-featured', label: 'Standard Projects' }
+  ]
+
+  const handleFilterChange = (filterType: string, value: string) => {
+    setActiveFilters((prev) => {
+      const active = prev[filterType] || []
+      const updated = active.includes(value)
+        ? active.filter((v) => v !== value)
+        : [...active, value]
+      return { ...prev, [filterType]: updated }
+    })
+  }
+
+  const handleClearFilters = () => {
+    setActiveFilters({ tech: [], status: [] })
+    setSearchQuery('')
+  }
 
   // Track achievement when projects page is viewed
   useEffect(() => {
@@ -74,14 +112,22 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
       )
     }
 
-    if (filterFeatured === 'featured') {
-      filtered = filtered.filter((p) => p.is_featured)
-    } else if (filterFeatured === 'not-featured') {
-      filtered = filtered.filter((p) => !p.is_featured)
+    if (activeFilters.tech.length > 0) {
+      filtered = filtered.filter((p) =>
+        activeFilters.tech.some((selectedTech) => p.tech_stack?.includes(selectedTech))
+      )
+    }
+
+    if (activeFilters.status.length > 0 && activeFilters.status.length < 2) {
+      if (activeFilters.status.includes('featured')) {
+        filtered = filtered.filter((p) => p.is_featured)
+      } else if (activeFilters.status.includes('not-featured')) {
+        filtered = filtered.filter((p) => !p.is_featured)
+      }
     }
 
     return filtered
-  }, [projects, searchQuery, filterFeatured])
+  }, [projects, searchQuery, activeFilters])
 
   // Separate featured and regular projects
   const featuredProjects = filteredProjects.filter((p) => p.is_featured)
@@ -106,26 +152,30 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
           </div>
 
       {/* Filters */}
-      <div className={cn("flex flex-col sm:flex-row gap-4", SECTION_SPACING.mb8)}>
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Search projects..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+      <div className={cn("flex flex-col gap-4", SECTION_SPACING.mb8)}>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search projects..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <EnhancedFilters 
+            filters={{
+              tags: techOptions,
+              status: statusOptions
+            }}
+            activeFilters={{
+              tags: activeFilters.tech,
+              status: activeFilters.status
+            }}
+            onFilterChange={(type, value) => handleFilterChange(type === 'tags' ? 'tech' : type, value)}
+            onClearFilters={handleClearFilters}
           />
         </div>
-        <Select value={filterFeatured} onValueChange={setFilterFeatured}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="All Projects" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Projects</SelectItem>
-            <SelectItem value="featured">Featured Only</SelectItem>
-            <SelectItem value="not-featured">Not Featured</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {/* Featured Projects Section */}
@@ -146,11 +196,12 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
                   onClick={() => trackClick('project', project.id, { source: 'featured-grid' })}
                 >
                   {project.featured_image && (
-                    <div className="relative w-full h-48 overflow-hidden">
-                      <img
+                    <div className="relative w-full h-48">
+                      <OptimizedImage
                         src={project.featured_image}
                         alt={project.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       <div className="absolute top-2 right-2">
                         <Badge className="bg-primary text-primary-foreground">
@@ -224,11 +275,12 @@ export default function ProjectsListing({ projects }: ProjectsListingProps) {
                   onClick={() => trackClick('project', project.id, { source: 'all-projects' })}
                 >
                   {project.featured_image && (
-                    <div className="relative w-full h-48 overflow-hidden">
-                      <img
+                    <div className="relative w-full h-48">
+                      <OptimizedImage
                         src={project.featured_image}
                         alt={project.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
                   )}

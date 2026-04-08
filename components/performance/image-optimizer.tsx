@@ -9,6 +9,7 @@ interface OptimizedImageProps {
   alt: string
   width?: number
   height?: number
+  fill?: boolean
   className?: string
   priority?: boolean
   quality?: number
@@ -21,6 +22,7 @@ export default function OptimizedImage({
   alt,
   width,
   height,
+  fill = false,
   className = '',
   priority = false,
   quality = 85,
@@ -38,7 +40,7 @@ export default function OptimizedImage({
     return (
       <div 
         className={`bg-muted flex items-center justify-center ${className}`}
-        style={{ width, height }}
+        style={!fill ? { width, height } : { position: 'absolute', inset: 0 }}
       >
         <span className="text-muted-foreground text-sm">Image not available</span>
       </div>
@@ -49,7 +51,7 @@ export default function OptimizedImage({
     <div className={`relative overflow-hidden ${className}`}>
       {isLoading && (
         <motion.div
-          className="absolute inset-0 bg-muted animate-pulse"
+          className="absolute inset-0 z-10 bg-muted animate-pulse"
           initial={{ opacity: 1 }}
           animate={{ opacity: isLoading ? 1 : 0 }}
           transition={{ duration: 0.3 }}
@@ -58,8 +60,9 @@ export default function OptimizedImage({
       <Image
         src={src}
         alt={alt}
-        width={width}
-        height={height}
+        width={!fill ? width : undefined}
+        height={!fill ? height : undefined}
+        fill={fill}
         priority={priority}
         quality={quality}
         placeholder={placeholder}
