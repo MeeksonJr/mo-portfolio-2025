@@ -11,6 +11,8 @@ node_modules
 /.next/
 /out/
 
+/public/transcript-2026.pdf
+
 # production
 /build
 
