@@ -1,17 +1,24 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  ExternalLink, Github, Monitor, Maximize2, Minimize2, X, 
-  Play, Code, Zap, TrendingUp, Users, Award, ArrowRight, Video, Image as ImageIcon
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import {
+  ExternalLink,
+  Github,
+  Monitor,
+  Play,
+  Code,
+  Zap,
+  TrendingUp,
+  Users,
+  Award,
+  ArrowUpRight,
+  Globe,
+  Star,
 } from 'lucide-react'
-import { BeforeAfterSlider } from './before-after-slider'
-import { VideoWalkthrough } from './video-walkthrough'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Navigation from '@/components/navigation'
 import FooterLight from '@/components/footer-light'
 import Link from 'next/link'
@@ -31,141 +38,96 @@ interface Project {
   is_featured: boolean
   views: number
   slug: string
-  before_image?: string | null
-  after_image?: string | null
-  video_walkthrough?: string | null
+}
+
+const FALLBACK_PROJECTS: Project[] = [
+  {
+    id: 'edusphere-ai',
+    name: 'EduSphere AI',
+    description:
+      'AI-powered student productivity suite with assignment assistant, blog generator, and smart scheduling.',
+    tech_stack: ['Next.js', 'Supabase', 'Gemini AI', 'TailwindCSS', 'PayPal'],
+    featured_image: null,
+    homepage_url: 'https://edusphere-ai.vercel.app',
+    github_url: 'https://github.com/MeeksonJr/edusphere-ai',
+    is_featured: true,
+    views: 0,
+    slug: 'edusphere-ai',
+  },
+  {
+    id: 'interview-prep-ai',
+    name: 'InterviewPrep AI',
+    description:
+      'AI-powered mock interview platform with voice and text interviews, real-time feedback, and progress tracking.',
+    tech_stack: ['Next.js', 'PostgreSQL', 'Gemini AI', 'Firebase', 'Vapi Voice'],
+    featured_image: null,
+    homepage_url: 'https://www.humanoraconsulting.com/',
+    github_url: 'https://github.com/MeeksonJr/interview-prep',
+    is_featured: true,
+    views: 0,
+    slug: 'interview-prep-ai',
+  },
+  {
+    id: 'ai-content-generator',
+    name: 'AI Content Generator',
+    description:
+      'Full SaaS platform for generating blog posts, emails, and social content with analytics dashboard.',
+    tech_stack: ['Next.js 14', 'Supabase', 'Gemini AI', 'Hugging Face', 'Recharts'],
+    featured_image: null,
+    homepage_url: 'https://ai-content-generator-mu-seven.vercel.app/',
+    github_url: 'https://github.com/MeeksonJr/content-generator',
+    is_featured: true,
+    views: 0,
+    slug: 'ai-content-generator',
+  },
+]
+
+const TECH_COLORS: Record<string, string> = {
+  'Next.js': 'bg-gray-900 text-white',
+  'React': 'bg-blue-600 text-white',
+  'TypeScript': 'bg-blue-500 text-white',
+  'Supabase': 'bg-green-600 text-white',
+  'TailwindCSS': 'bg-teal-500 text-white',
+  'Firebase': 'bg-orange-500 text-white',
+  'PostgreSQL': 'bg-blue-700 text-white',
 }
 
 export default function LiveProjectShowcase() {
   const [projects, setProjects] = useState<Project[]>([])
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
-  const [isFullscreen, setIsFullscreen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [iframeError, setIframeError] = useState(false)
-  const [iframeLoading, setIframeLoading] = useState(true)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     fetchProjects()
   }, [])
 
-  // Handle iframe load timeout - detect X-Frame-Options blocking
-  useEffect(() => {
-    if (selectedProject?.homepage_url && !iframeError) {
-      // Clear any existing timeout
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-
-      // Set new timeout to detect if iframe fails to load after 10 seconds
-      timeoutRef.current = setTimeout(() => {
-        if (iframeLoading) {
-          // Still loading after 10 seconds - likely blocked by X-Frame-Options
-          setIframeError(true)
-          setIframeLoading(false)
-        }
-      }, 10000)
-
-      return () => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current)
-        }
-      }
-    }
-  }, [selectedProject?.homepage_url, iframeLoading, iframeError])
-
-  // Reset states when project changes
-  useEffect(() => {
-    if (selectedProject?.homepage_url) {
-      setIframeError(false)
-      setIframeLoading(true)
-    }
-  }, [selectedProject?.id])
-
   const fetchProjects = async () => {
     try {
-      // Try to fetch from projects API
       const response = await fetch('/api/admin/content/projects')
       if (response.ok) {
         const result = await response.json()
-        // API returns { success: true, data: [...] }
         const data = result.data || result
-        const projectsArray = Array.isArray(data) ? data : []
-        
-        // Filter to only published projects with live demos
-        const projectsWithDemos = projectsArray.filter((p: any) => 
-          p.status === 'published' &&
-          p.homepage_url &&
-          p.homepage_url !== '#' &&
-          !p.homepage_url.includes('github.com') &&
-          p.homepage_url.startsWith('http')
+        const arr = Array.isArray(data) ? data : []
+        const withDemos = arr.filter(
+          (p: any) =>
+            p.status === 'published' &&
+            p.homepage_url &&
+            p.homepage_url !== '#' &&
+            !p.homepage_url.includes('github.com') &&
+            p.homepage_url.startsWith('http')
         )
-        
-        if (projectsWithDemos.length > 0) {
-          setProjects(projectsWithDemos)
+        if (withDemos.length > 0) {
+          setProjects(withDemos)
           setIsLoading(false)
           return
         }
       }
-    } catch (error) {
-      console.error('Error fetching projects:', error)
+    } catch {
+      // silently fall through to fallback
     }
-    
-    // Fallback to known projects
     setIsLoading(false)
   }
 
-  // Known projects with live demos
-  const knownProjects = [
-    {
-      id: 'edusphere-ai',
-      name: 'EduSphere AI',
-      description: 'AI-powered student productivity suite with assignment assistant and blog generator',
-      tech_stack: ['Next.js', 'Supabase', 'Gemini', 'TailwindCSS', 'PayPal'],
-      featured_image: '/placeholder.svg?height=300&width=500&text=EduSphere+AI',
-      homepage_url: 'https://edusphere-ai.vercel.app',
-      github_url: 'https://github.com/MeeksonJr/edusphere-ai',
-      is_featured: true,
-      views: 0,
-      slug: 'edusphere-ai',
-    },
-    {
-      id: 'interview-prep-ai',
-      name: 'InterviewPrep AI',
-      description: 'AI-powered interview preparation platform with voice and text mock interviews',
-      tech_stack: ['Next.js', 'PostgreSQL', 'Gemini', 'Firebase', 'PayPal', 'Vapi Voice'],
-      featured_image: '/placeholder.svg?height=300&width=500&text=InterviewPrep+AI',
-      homepage_url: 'https://www.humanoraconsulting.com/',
-      github_url: 'https://github.com/MeeksonJr/interview-prep',
-      is_featured: true,
-      views: 0,
-      slug: 'interview-prep-ai',
-    },
-    {
-      id: 'ai-content-generator',
-      name: 'AI Content Generator',
-      description: 'Full SaaS platform for blog, email, and social content with analytics dashboard',
-      tech_stack: ['Next.js 14', 'Supabase', 'Gemini', 'Hugging Face', 'Recharts'],
-      featured_image: '/placeholder.svg?height=300&width=500&text=Content+Generator',
-      homepage_url: 'https://ai-content-generator-mu-seven.vercel.app/',
-      github_url: 'https://github.com/MeeksonJr/content-generator',
-      is_featured: true,
-      views: 0,
-      slug: 'ai-content-generator',
-    },
-  ]
-
-  const displayProjects = projects.length > 0 ? projects : knownProjects
-
-  const handleOpenDemo = (project: Project) => {
-    setSelectedProject(project)
-    setIsFullscreen(true)
-  }
-
-  const handleCloseDemo = () => {
-    setIsFullscreen(false)
-    setTimeout(() => setSelectedProject(null), 300)
-  }
+  const displayProjects = projects.length > 0 ? projects : FALLBACK_PROJECTS
 
   if (isLoading) {
     return (
@@ -173,7 +135,7 @@ export default function LiveProjectShowcase() {
         <Navigation />
         <div className="min-h-screen flex items-center justify-center pt-20">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
             <p className="text-muted-foreground">Loading projects...</p>
           </div>
         </div>
@@ -187,101 +149,147 @@ export default function LiveProjectShowcase() {
       <Navigation />
       <div className="min-h-screen bg-background pt-20 pb-16">
         <PageContainer width="wide" padding="default">
-          {/* Header */}
+          {/* Hero Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="text-center mb-16"
           >
-            <h1 className={cn(TYPOGRAPHY.h1, "mb-4 flex items-center justify-center gap-3")}>
-              <Play className="h-10 w-10 text-primary" />
-              Live Project Demos
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+              <Globe className="h-4 w-4" />
+              Live Deployed Applications
+            </div>
+            <h1 className={cn(TYPOGRAPHY.h1, 'mb-4')}>
+              Project{' '}
+              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Demos
+              </span>
             </h1>
-            <p className={cn(TYPOGRAPHY.lead, "text-muted-foreground max-w-2xl mx-auto")}>
-              See my projects in action. Interactive live demos of real working applications.
+            <p className={cn(TYPOGRAPHY.lead, 'text-muted-foreground max-w-2xl mx-auto')}>
+              Real applications, live in production. Explore what I've built — click any card to visit
+              the site directly.
             </p>
           </motion.div>
-        </PageContainer>
 
-        <PageContainer width="wide" padding="default">
           {/* Projects Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
             {displayProjects.map((project, idx) => (
               <motion.div
                 key={project.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
+                transition={{ delay: idx * 0.1, duration: 0.4 }}
+                className="group"
               >
-                <Card className="group hover:shadow-lg transition-all duration-300 h-full flex flex-col">
-                  {project.featured_image && (
-                    <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
+                <Card className="h-full flex flex-col overflow-hidden border hover:border-primary/50 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  {/* Thumbnail / Gradient Banner */}
+                  <div className="relative w-full h-44 overflow-hidden bg-gradient-to-br from-primary/20 via-primary/10 to-background">
+                    {project.featured_image ? (
                       <Image
                         src={project.featured_image}
                         alt={project.name}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Button
-                          onClick={() => handleOpenDemo(project)}
-                          variant="secondary"
-                          className="gap-2"
-                        >
-                          <Play className="h-4 w-4" />
-                          View Live Demo
-                        </Button>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Monitor className="h-20 w-20 text-primary/20" />
                       </div>
-                    </div>
-                  )}
-                  <CardHeader>
-                    <div className="flex items-start justify-between mb-2">
-                      <CardTitle className="text-xl">{project.name}</CardTitle>
-                      {project.is_featured && (
-                        <Badge variant="default" className="ml-2">
-                          <Award className="h-3 w-3 mr-1" />
-                          Featured
-                        </Badge>
-                      )}
-                    </div>
-                    <CardDescription className="line-clamp-2">
-                      {project.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col">
-                    <div className="flex flex-wrap gap-1 mb-4">
-                      {project.tech_stack?.slice(0, 4).map((tech, i) => (
-                        <Badge key={i} variant="secondary" className="text-xs">
-                          {tech}
-                        </Badge>
-                      ))}
-                      {project.tech_stack && project.tech_stack.length > 4 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{project.tech_stack.length - 4}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex gap-2 mt-auto">
+                    )}
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
                       {project.homepage_url && (
                         <Button
-                          onClick={() => handleOpenDemo(project)}
-                          variant="default"
-                          className="flex-1 gap-2"
+                          asChild
+                          size="sm"
+                          className="gap-2 shadow-lg"
                         >
-                          <Monitor className="h-4 w-4" />
-                          Live Demo
+                          <a href={project.homepage_url} target="_blank" rel="noopener noreferrer">
+                            <Play className="h-4 w-4" />
+                            Visit Site
+                          </a>
                         </Button>
                       )}
                       {project.github_url && (
                         <Button
                           asChild
-                          variant="outline"
-                          className="flex-1 gap-2"
+                          variant="secondary"
+                          size="sm"
+                          className="gap-2 shadow-lg"
                         >
-                          <Link href={project.github_url} target="_blank" rel="noopener noreferrer">
+                          <a href={project.github_url} target="_blank" rel="noopener noreferrer">
                             <Github className="h-4 w-4" />
                             Code
-                          </Link>
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                    {project.is_featured && (
+                      <div className="absolute top-3 right-3">
+                        <Badge className="gap-1 shadow-md">
+                          <Star className="h-3 w-3 fill-current" />
+                          Featured
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg flex items-start justify-between gap-2">
+                      <span>{project.name}</span>
+                      {project.homepage_url && (
+                        <a
+                          href={project.homepage_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-muted-foreground hover:text-primary transition-colors flex-shrink-0 mt-0.5"
+                          title={`Open ${project.name}`}
+                        >
+                          <ArrowUpRight className="h-4 w-4" />
+                        </a>
+                      )}
+                    </CardTitle>
+                    <CardDescription className="line-clamp-3 text-sm leading-relaxed">
+                      {project.description}
+                    </CardDescription>
+                  </CardHeader>
+
+                  <CardContent className="flex-1 flex flex-col gap-4">
+                    {/* Tech Stack */}
+                    {project.tech_stack && project.tech_stack.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {project.tech_stack.slice(0, 5).map((tech, i) => (
+                          <Badge
+                            key={i}
+                            variant="secondary"
+                            className="text-xs"
+                          >
+                            {tech}
+                          </Badge>
+                        ))}
+                        {project.tech_stack.length > 5 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{project.tech_stack.length - 5} more
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 mt-auto">
+                      {project.homepage_url && (
+                        <Button asChild className="flex-1 gap-2">
+                          <a href={project.homepage_url} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-4 w-4" />
+                            Live Demo
+                          </a>
+                        </Button>
+                      )}
+                      {project.github_url && (
+                        <Button asChild variant="outline" size="icon" className="flex-shrink-0">
+                          <a href={project.github_url} target="_blank" rel="noopener noreferrer" title="View source code">
+                            <Github className="h-4 w-4" />
+                          </a>
                         </Button>
                       )}
                     </div>
@@ -291,279 +299,48 @@ export default function LiveProjectShowcase() {
             ))}
           </div>
 
-          {/* Info Card */}
+          {/* Stats / Info Strip */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.4 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-4"
           >
-            <Card className="border-primary/20 bg-primary/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-primary" />
-                  Why Live Demos Matter
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                icon: TrendingUp,
+                title: 'Real Performance',
+                desc: 'See actual speed and responsiveness, not just screenshots',
+              },
+              {
+                icon: Users,
+                title: 'Live & Active',
+                desc: 'These are deployed apps with real users and real uptime',
+              },
+              {
+                icon: Code,
+                title: 'Production Quality',
+                desc: 'Every project follows industry standards and best practices',
+              },
+            ].map(({ icon: Icon, title, desc }, i) => (
+              <Card key={i} className="border-primary/10 bg-primary/5">
+                <CardContent className="pt-6">
                   <div className="flex items-start gap-3">
-                    <TrendingUp className="h-5 w-5 text-primary mt-0.5" />
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
                     <div>
-                      <p className="font-semibold text-sm">Real Performance</p>
-                      <p className="text-xs text-muted-foreground">
-                        See actual speed and responsiveness, not just screenshots
-                      </p>
+                      <p className="font-semibold text-sm mb-1">{title}</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Users className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="font-semibold text-sm">User Experience</p>
-                      <p className="text-xs text-muted-foreground">
-                        Experience the interface and interactions firsthand
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Code className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
-                      <p className="font-semibold text-sm">Production Quality</p>
-                      <p className="text-xs text-muted-foreground">
-                        These are real, deployed applications with real users
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            ))}
           </motion.div>
         </PageContainer>
       </div>
-
-      {/* Fullscreen Demo Modal */}
-      <AnimatePresence>
-        {isFullscreen && selectedProject && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm"
-            onClick={handleCloseDemo}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="absolute inset-4 md:inset-8 bg-background rounded-lg shadow-2xl flex flex-col"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="h-3 w-3 rounded-full bg-red-500"></div>
-                  <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
-                  <div className="h-3 w-3 rounded-full bg-green-500"></div>
-                  <div className="ml-4">
-                    <h2 className="font-semibold">{selectedProject.name}</h2>
-                    <p className="text-xs text-muted-foreground">
-                      {selectedProject.homepage_url}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => window.open(selectedProject.homepage_url || '', '_blank')}
-                    title="Open in new tab"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleCloseDemo}
-                    title="Close"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Content Tabs */}
-              <div className="flex-1 relative overflow-hidden flex flex-col">
-                <Tabs defaultValue="demo" className="flex-1 flex flex-col">
-                  <TabsList className="mx-4 mt-4">
-                    {selectedProject.homepage_url && (
-                      <TabsTrigger value="demo" className="gap-2">
-                        <Monitor className="h-4 w-4" />
-                        Live Demo
-                      </TabsTrigger>
-                    )}
-                    {selectedProject.before_image && selectedProject.after_image && (
-                      <TabsTrigger value="comparison" className="gap-2">
-                        <ImageIcon className="h-4 w-4" />
-                        Before/After
-                      </TabsTrigger>
-                    )}
-                    {selectedProject.video_walkthrough && (
-                      <TabsTrigger value="video" className="gap-2">
-                        <Video className="h-4 w-4" />
-                        Walkthrough
-                      </TabsTrigger>
-                    )}
-                  </TabsList>
-
-                  {/* Live Demo Tab */}
-                  {selectedProject.homepage_url && (
-                    <TabsContent value="demo" className="flex-1 m-0 p-0">
-                      <div className="h-full relative">
-                        {iframeError ? (
-                          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm p-8 border border-border rounded-lg">
-                            <div className="text-center max-w-md">
-                              <Monitor className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                              <h3 className="text-lg font-semibold mb-2">Unable to Load Demo</h3>
-                              <p className="text-sm text-muted-foreground mb-4">
-                                This website does not allow embedding in iframes for security reasons (X-Frame-Options). 
-                                You can still visit it directly using the button below.
-                              </p>
-                              <div className="flex gap-2 justify-center">
-                                <Button
-                                  variant="default"
-                                  onClick={() => window.open(selectedProject.homepage_url || '', '_blank', 'noopener,noreferrer')}
-                                >
-                                  <ExternalLink className="h-4 w-4 mr-2" />
-                                  Open in New Tab
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  onClick={() => {
-                                    setIframeError(false)
-                                    setIframeLoading(true)
-                                  }}
-                                >
-                                  Try Again
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            {iframeLoading && (
-                              <div className="absolute inset-0 flex items-center justify-center bg-background/95 backdrop-blur-sm z-10 border border-border rounded-lg">
-                                <div className="text-center">
-                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-                                  <p className="text-sm text-muted-foreground">Loading demo...</p>
-                                </div>
-                              </div>
-                            )}
-                            <iframe
-                              key={selectedProject.homepage_url} // Force re-render on project change
-                              src={selectedProject.homepage_url}
-                              className="w-full h-full border-0 rounded-lg"
-                              title={`${selectedProject.name} Live Demo`}
-                              allow="camera; microphone; geolocation; encrypted-media; autoplay; fullscreen"
-                              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-top-navigation allow-downloads"
-                              referrerPolicy="no-referrer-when-downgrade"
-                              onLoad={() => {
-                                // Clear the error timeout since iframe loaded
-                                if (timeoutRef.current) {
-                                  clearTimeout(timeoutRef.current)
-                                }
-                                // Hide loading after a short delay
-                                setTimeout(() => {
-                                  setIframeLoading(false)
-                                }, 1500)
-                              }}
-                              onError={() => {
-                                setIframeError(true)
-                                setIframeLoading(false)
-                              }}
-                            />
-                          </>
-                        )}
-                        {!selectedProject.homepage_url.startsWith('http') && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-background/95 backdrop-blur-sm border border-border rounded-lg">
-                            <p className="text-muted-foreground">
-                              Invalid URL. Please provide a valid HTTP/HTTPS URL.
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </TabsContent>
-                  )}
-
-                  {/* Before/After Tab */}
-                  {selectedProject.before_image && selectedProject.after_image && (
-                    <TabsContent value="comparison" className="flex-1 m-0 p-4 overflow-auto">
-                      <BeforeAfterSlider
-                        beforeImage={selectedProject.before_image}
-                        afterImage={selectedProject.after_image}
-                        beforeLabel="Before"
-                        afterLabel="After"
-                      />
-                    </TabsContent>
-                  )}
-
-                  {/* Video Walkthrough Tab */}
-                  {selectedProject.video_walkthrough && (
-                    <TabsContent value="video" className="flex-1 m-0 p-4 overflow-auto">
-                      <VideoWalkthrough
-                        videoUrl={selectedProject.video_walkthrough}
-                        title={`${selectedProject.name} Walkthrough`}
-                        description={selectedProject.description || undefined}
-                        thumbnail={selectedProject.featured_image || undefined}
-                      />
-                    </TabsContent>
-                  )}
-                </Tabs>
-              </div>
-
-              {/* Footer */}
-              <div className="p-4 border-t flex items-center justify-between bg-muted/50">
-                <div className="flex items-center gap-4">
-                  {selectedProject.tech_stack && (
-                    <div className="flex flex-wrap gap-1">
-                      {selectedProject.tech_stack.slice(0, 5).map((tech, i) => (
-                        <Badge key={i} variant="secondary" className="text-xs">
-                          {tech}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  {selectedProject.github_url && (
-                    <Button
-                      asChild
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Link href={selectedProject.github_url} target="_blank" rel="noopener noreferrer">
-                        <Github className="h-4 w-4 mr-2" />
-                        View Code
-                      </Link>
-                    </Button>
-                  )}
-                  <Button
-                    asChild
-                    variant="default"
-                    size="sm"
-                  >
-                    <Link href={`/projects/${selectedProject.slug || selectedProject.id}`}>
-                      View Details
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <FooterLight />
     </>
   )
 }
-

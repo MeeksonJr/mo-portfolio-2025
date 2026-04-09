@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Globe, Check } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Globe, Check, ChevronDown } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,40 +34,74 @@ const LANGUAGES: Language[] = [
   { code: 'sw', name: 'Swahili', nativeName: 'Kiswahili', flag: '🌍' },
 ]
 
-function getCookie(name: string): string {
-  if (typeof document === 'undefined') return ''
-  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`))
-  return match ? decodeURIComponent(match[2]) : ''
-}
+function triggerGoogleTranslate(langCode: string) {
+  // Find the hidden Google Translate select element
+  const selectEl = document.querySelector<HTMLSelectElement>(
+    '.goog-te-combo, #\\:1\\.target select, [class^="goog-te"] select'
+  )
 
-function setGoogleTranslateCookie(langCode: string) {
-  if (langCode === 'en') {
-    // Clear the cookie to revert to English
-    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
-    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`
-  } else {
-    const value = `/en/${langCode}`
-    document.cookie = `googtrans=${value}; path=/;`
-    document.cookie = `googtrans=${value}; path=/; domain=${window.location.hostname};`
+  if (selectEl) {
+    selectEl.value = langCode
+    selectEl.dispatchEvent(new Event('change'))
+    return true
   }
-  // Reload the page so Google Translate picks up the new cookie
+
+  // Fallback: use the iframe approach via googtrans cookie + reload
+  const value = langCode === 'en' ? '' : `/en/${langCode}`
+  document.cookie = `googtrans=${value}; path=/;`
+  document.cookie = `googtrans=${value}; path=/; domain=.${window.location.hostname};`
   window.location.reload()
+  return false
 }
 
-function getCurrentLanguageCode(): string {
-  const cookie = getCookie('googtrans')
-  if (!cookie || cookie === '') return 'en'
-  const parts = cookie.split('/')
-  return parts[parts.length - 1] || 'en'
+function getCurrentLangFromCookie(): string {
+  if (typeof document === 'undefined') return 'en'
+  const match = document.cookie.match(/googtrans=\/en\/([^;]+)/)
+  return match ? match[1] : 'en'
 }
 
 export default function LanguageSwitcher() {
   const [mounted, setMounted] = useState(false)
   const [currentCode, setCurrentCode] = useState('en')
+  const [gtReady, setGtReady] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    setCurrentCode(getCurrentLanguageCode())
+    setCurrentCode(getCurrentLangFromCookie())
+
+    // Poll until Google Translate widget is fully initialized
+    let attempts = 0
+    const maxAttempts = 30 // 15 seconds max
+    const interval = setInterval(() => {
+      attempts++
+      const selectEl = document.querySelector<HTMLSelectElement>(
+        '.goog-te-combo, [class^="goog-te"] select'
+      )
+      if (selectEl) {
+        setGtReady(true)
+        clearInterval(interval)
+      } else if (attempts >= maxAttempts) {
+        // Widget didn't load; fall back to cookie+reload silently
+        setGtReady(false)
+        clearInterval(interval)
+      }
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const handleSelectLanguage = useCallback((code: string) => {
+    setCurrentCode(code)
+
+    if (code === 'en') {
+      // Revert to English: clear cookie and reload
+      document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+      document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${window.location.hostname};`
+      window.location.reload()
+      return
+    }
+
+    triggerGoogleTranslate(code)
   }, [])
 
   if (!mounted) return null
@@ -81,29 +115,33 @@ export default function LanguageSwitcher() {
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-accent transition-colors text-sm font-medium text-foreground/70 hover:text-foreground focus:outline-none"
           aria-label={`Current language: ${currentLang.name}. Click to change.`}
         >
-          <Globe className="w-4 h-4" />
+          <Globe className="w-4 h-4 flex-shrink-0" />
           <span className="hidden sm:inline">
             {currentLang.flag} {currentLang.name}
           </span>
           <span className="sm:hidden">{currentLang.flag}</span>
+          <ChevronDown className="w-3 h-3 opacity-50 hidden sm:inline" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52 max-h-80 overflow-y-auto">
         <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">
-          Translate entire site
+          Translate site
+          {!gtReady && (
+            <span className="ml-1 opacity-60">(loading...)</span>
+          )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {LANGUAGES.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
-            onClick={() => setGoogleTranslateCookie(lang.code)}
+            onClick={() => handleSelectLanguage(lang.code)}
             className="flex items-center gap-2 cursor-pointer"
           >
             <span className="text-base leading-none">{lang.flag}</span>
             <span className="flex-1">{lang.nativeName}</span>
             <span className="text-xs text-muted-foreground">{lang.name}</span>
             {currentCode === lang.code && (
-              <Check className="w-3.5 h-3.5 text-primary ml-1" />
+              <Check className="w-3.5 h-3.5 text-primary ml-1 flex-shrink-0" />
             )}
           </DropdownMenuItem>
         ))}
