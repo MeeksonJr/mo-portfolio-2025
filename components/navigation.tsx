@@ -7,7 +7,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { UserPreferencesDialog } from "@/components/preferences/user-preferences-dialog"
-import LanguageSwitcher from "@/components/i18n/language-switcher"
+
 import NotificationCenter from "@/components/notifications/notification-center"
 import { usePersonalization } from "@/components/personalization/visitor-profile-provider"
 import AvailabilityBadge from "@/components/availability-badge"
@@ -86,7 +86,9 @@ export default function Navigation() {
       role="navigation"
       aria-label="Main navigation"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "glass shadow-lg py-3" : "bg-transparent py-5"
+        isScrolled || !isHomePage
+          ? "bg-background/95 backdrop-blur-md border-b border-border shadow-sm py-3"
+          : "bg-transparent py-5"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -182,7 +184,6 @@ export default function Navigation() {
             <AvailabilityBadge variant="compact" className="hidden xl:flex" />
             <NotificationCenter />
             <div className="hidden xl:flex items-center gap-2">
-              <LanguageSwitcher />
               <UserPreferencesDialog />
             </div>
             
@@ -319,10 +320,6 @@ export default function Navigation() {
 
               {/* Footer Actions */}
               <div className="border-t border-border pt-3 mt-2 space-y-2">
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm font-medium text-foreground/70">Language</span>
-                  <LanguageSwitcher />
-                </div>
                 <div className="flex items-center justify-between py-2">
                   <span className="text-sm font-medium text-foreground/70">Preferences</span>
                   <UserPreferencesDialog />
